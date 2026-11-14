@@ -921,7 +921,7 @@ body:has(#gate) #fb-out{display:block!important}
 </script>
 <script>
 /* 새 버전 알림: 올라간 index.html이 바뀌면 상단에 새로고침 안내를 띄워요 */
-const BUILD_ID="1794672850036";
+const BUILD_ID="1794674091909";
 (function(){
   if(!/^https?:/.test(location.protocol))return;
   let shown=false;
@@ -944,6 +944,9 @@ const partner=()=>Object.keys(members).find(k=>k!==me);
 function gSt(o){try{o.st=firebase.firestore.FieldValue.serverTimestamp()}catch(e){}return o}
 function gMsgs(docs){return docs.map((x,i)=>{let d;try{d=x.data({serverTimestamps:"estimate"})}catch(e){d=x.data()}const st=d.st&&typeof d.st.toMillis==="function"?d.st.toMillis():null;return{d,k:st??d.ts??0,ts:d.ts||0,i}})
   .sort((a,b)=>(a.k-b.k)||(a.ts-b.ts)||(a.i-b.i)).map(o=>{const m={...o.d};delete m.st;return m})}
+/* 화면을 다시 그려도 채팅 입력칸의 포커스·내용을 그대로 → 휴대폰 키보드가 내려가지 않아요 */
+(function(){const r0=render;render=function(){const a=document.activeElement,k=a&&a.id==="ci"?{v:a.value,s:a.selectionStart,e:a.selectionEnd}:null;const out=r0.apply(this,arguments);
+  if(k){const c=document.getElementById("ci");if(c&&c!==a){c.value=k.v;try{c.focus({preventScroll:true});c.setSelectionRange(k.s,k.e)}catch(e){}}}return out}})();
 function gSendSync(){[["ci","cs"],["sx","sb"]].forEach(([i,b])=>{const c=document.getElementById(b);if(!c)return;const a=document.getElementById(i);c.classList.toggle("gidle",!(a&&a.value.trim()))})}
 function gPerf(){const g=document.querySelector("#roomApp #view .gsh .grid");if(!g)return;const cs=[...g.children].filter(x=>x.classList.contains("day"));if(!cs.length)return;
   const W=g.clientWidth,H=g.clientHeight,key=W+"x"+H+"x"+cs.length;if(g.dataset.pk===key)return;g.dataset.pk=key;
@@ -1059,7 +1062,7 @@ function viewDay(){
   $("#view").innerHTML='<div class="gtk"><div class="card dcard">'+stampArea(n,live)+'<div class="gadm2">ADMIT TWO · No. '+String(n).padStart(4,"0")+'</div><div class="dhead" style="'+dheadStyle(n,live)+'"><span class="gday">DAY '+n+'</span><span class="gdate">'+gDate(n)+'</span><span class="badge '+(live?"":"closed")+'">'+(live?"채팅 열림":"종료·보관됨")+'</span>'+stampText(n)+stampBtn(n,live)+'</div>'+stEditor(n,live)+'<div class="q">'+esc(Q[n-1])+"</div>"+a(me,"me")+(p?a(p,"you"):'<div class="note">상대가 아직 참여하지 않았어요.</div>')+
   '</div>'+gStub(n,live)+'</div><div class="card gchat"><div class="gchh">'+(live?"오늘의 대화":"그날의 대화")+'</div><div class="chat" id="chat"></div>'+(live?'<div class="row"><div class="ibox"><input id="ci" placeholder="이 주제로 이야기해요" maxlength="500"></div><button class="btn pri sendb" id="cs" title="보내기"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4z"/></svg></button></div>':'<div class="row" style="justify-content:flex-start;align-items:center;gap:8px"><span class="note">이 날의 대화는 닫혔어요. 기록만 볼 수 있어요.</span></div>')+"</div>";
   wireStamp(n);
-  if(live){const send=async()=>{const t=$("#ci").value.trim();if(!t)return;$("#ci").value="";try{const ts0=Date.now();await db.collection(P("chats/d"+n+"/messages")).add(gSt({uid:me,text:t,ts:ts0}));const dm=[...t.matchAll(DICE_RE)].slice(0,5);for(let i=0;i<dm.length;i++){const dn=+dm[i][1];await db.collection(P("chats/d"+n+"/messages")).add(gSt({uid:me,dice:dn,v:1+Math.floor(Math.random()*dn),ts:ts0+i+1}))}}catch(e){alert("전송하지 못했어요. 연결을 확인하거나, 문답이 닫혔는지 확인해 주세요.")}};$("#cs").onclick=send;$("#ci").onkeydown=e=>{if(e.key==="Enter"&&!e.isComposing)send()}}
+  if(live){const send=async()=>{const t=$("#ci").value.trim();if(!t)return;$("#ci").value="";try{const ts0=Date.now();await db.collection(P("chats/d"+n+"/messages")).add(gSt({uid:me,text:t,ts:ts0}));const dm=[...t.matchAll(DICE_RE)].slice(0,5);for(let i=0;i<dm.length;i++){const dn=+dm[i][1];await db.collection(P("chats/d"+n+"/messages")).add(gSt({uid:me,dice:dn,v:1+Math.floor(Math.random()*dn),ts:ts0+i+1}))}}catch(e){alert("전송하지 못했어요. 연결을 확인하거나, 문답이 닫혔는지 확인해 주세요.")}};$("#cs").onclick=()=>{send();const ci=$("#ci");if(ci&&document.activeElement!==ci)ci.focus({preventScroll:true})};{const cb=$("#cs");/* 보내기 버튼을 눌러도 입력칸이 포커스를 잃지 않게 → 키보드가 내려가지 않아요 */["pointerdown","mousedown","touchstart"].forEach(t=>cb.addEventListener(t,e=>{if(document.activeElement===$("#ci"))e.preventDefault()},{passive:false}));cb.addEventListener("touchend",e=>{if(document.activeElement===$("#ci")){e.preventDefault();cb.click()}},{passive:false})}$("#ci").onkeydown=e=>{if(e.key==="Enter"&&!e.isComposing)send()}}
   stopChat();
   unsubChat=db.collection(P("chats/d"+n+"/messages")).orderBy("ts").onSnapshot(s=>{
     const c=$("#chat");if(!c)return;
