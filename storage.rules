@@ -1,0 +1,34 @@
+rules_version = '2';
+
+// 크리스마스 30문답 공개판 — Cloud Storage 보안 규칙
+// 이미지는 rooms/{rid}/(headers|stamps|profiles)/파일 에만 두고, 그 문답의 멤버 두 명만 다룬다.
+// 멤버 확인은 Firestore 의 rooms/{rid}.memberIds 를 읽어서 한다(교차 서비스 규칙).
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    function isMember(rid) {
+      return request.auth != null
+        && request.auth.uid in firestore.get(/databases/(default)/documents/rooms/$(rid)).data.memberIds;
+    }
+    function isOpen() {
+      return firestore.get(/databases/(default)/documents/meta/config).data.closeAt > request.time;
+    }
+
+    match /rooms/{rid}/{kind}/{file} {
+      allow get: if isMember(rid);
+      allow list: if false;
+      // 새 파일만(덮어쓰기 불가), 1MB 미만의 이미지만
+      allow create: if resource == null && isMember(rid) && isOpen()
+        && kind in ['headers', 'stamps', 'profiles']
+        && request.resource.size < 1024 * 1024
+        && request.resource.contentType.matches('image/(jpeg|png|webp)');
+      allow update: if false;
+      // 헤더를 빼거나 프로필 사진을 바꿀 때만 지운다. 우표는 지울 수 없다
+      allow delete: if isMember(rid) && isOpen() && kind in ['headers', 'profiles'];
+    }
+
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

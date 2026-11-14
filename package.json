@@ -1,0 +1,16 @@
+{
+  "name": "our-christmas-diary",
+  "private": true,
+  "description": "크리스마스 30문답 공개판 — 보안 규칙 테스트와 배포 도구",
+  "scripts": {
+    "test:rules": "firebase emulators:exec --only firestore,storage --project demo-christmas \"node --test --test-concurrency=1 tests/rules.test.mjs\"",
+    "emulators": "firebase emulators:start --project demo-christmas",
+    "deploy:dev": "firebase deploy --project dev",
+    "deploy:prod": "firebase deploy --project prod"
+  },
+  "devDependencies": {
+    "@firebase/rules-unit-testing": "^3.0.4",
+    "firebase": "^10.14.1",
+    "firebase-tools": "^13.29.1"
+  }
+}

@@ -1,0 +1,143 @@
+# Our Christmas Diary · 크리스마스 30문답 공개판
+
+두 사람이 크리스마스까지 30일 동안 같은 질문에 답하고, 그날그날 대화하는 사이트입니다.
+원본 사이트(our-30day-diary)에서 크리스마스 30문답 한 세트만 남긴 공개용 경량판이에요.
+원본 사이트와 원본 Firebase 프로젝트는 건드리지 않습니다.
+
+## 무엇이 들어 있나
+
+| 파일 | 하는 일 |
+|---|---|
+| `public/index.html` | 사이트 본체 (홈·캘린더·내 답변·한마디·설정, 채팅, 우표, 헤더, 내보내기) |
+| `public/admin.html` | 관리자 화면 (운영 일정, 가입 코드 발급·사용 현황) |
+| `public/config.js` | Firebase 설정값 (dev·prod) — **여기만 채우면 돼요** |
+| `firestore.rules`, `storage.rules` | 보안 규칙 (문답 멤버 두 명만 읽고 쓰기) |
+| `tests/rules.test.mjs` | 보안 규칙 테스트 51개 (에뮬레이터에서만 실행) |
+| `cors.json` | 내보내기·백업이 Storage 이미지를 읽을 수 있게 하는 설정 |
+| `firebase.json`, `.firebaserc` | 배포 설정 (Firebase Hosting) |
+
+## 사용 흐름
+
+1. 관리자가 `admin.html`에서 운영 일정을 저장하고 가입 코드를 발급해요.
+2. 가입자가 구글로 로그인하고 **가입 코드**를 넣으면 시작 화면이 나와요. 이름, 문답 제목, 색, 종이, 눈 효과를 고르면 자기 문답이 생겨요.
+3. 가입자의 설정 화면에 **짝꿍 코드**가 보여요. 한 번만 쓸 수 있고, 7일 뒤 만료돼요. 만료되면 새 코드를 받을 수 있어요.
+4. 짝꿍이 구글로 로그인해서 짝꿍 코드를 넣으면 같은 문답에 들어가요. 두 명이 차면 문답이 잠겨요.
+5. 코드 없이 로그인한 사람에게는 "초대 코드가 필요해요" 화면만 보여요.
+6. 모든 문답은 관리자가 정한 같은 날 시작해요. 문답 종료 시각이 지나면 쓰기가 모두 막히고, 열람·이미지 내보내기·HTML 백업만 돼요. 화면 위에 삭제일 안내가 떠요.
+
+## 원본에서 뺀 것
+
+- 메인 페이지(티켓 보관함), 새 문답 만들기, 미리보기, 휴지통·복원
+- 이모티콘 기능 전체
+- 사이트 공용 헤더 저장소 → 문답마다 헤더 최대 4개를 올리고 빼는 방식
+- 눈 계열(눈, 함박눈, 눈송이, 눈보라, 진눈깨비)을 뺀 나머지 배경 효과
+- 시작일 바꾸기 (모든 문답이 같은 날 시작)
+- 채팅 이벤트 기능 (이번 공개에서는 넣지 않음)
+
+## 바뀐 것
+
+- 이미지(헤더·우표·프로필 사진)는 Cloud Storage에 파일로 저장하고, Firestore에는 주소만 둬요. 브라우저가 1년 동안 다시 받지 않게 캐시 헤더를 붙여요.
+- 헤더는 가로 960px JPEG(장당 160KB 이하), 우표는 WebP(지원하지 않는 브라우저는 PNG)로 저장해요.
+- Firestore 오프라인 캐시를 켰어요.
+- 전체 문답 목록을 구독하던 부분을 없앴어요. 규칙에서도 문답 목록 조회를 막아요.
+- HTML 백업은 이미지를 파일 안에 넣어, 사이트가 지워진 뒤에도 열려요.
+
+---
+
+## 처음 설정하기
+
+명령어는 모두 **Google Cloud Shell**에서 실행해요. Cloud Shell은 브라우저에서 열리는 터미널이라 설치할 게 없고, 구글 계정으로 이미 로그인되어 있어요.
+`[대괄호]` 부분은 자기 값으로 바꿔 넣어요.
+
+### 1. Firebase 프로젝트 두 개 (dev·prod)
+
+Firebase 콘솔(console.firebase.google.com)에서 각각 다음을 해요.
+
+1. 프로젝트 만들기 → 요금제를 **Blaze**로 바꾸기
+2. Google Cloud 콘솔 → 결제 → 예산 및 알림 → 예산 만들기 (예: 5,000원 / 10,000원 / 20,000원 알림). 알림은 사용을 멈추지 않으니 직접 확인해요.
+3. **Authentication** → 시작하기 → 로그인 방법에 **Google** 추가
+4. **Firestore Database** → 데이터베이스 만들기 (위치: `asia-northeast3` 서울 권장, 프로덕션 모드)
+5. **Storage** → 시작하기 (같은 위치)
+6. 프로젝트 설정 → 일반 → 내 앱 → 웹 앱(`</>`) 추가 → **Firebase Hosting도 설정** 체크 → 나오는 `firebaseConfig` 값을 `public/config.js`의 `dev` 또는 `prod`에 옮겨 적기
+
+### 2. App Check (사이트 밖에서 DB에 접근하는 것 막기)
+
+1. reCAPTCHA 관리 콘솔(www.google.com/recaptcha/admin)에서 **reCAPTCHA v3** 사이트 키 만들기. 도메인에는 `[프로젝트ID].web.app`, `[프로젝트ID].firebaseapp.com`(직접 연결한 도메인이 있으면 그것도)을 넣어요.
+2. Firebase 콘솔 → App Check → 앱 등록 → reCAPTCHA v3 → 비밀 키 입력
+3. 사이트 키를 `public/config.js`의 `appCheckKey`에 넣기
+4. 배포하고 사이트가 잘 되는 걸 확인한 뒤, App Check → API 탭에서 **Cloud Firestore**, **Cloud Storage**를 **적용(Enforce)** 으로 바꾸기
+
+### 3. API 키 도메인 제한과 로그인 허용 도메인
+
+1. Google Cloud 콘솔 → API 및 서비스 → 사용자 인증 정보 → `Browser key (auto created by Firebase)` → 애플리케이션 제한사항: **웹사이트**
+   - `https://[프로젝트ID].web.app/*`
+   - `https://[프로젝트ID].firebaseapp.com/*`
+   - (직접 연결한 도메인이 있으면 그것도)
+2. Firebase 콘솔 → Authentication → 설정 → 승인된 도메인: 위 도메인만 남기고, `localhost`는 운영(prod)에서는 지워요.
+
+### 4. 설정값 넣고 배포하기 (Cloud Shell)
+
+`.firebaserc`의 `YOUR-DEV-PROJECT`, `YOUR-PROD-PROJECT`를 실제 프로젝트 ID로, `cors.json`의 주소도 실제 주소로 바꾼 뒤 저장소에 올려 두면 아래 명령을 그대로 쓸 수 있어요.
+
+```
+git clone https://github.com/malang-bal/our-christmas-diary.git
+cd our-christmas-diary
+npm ci
+npm run test:rules
+```
+
+`# fail 0`이 나오면 규칙 테스트를 모두 통과한 거예요. **통과했을 때만** 배포해요.
+
+```
+npx firebase deploy --project dev
+```
+
+dev 사이트에서 직접 써 보고 문제가 없으면 운영에도 올려요.
+
+```
+npx firebase deploy --project prod
+```
+
+이미지 내보내기·HTML 백업용 CORS 설정 (프로젝트마다 한 번):
+
+```
+gsutil cors set cors.json gs://[storageBucket 값]
+```
+
+### 5. 관리자 되기와 운영 시작
+
+1. 배포된 사이트 주소 뒤에 `/admin.html`을 붙여 열고 구글로 로그인하면, 화면에 **내 사용자 ID**가 보여요.
+2. Firebase 콘솔 → Firestore → 컬렉션 시작 → 컬렉션 ID `admins`, 문서 ID에 그 사용자 ID, 필드는 아무거나 하나(예: `on` = `true`) → 저장
+3. `admin.html`을 새로고침하면 관리자 화면이 열려요.
+   - **운영 일정**: 시작일을 고르면 종료 시각(31일째 0시)과 삭제일(+35일)이 자동으로 채워져요. 확인하고 저장해요.
+   - **가입 코드**: 필요한 쌍 수만큼 발급하고 "남은 코드 모두 복사"로 나눠 줘요.
+
+## 종료 절차
+
+1. 시작 전부터 종료일과 삭제일을 공지해요 (가입 화면과 설정 화면에도 표시돼요).
+2. 문답 종료 시각이 지나면 쓰기가 자동으로 막혀요. 일찍 닫아야 하면 관리자 화면의 **지금 바로 닫기**를 눌러요.
+3. 삭제일까지 열람·이미지 내보내기·HTML 백업만 열어 둬요.
+4. 삭제일에:
+   - 사이트 내리기: `npx firebase hosting:disable --project prod`
+   - 데이터 지우기: Firebase 콘솔 → Firestore에서 컬렉션 삭제, Storage에서 `rooms` 폴더 삭제
+   - (또는 프로젝트 설정 → 프로젝트 삭제로 한 번에)
+5. 결제 계정 연결을 끊어요.
+
+## 규칙 요약
+
+- `rooms/{rid}`와 그 아래 모든 기록: `memberIds`에 있는 두 사람만 읽고 쓰기
+- 문답은 쓰지 않은 가입 코드를 '사용됨'으로 바꾸는 같은 묶음 안에서만 만들 수 있고, 이미 문답이 있는 사람은 못 만듦
+- 짝꿍은 유효한 짝꿍 코드를 '사용됨'으로 바꾸는 같은 묶음 안에서 자기 자신만 추가할 수 있고, 멤버는 2명을 넘을 수 없음
+- 답변·프로필은 본인 것만, 채팅·한마디·우표는 본인 이름으로만, 채팅은 고치거나 지울 수 없음
+- 헤더는 `h1`~`h4` 네 칸뿐
+- `meta/config.closeAt`이 지나면 모든 쓰기 금지
+- 관리자도 남의 문답 내용은 사이트로는 볼 수 없음 (콘솔에서는 볼 수 있어서 가입 화면에 안내함)
+- Storage: 해당 문답 멤버만, 1MB 미만 JPEG·PNG·WebP만, 덮어쓰기 금지
+
+## 개발용: 내 컴퓨터에서 시험하기
+
+```
+npx firebase emulators:start --project demo-christmas
+```
+
+브라우저에서 `http://127.0.0.1:5000/?emu`를 열면 실제 프로젝트 대신 에뮬레이터(가짜 서버)에 연결돼요.

@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>관리자 · Our Christmas Diary</title>
+<link rel="icon" href="favicon.ico" sizes="any">
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-check-compat.js"></script>
+<script src="config.js"></script>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#1c1c1d;color:#2b211e;font:15px/1.6 "Noto Sans KR",-apple-system,"Apple SD Gothic Neo",system-ui,sans-serif;letter-spacing:-.01em}
+main{max-width:720px;margin:0 auto;padding:20px 16px 60px}
+h1{color:#fff;font-size:22px;margin:4px 0 14px}
+.card{background:#fbf6ee;border-radius:12px;padding:16px 18px;margin:0 0 14px}
+.card h2{font-size:17px;margin:0 0 10px}
+label{display:block;font-size:13px;font-weight:700;color:#605856;margin:10px 0 4px}
+input{font:inherit;padding:8px 10px;border:1px solid #cec6b8;border-radius:8px;background:#fff;width:100%;max-width:260px}
+button{font:inherit;font-weight:700;padding:8px 14px;border-radius:8px;border:1px solid #2b211e;background:#fff;color:#2b211e;cursor:pointer}
+button.pri{background:#c8352b;border-color:#c8352b;color:#fff}
+button:disabled{opacity:.5;cursor:default}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:12px}
+.note{color:#605856;font-size:13px}
+.msg{min-height:1.4em;font-size:14px;margin-top:8px}
+.ok{color:#2a7d46}.err{color:#c8352b}
+table{width:100%;border-collapse:collapse;font-size:14px;margin-top:10px}
+th,td{text-align:left;padding:6px 6px;border-bottom:1px solid #e3dccf}
+td.code{font:700 15px ui-monospace,Menlo,Consolas,monospace;letter-spacing:.08em}
+.tag{display:inline-block;padding:1px 8px;border-radius:99px;font-size:12px;font-weight:700}
+.tag.u{background:#e8f0ec;color:#2a7d46}.tag.n{background:#f2ede6;color:#605856}
+.stat{display:flex;gap:16px;flex-wrap:wrap;margin:4px 0 0}.stat b{font-size:20px}
+#gate{color:#fff;text-align:center;padding:60px 0}
+</style>
+</head>
+<body>
+<main>
+<h1>Our Christmas Diary · 관리자</h1>
+<div id="gate"><p>불러오는 중…</p></div>
+<div id="app" hidden>
+  <div class="card">
+    <h2>운영 일정</h2>
+    <p class="note">모든 문답이 같은 날 시작해 30일 동안 진행돼요. 문답 종료 시각이 지나면 모든 쓰기가 막히고, 열람·내보내기만 돼요.</p>
+    <label for="c-start">시작일 (1일째)</label><input type="date" id="c-start">
+    <label for="c-close">문답 종료 시각 (이때부터 쓰기 막힘)</label><input type="datetime-local" id="c-close">
+    <div class="note" id="c-hint"></div>
+    <label for="c-del">전체 삭제일 (사이트에 안내되는 날짜)</label><input type="date" id="c-del">
+    <div class="row"><button class="pri" id="c-save">일정 저장</button><button id="c-now">지금 바로 닫기</button></div>
+    <div class="msg" id="c-msg"></div>
+  </div>
+  <div class="card">
+    <h2>가입 코드</h2>
+    <div class="stat"><span>전체 <b id="s-all">0</b></span><span>사용됨 <b id="s-used">0</b></span><span>남음 <b id="s-left">0</b></span></div>
+    <p class="note">가입 코드 한 개 = 한 쌍(두 사람)이에요. 가입한 사람이 설정 화면에서 짝꿍 코드를 받아 짝꿍을 초대해요.</p>
+    <label for="i-n">새로 발급할 개수</label><input type="number" id="i-n" min="1" max="100" value="10">
+    <div class="row"><button class="pri" id="i-make">발급</button><button id="i-copy">남은 코드 모두 복사</button><button id="i-reload">새로고침</button></div>
+    <div class="msg" id="i-msg"></div>
+    <table><thead><tr><th>코드</th><th>상태</th><th>발급</th><th>사용</th><th></th></tr></thead><tbody id="i-list"></tbody></table>
+  </div>
+  <div class="row" style="justify-content:flex-end"><button id="out">로그아웃</button></div>
+</div>
+</main>
+<script>
+(function(){
+  const ENV=window.DIARY_ENV||{},CFG=ENV.firebase||{},$=s=>document.querySelector(s);
+  const gate=t=>{$("#gate").innerHTML=t;$("#gate").hidden=false;$("#app").hidden=true};
+  if(!CFG.apiKey&&!ENV.emulator){gate("<p>config.js 에 Firebase 설정값을 넣어 주세요.</p>");return}
+  firebase.initializeApp(ENV.emulator?{apiKey:"demo-key",authDomain:"localhost",projectId:"demo-christmas",appId:"demo"}:CFG);
+  try{if(!ENV.emulator&&ENV.appCheckKey)firebase.appCheck().activate(new firebase.appCheck.ReCaptchaV3Provider(ENV.appCheckKey),true)}catch(e){}
+  const auth=firebase.auth(),db=firebase.firestore(),TS=firebase.firestore.Timestamp;
+  if(ENV.emulator){auth.useEmulator("http://127.0.0.1:9099",{disableWarnings:true});db.useEmulator("127.0.0.1",8080);
+    window.__emuLogin=(uid)=>auth.signInWithCredential(firebase.auth.GoogleAuthProvider.credential(JSON.stringify({sub:uid,email:uid+"@example.com",email_verified:true})))}
+  const A="ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  const code=()=>{const a=new Uint32Array(8);crypto.getRandomValues(a);return Array.from(a,v=>A[v%A.length]).join("")};
+  const pad=n=>String(n).padStart(2,"0");
+  const ymd=d=>d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());
+  const local=d=>ymd(d)+"T"+pad(d.getHours())+":"+pad(d.getMinutes());
+  const fmt=ms=>{if(!ms)return"";const d=new Date(ms);return (d.getMonth()+1)+"/"+d.getDate()+" "+pad(d.getHours())+":"+pad(d.getMinutes())};
+  const say=(id,t,ok)=>{const m=$(id);m.textContent=t;m.className="msg "+(ok?"ok":"err")};
+  let list=[];
+
+  auth.onAuthStateChanged(async u=>{
+    if(!u){gate('<p>관리자 계정으로 로그인해 주세요.</p><button class="pri" id="in">Google로 로그인</button>');
+      $("#in").onclick=()=>auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()).catch(e=>alert("로그인 실패: "+(e.code||e.message)));return}
+    let ok=false;try{ok=(await db.doc("admins/"+u.uid).get()).exists}catch(e){}
+    if(!ok){gate('<p>관리자만 들어올 수 있어요.</p><p class="note" style="color:#aaa">내 사용자 ID: <b>'+u.uid+'</b><br>Firebase 콘솔의 Firestore에 <b>admins</b> 모음을 만들고, 이 ID로 문서를 하나 만들면 관리자가 돼요.</p><button id="o2">로그아웃</button>');$("#o2").onclick=()=>auth.signOut();return}
+    $("#gate").hidden=true;$("#app").hidden=false;loadConf();loadList()});
+  $("#out").onclick=()=>auth.signOut();
+
+  /* 일정 */
+  const hint=()=>{const v=$("#c-start").value;if(!v){$("#c-hint").textContent="";return}const [y,m,d]=v.split("-").map(Number),last=new Date(y,m-1,d+29),end=new Date(y,m-1,d+30);
+    $("#c-hint").textContent="30일째(마지막 날)는 "+(last.getMonth()+1)+"월 "+last.getDate()+"일이에요. 보통 종료 시각은 그다음 날 0시("+local(end).replace("T"," ")+")로 둬요."};
+  $("#c-start").oninput=()=>{hint();const v=$("#c-start").value;if(!v)return;const [y,m,d]=v.split("-").map(Number);
+    if(!$("#c-close").dataset.touched)$("#c-close").value=local(new Date(y,m-1,d+30));
+    if(!$("#c-del").dataset.touched)$("#c-del").value=ymd(new Date(y,m-1,d+35))};
+  $("#c-close").oninput=()=>{$("#c-close").dataset.touched=1};$("#c-del").oninput=()=>{$("#c-del").dataset.touched=1};
+  async function loadConf(){try{const c=await db.doc("meta/config").get();if(c.exists){const d=c.data();$("#c-start").value=d.start||"";$("#c-close").value=d.closeAt?local(d.closeAt.toDate()):"";$("#c-del").value=d.deleteOn||"";$("#c-close").dataset.touched=1;$("#c-del").dataset.touched=1}else{const t=new Date();$("#c-start").value="2026-11-26";$("#c-start").oninput()}hint()}catch(e){say("#c-msg","일정을 불러오지 못했어요: "+(e.code||e.message))}}
+  async function saveConf(closeAt){const start=$("#c-start").value,del=$("#c-del").value;
+    if(!start||!closeAt||!del){say("#c-msg","세 칸을 모두 채워 주세요");return}
+    try{await db.doc("meta/config").set({start,closeAt:TS.fromDate(closeAt),deleteOn:del});$("#c-close").value=local(closeAt);say("#c-msg","저장했어요 ✓",1)}
+    catch(e){say("#c-msg","저장하지 못했어요: "+(e.code||e.message))}}
+  $("#c-save").onclick=()=>{const v=$("#c-close").value;saveConf(v?new Date(v):null)};
+  $("#c-now").onclick=()=>{if(confirm("지금 바로 모든 문답의 쓰기를 막을까요? (열람·내보내기는 계속 돼요)"))saveConf(new Date())};
+
+  /* 가입 코드 */
+  async function loadList(){try{const sn=await db.collection("invites").get();list=sn.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(a.used-b.used)||((b.createdAt||0)-(a.createdAt||0)));draw()}
+    catch(e){say("#i-msg","목록을 불러오지 못했어요: "+(e.code||e.message))}}
+  function draw(){const used=list.filter(x=>x.used).length;$("#s-all").textContent=list.length;$("#s-used").textContent=used;$("#s-left").textContent=list.length-used;
+    $("#i-list").innerHTML=list.map(x=>'<tr><td class="code">'+x.id+'</td><td>'+(x.used?'<span class="tag u">사용됨</span>':'<span class="tag n">남음</span>')+'</td><td>'+fmt(x.createdAt)+'</td><td>'+fmt(x.usedAt)+'</td><td>'+(x.used?"":'<button data-del="'+x.id+'">삭제</button>')+'</td></tr>').join("")||'<tr><td colspan="5" class="note">아직 발급한 코드가 없어요</td></tr>';
+    document.querySelectorAll("[data-del]").forEach(b=>b.onclick=async()=>{if(!confirm(b.dataset.del+" 코드를 삭제할까요?"))return;
+      try{await db.doc("invites/"+b.dataset.del).delete();list=list.filter(x=>x.id!==b.dataset.del);draw()}catch(e){say("#i-msg","삭제하지 못했어요: "+(e.code||e.message))}})}
+  $("#i-make").onclick=async()=>{const n=Math.max(1,Math.min(100,+$("#i-n").value||0)),b=$("#i-make");b.disabled=true;let made=0;
+    try{for(let i=0;i<n;i++){const c=code(),ref=db.doc("invites/"+c);if((await ref.get()).exists){i--;continue}await ref.set({used:false,createdAt:Date.now()});made++}
+      say("#i-msg",made+"개 발급했어요 ✓",1)}catch(e){say("#i-msg",made+"개 발급 후 멈췄어요: "+(e.code||e.message))}
+    b.disabled=false;loadList()};
+  $("#i-copy").onclick=async()=>{const t=list.filter(x=>!x.used).map(x=>x.id).join("\n");if(!t){say("#i-msg","남은 코드가 없어요");return}
+    try{await navigator.clipboard.writeText(t);say("#i-msg","남은 코드 "+t.split("\n").length+"개를 복사했어요 ✓",1)}catch(e){say("#i-msg","복사하지 못했어요")}};
+  $("#i-reload").onclick=loadList;
+})();
+</script>
+</body>
+</html>

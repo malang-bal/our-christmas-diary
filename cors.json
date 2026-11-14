@@ -1,0 +1,7 @@
+[
+  {
+    "origin": ["https://YOUR-PROD-PROJECT.web.app", "https://YOUR-PROD-PROJECT.firebaseapp.com", "https://YOUR-DEV-PROJECT.web.app", "https://YOUR-DEV-PROJECT.firebaseapp.com"],
+    "method": ["GET"],
+    "maxAgeSeconds": 3600
+  }
+]
