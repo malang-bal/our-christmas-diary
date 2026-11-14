@@ -178,13 +178,15 @@ service cloud.firestore {
         allow delete: if false;
       }
 
-      // 답변: 본인 것만
+      // 답변: 본인 것만. r = 긴급 송부한 날 {일차: 시각}
       match /answers/{aid} {
         allow read: if isMember(rid);
         allow create, update: if canWrite(rid) && aid == uid()
-          && request.resource.data.keys().hasOnly(['a'])
+          && request.resource.data.keys().hasOnly(['a', 'r'])
           && request.resource.data.a is map
-          && request.resource.data.a.size() <= 30;
+          && request.resource.data.a.size() <= 30
+          && request.resource.data.get('r', {}) is map
+          && request.resource.data.get('r', {}).size() <= 30;
         allow delete: if false;
       }
 
@@ -228,18 +230,20 @@ service cloud.firestore {
       }
 
       // 채팅: 1~30일 방에만, 본인 이름으로만. 고치거나 지울 수 없다
+      // st = 서버가 받은 시각(정렬용). 넣으려면 반드시 서버 시각이어야 한다
       match /chats/{day}/messages/{mid} {
         allow read: if isMember(rid);
         allow create: if canWrite(rid)
           && day.matches('^d([1-9]|[12][0-9]|30)$')
           && request.resource.data.uid == uid()
           && request.resource.data.ts is number
+          && (!('st' in request.resource.data) || request.resource.data.st == request.time)
           && (
-            (request.resource.data.keys().hasOnly(['uid', 'text', 'ts'])
+            (request.resource.data.keys().hasOnly(['uid', 'text', 'ts', 'st'])
               && request.resource.data.text is string
               && request.resource.data.text.size() >= 1 && request.resource.data.text.size() <= 500)
             ||
-            (request.resource.data.keys().hasOnly(['uid', 'dice', 'v', 'ts'])
+            (request.resource.data.keys().hasOnly(['uid', 'dice', 'v', 'ts', 'st'])
               && request.resource.data.dice in [6, 10, 100]
               && request.resource.data.v is int
               && request.resource.data.v >= 1 && request.resource.data.v <= request.resource.data.dice)

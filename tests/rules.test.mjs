@@ -323,6 +323,10 @@ describe("문답은 멤버 두 명만", () => {
     await assertSucceeds(db(B).doc(p + "answers/" + B).set({ a: { 1: "내 답변" } }));
     await assertFails(db(B).doc(p + "answers/" + A).set({ a: { 1: "바꿔치기" } }));
     await assertFails(db(B).doc(p + "answers/" + A).delete());
+    // 긴급 송부 표시
+    await assertSucceeds(db(B).doc(p + "answers/" + B).set({ a: { 2: "급하게" }, r: { 2: Date.now() } }));
+    await assertFails(db(B).doc(p + "answers/" + B).set({ a: { 2: "급하게" }, r: "아무거나" }));
+    await assertFails(db(B).doc(p + "answers/" + B).set({ a: { 2: "급하게" }, extra: 1 }));
     await assertSucceeds(db(B).doc(p + "members/" + B).set({ name: "밥", color: "#2f6b4f", img: "" }));
     await assertFails(db(B).doc(p + "members/" + A).set({ name: "가짜", color: "#2f6b4f", img: "" }));
     await assertFails(db(B).doc(p + "members/" + B).set({ name: "밥", color: "#2f6b4f", img: "x".repeat(601) }));
@@ -346,6 +350,10 @@ describe("문답은 멤버 두 명만", () => {
     await assertFails(c.add({ uid: B, dice: 6, v: 7, ts: 3 }));
     await assertFails(c.add({ uid: B, dice: 1000, v: 999, ts: 3 }));
     await assertFails(c.add({ uid: B, text: "덤", extra: 1, ts: 2 }));
+    // 정렬용 서버 시각: 서버 시각만 허용, 기기 시계 값은 거절
+    await assertSucceeds(c.add({ uid: B, text: "서버 시각", ts: 4, st: FV.serverTimestamp() }));
+    await assertSucceeds(c.add({ uid: B, dice: 10, v: 4, ts: 5, st: FV.serverTimestamp() }));
+    await assertFails(c.add({ uid: B, text: "가짜 시각", ts: 4, st: TS.fromMillis(Date.now() + 864e5) }));
     await assertFails(db(B).collection(p + "chats/d31/messages").add({ uid: B, text: "없는 날", ts: 2 }));
     await assertFails(db(B).collection(p + "chats/d0/messages").add({ uid: B, text: "없는 날", ts: 2 }));
     await assertFails(db(A).doc(p + "chats/d1/messages/m1").update({ text: "수정" }));

@@ -720,10 +720,10 @@ body:has(#mainApp:not([hidden])):not(:has(#su-n)) #fb-out{display:none}
 .gedb .btn{min-width:84px;justify-content:center}
 .gedm:empty{display:none}
 /* 알림 설정 접기 */
-#ncard .nhd{display:flex;width:100%;align-items:center;justify-content:space-between;gap:8px;padding:0;margin:0;border:0;background:none;color:inherit;font:inherit;text-align:left;cursor:pointer;min-height:36px}
-#ncard .nhd svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;opacity:.55;transition:transform .25s}
-#ncard .nhd[aria-expanded="true"] svg{transform:rotate(180deg)}
-#ncard .nhd:hover svg{opacity:.9}
+#ncard .nhd,#gapp .nhd{display:flex;width:100%;align-items:center;justify-content:space-between;gap:8px;padding:0;margin:0;border:0;background:none;color:inherit;font:inherit;text-align:left;cursor:pointer;min-height:36px}
+#ncard .nhd svg,#gapp .nhd svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;opacity:.55;transition:transform .25s}
+#ncard .nhd[aria-expanded="true"] svg,#gapp .nhd[aria-expanded="true"] svg{transform:rotate(180deg)}
+#ncard .nhd:hover svg,#gapp .nhd:hover svg{opacity:.9}
 .ncol{display:grid;grid-template-rows:0fr;transition:grid-template-rows .28s ease}
 .ncol.open{grid-template-rows:1fr}
 .ncol>.nin{min-height:0;overflow:hidden}
@@ -828,6 +828,24 @@ html.gdk #roomApp ::placeholder{color:color-mix(in srgb,var(--txt) 45%,transpare
 .ppb span{white-space:nowrap;letter-spacing:-.03em}
 .ppb i{position:relative}
 .ppink{position:absolute;right:4px;bottom:4px;width:8px;height:8px;border-radius:50%;box-shadow:0 0 0 1.5px color-mix(in srgb,#fff 70%,transparent)}
+/* 앱 · 백그라운드 알림 카드 */
+#gapp .garow{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 0;border-top:1px dashed var(--line2,#ddd)}
+#gapp .nin>.garow:first-child{margin-top:4px}
+#gapp .garow>div{display:flex;flex-direction:column;gap:3px;min-width:0}
+#gapp .gat{font-weight:700;font-size:14px}
+#gapp .gadev{font-style:normal;font-size:11px;font-weight:600;margin-left:6px;padding:1px 7px;border-radius:999px;background:color-mix(in srgb,var(--main) 14%,transparent);color:var(--main)}
+#gapp .garow .btn{flex:none;white-space:nowrap}
+#gapp .gah{margin-top:4px;padding:8px 10px;border-radius:8px;background:color-mix(in srgb,var(--txt) 5%,transparent)}
+#gapp .sw{flex:none}
+#gapp .sw:disabled{opacity:.4;cursor:default}
+#gast:empty{display:none}
+/* 답변 글씨 한 단계 진하게 */
+#roomApp .ans,#roomApp .wans{font-weight:500}
+/* 긴급 송부 */
+#roomApp .gtag.rush{opacity:1;background:var(--main);border-color:var(--main);color:#fff}
+#roomApp #view .wcard.gw.grush{box-shadow:none;filter:drop-shadow(2px 0 0 var(--main)) drop-shadow(-2px 0 0 var(--main)) drop-shadow(0 2px 0 var(--main)) drop-shadow(0 -2px 0 var(--main)) drop-shadow(0 6px 10px rgba(0,0,0,.22))}
+#roomApp .grushn{margin:4px 0 8px;padding:8px 10px;border-radius:8px;font-size:12.5px;line-height:1.5;background:color-mix(in srgb,var(--main) 10%,transparent);color:var(--txt)}
+#roomApp .grushn b{color:var(--main)}
 
 /* ===== 공개판 추가 ===== */
 body:has(#gate) #fb-out{display:block!important}
@@ -903,7 +921,7 @@ body:has(#gate) #fb-out{display:block!important}
 </script>
 <script>
 /* 새 버전 알림: 올라간 index.html이 바뀌면 상단에 새로고침 안내를 띄워요 */
-const BUILD_ID="1794669976176";
+const BUILD_ID="1794672850036";
 (function(){
   if(!/^https?:/.test(location.protocol))return;
   let shown=false;
@@ -915,13 +933,17 @@ const BUILD_ID="1794669976176";
 <script>
 const XQ=["크리스마스를 기다리는 첫날. 나의 마음가짐은?", "크리스마스에 대한 나의 생각은?", "우리의 지난 크리스마스는 어땠을까?", "크리스마스에 받고 싶은 선물은?", "크리스마스에 주고 싶은 선물은?", "크리스마스에 먹고 싶은 케이크는?", "크리스마스 케이크는 제과점에서 구매 vs 직접 굽기", "크리스마스에 대한 추억을 한 가지 들려준다면?", "화이트 크리스마스 vs 그린 크리스마스", "트리 꾸미는 것을 좋아해?", "크리스마스를 보내고 싶은 장소는?", "크리스마스 저녁엔 음주 vs 맨정신", "크리스마스에 가장 어울리는 음료는 무엇일까?", "크리스마스를 맞아 인테리어에 변화를 준다면?", "캐롤은 언제부터 트는 것이 적당하다고 생각해?", "내가 산타를 믿었던 나이는?", "주변인에게 크리스마스 카드를 쓰는 편이야?", "수많은 연중행사 중 크리스마스의 순위를 정하자면?", "머리맡에 양말을 걸어둘 거야?", "크리스마스와 어울리는 향은?", "크리스마스와 어울리는 색은?", "크리스마스 하면 떠오르는 풍경은?", "크리스마스에 단 한 장의 사진을 찍을 수 있다면?", "너와 함께 크리스마스를 보내기로 한 이유는?", "함께 보낼 크리스마스에 대한 기대치는 몇 퍼센트?", "이브의 밤, 일찍 잘 생각이야?", "크리스마스에 너와 하고 싶은 일은?", "크리스마스 이브, 소원을 빈다면?", "크리스마스 당일, 너에게 하고 싶은 말은?", "메리 크리스마스! 내년에도 함께할 거지?"];let Q=XQ.slice();
 const $=s=>document.querySelector(s);
-let db=null,me=null,cfg=null,members={},answers={},tab="cal",sel=null,msgs=[],unsubChat=null,today=0,myDraft={},nick="",stickers=[],emotes=[],headers=[],draft={},bi=0,bt=null,says=[],tk={},pend={},stamps=[],stEd={open:false,img:null,zoom:1,ox:0,oy:0};
+let db=null,me=null,cfg=null,members={},answers={},arush={},tab="cal",sel=null,msgs=[],unsubChat=null,today=0,myDraft={},nick="",stickers=[],emotes=[],headers=[],draft={},bi=0,bt=null,says=[],tk={},pend={},stamps=[],stEd={open:false,img:null,zoom:1,ox:0,oy:0};
 
 const ymd=d=>d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
 function calcToday(){if(!cfg)return 0;const [y,m,d]=cfg.start.split("-").map(Number);const s=new Date(y,m-1,d),n=new Date();n.setHours(0,0,0,0);return Math.round((n-s)/864e5)+1}
 const esc=t=>String(t).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const nameOf=id=>id===me?"나":(members[id]?.name||"상대");
 const partner=()=>Object.keys(members).find(k=>k!==me);
+/* 채팅 순서: 기기마다 시계가 달라 섞이지 않도록 서버가 받은 시각(st)으로 정렬해요. st가 없는 예전 메시지는 보낸 시각(ts) */
+function gSt(o){try{o.st=firebase.firestore.FieldValue.serverTimestamp()}catch(e){}return o}
+function gMsgs(docs){return docs.map((x,i)=>{let d;try{d=x.data({serverTimestamps:"estimate"})}catch(e){d=x.data()}const st=d.st&&typeof d.st.toMillis==="function"?d.st.toMillis():null;return{d,k:st??d.ts??0,ts:d.ts||0,i}})
+  .sort((a,b)=>(a.k-b.k)||(a.ts-b.ts)||(a.i-b.i)).map(o=>{const m={...o.d};delete m.st;return m})}
 function gSendSync(){[["ci","cs"],["sx","sb"]].forEach(([i,b])=>{const c=document.getElementById(b);if(!c)return;const a=document.getElementById(i);c.classList.toggle("gidle",!(a&&a.value.trim()))})}
 function gPerf(){const g=document.querySelector("#roomApp #view .gsh .grid");if(!g)return;const cs=[...g.children].filter(x=>x.classList.contains("day"));if(!cs.length)return;
   const W=g.clientWidth,H=g.clientHeight,key=W+"x"+H+"x"+cs.length;if(g.dataset.pk===key)return;g.dataset.pk=key;
@@ -1012,7 +1034,7 @@ function homeSays(){const a=$("#hs1"),b=$("#hs2");if(!a||!b)return;const p=partn
     el.ontouchend=e=>{if(sy===null)return;const t=e.changedTouches[0],dy=t.clientY-sy,dx=Math.abs(t.clientX-sx);sy=null;if(x&&dy<-40&&-dy>dx*1.5){renderTalk(true);gSwipeSnd()}}};
   row(p,a);row(me,b)}
 function gReceipt(){const T=Q.length,n=today;if(n<1||n>T)return"";const p=partner(),ok=id=>!!answers[id]?.[n],both=ok(me)&&!!p&&ok(p),sp=stampsOf(n)[0];
-  const st=(id,role)=>'<div class="grc"><small>'+role+' · '+(id?esc(realName(id)):"상대")+'</small><b'+(id&&ok(id)?"":' class="no"')+'>'+(!id?"참여 전":ok(id)?"✓ 답변 완료":"작성 전")+'</b></div>';
+  const st=(id,role)=>'<div class="grc"><small>'+role+' · '+(id?esc(realName(id)):"상대")+'</small><b'+(id&&ok(id)?"":' class="no"')+'>'+(!id?"참여 전":ok(id)?(arush[id]&&arush[id][n]?"✓ 긴급 송부":"✓ 답변 완료"):"작성 전")+'</b></div>';
   return '<div class="grcpt"><div class="grh"><b>접수증</b><span>No. '+String(n).padStart(4,"0")+' · DAY '+n+'</span></div><div class="grr">'+st(p,"발송인")+st(me,"수취인")+'</div>'+
     '<div class="grst">'+(sp?'<img src="'+sp.img+'" alt="오늘의 우표">':'우표<br>한 장')+'</div>'+
     '<div class="grq"><small>내용 · 오늘의 질문</small><b>'+esc(Q[n-1])+'</b></div>'+
@@ -1037,25 +1059,29 @@ function viewDay(){
   $("#view").innerHTML='<div class="gtk"><div class="card dcard">'+stampArea(n,live)+'<div class="gadm2">ADMIT TWO · No. '+String(n).padStart(4,"0")+'</div><div class="dhead" style="'+dheadStyle(n,live)+'"><span class="gday">DAY '+n+'</span><span class="gdate">'+gDate(n)+'</span><span class="badge '+(live?"":"closed")+'">'+(live?"채팅 열림":"종료·보관됨")+'</span>'+stampText(n)+stampBtn(n,live)+'</div>'+stEditor(n,live)+'<div class="q">'+esc(Q[n-1])+"</div>"+a(me,"me")+(p?a(p,"you"):'<div class="note">상대가 아직 참여하지 않았어요.</div>')+
   '</div>'+gStub(n,live)+'</div><div class="card gchat"><div class="gchh">'+(live?"오늘의 대화":"그날의 대화")+'</div><div class="chat" id="chat"></div>'+(live?'<div class="row"><div class="ibox"><input id="ci" placeholder="이 주제로 이야기해요" maxlength="500"></div><button class="btn pri sendb" id="cs" title="보내기"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4z"/></svg></button></div>':'<div class="row" style="justify-content:flex-start;align-items:center;gap:8px"><span class="note">이 날의 대화는 닫혔어요. 기록만 볼 수 있어요.</span></div>')+"</div>";
   wireStamp(n);
-  if(live){const send=async()=>{const t=$("#ci").value.trim();if(!t)return;$("#ci").value="";try{const ts0=Date.now();await db.collection(P("chats/d"+n+"/messages")).add({uid:me,text:t,ts:ts0});const dm=[...t.matchAll(DICE_RE)].slice(0,5);for(let i=0;i<dm.length;i++){const dn=+dm[i][1];await db.collection(P("chats/d"+n+"/messages")).add({uid:me,dice:dn,v:1+Math.floor(Math.random()*dn),ts:ts0+i+1})}}catch(e){alert("전송하지 못했어요. 연결을 확인하거나, 문답이 닫혔는지 확인해 주세요.")}};$("#cs").onclick=send;$("#ci").onkeydown=e=>{if(e.key==="Enter"&&!e.isComposing)send()}}
+  if(live){const send=async()=>{const t=$("#ci").value.trim();if(!t)return;$("#ci").value="";try{const ts0=Date.now();await db.collection(P("chats/d"+n+"/messages")).add(gSt({uid:me,text:t,ts:ts0}));const dm=[...t.matchAll(DICE_RE)].slice(0,5);for(let i=0;i<dm.length;i++){const dn=+dm[i][1];await db.collection(P("chats/d"+n+"/messages")).add(gSt({uid:me,dice:dn,v:1+Math.floor(Math.random()*dn),ts:ts0+i+1}))}}catch(e){alert("전송하지 못했어요. 연결을 확인하거나, 문답이 닫혔는지 확인해 주세요.")}};$("#cs").onclick=send;$("#ci").onkeydown=e=>{if(e.key==="Enter"&&!e.isComposing)send()}}
   stopChat();
   unsubChat=db.collection(P("chats/d"+n+"/messages")).orderBy("ts").onSnapshot(s=>{
     const c=$("#chat");if(!c)return;
-    c.innerHTML=s.docs.length?s.docs.map(x=>msgHtml(x.data(),n===today)).join(""):'<div class="note">아직 대화가 없어요.</div>';
-    c.scrollTop=c.scrollHeight;msgs=s.docs.map(x=>x.data());if(n===today){const l=Math.max(0,...msgs.filter(m=>m.uid!==me).map(m=>m.ts));if(l)setSeen(n,l)}});
+    const ms=gMsgs(s.docs);c.innerHTML=ms.length?ms.map(m=>msgHtml(m,n===today)).join(""):'<div class="note">아직 대화가 없어요.</div>';
+    c.scrollTop=c.scrollHeight;msgs=ms;if(n===today){const l=Math.max(0,...msgs.filter(m=>m.uid!==me).map(m=>m.ts));if(l)setSeen(n,l)}});
 }
 function viewWrite(){
-  const T=Q.length,ed=[],lk=[];for(let n=1;n<=T;n++)(n>today&&!CLOSED?ed:lk).push(n);lk.reverse();
-  const mine=answers[me]||{};
+  const mine=answers[me]||{},myR=arush[me]||{};
+  const rushN=!CLOSED&&today>=1&&today<=Q.length&&!mine[today]?today:0;
+  const T=Q.length,ed=[],lk=[];for(let n=1;n<=T;n++){if(n!==rushN)(n>today&&!CLOSED?ed:lk).push(n)}lk.reverse();
+  if(rushN)ed.unshift(rushN);
   const SP='<span class="spk" style="color:var(--main);position:relative;top:-5px">✦</span>';
   const dirty=n=>draft[n]!==undefined&&draft[n]!==(mine[n]||"");
   const anyD=()=>Object.keys(draft).some(n=>dirty(n));
   const stamp=n=>{let h=2166136261;for(const ch of String(RID||"")+":"+n){h^=ch.charCodeAt(0);h=Math.imul(h,16777619)}const r=()=>{h^=h<<13;h^=h>>>17;h^=h<<5;return((h>>>0)%10000)/10000};
     const a=r(),b=r(),c=r(),d=r(),e=r(),f=r(),g=r();return '<i class="pmk" style="left:calc(60% + (40% - 87px)*'+a.toFixed(3)+');top:calc(-30px + (100% - 41px)*'+b.toFixed(3)+');transform:rotate('+((c*2-1)*30).toFixed(1)+'deg)"></i>'+(d<.4?'<i class="pmk paw" data-c="'+[[e,f,g]].concat(Array.from({length:15},()=>[r(),r(),r()])).map(v=>v.map(x=>x.toFixed(3)).join(",")).join(";")+'"></i>':"")};
   const card=(n,lock)=>{const sv=mine[n]||"",inp=!lock&&(wEdit||dirty(n)||!sv);
-    const tg=n>today?(n-today)+"일 뒤":n===today?"오늘":"마감";
-    return '<div class="wcard gw'+(lock?" lock":"")+(n===today?" gtd":"")+'"><div class="gws" aria-hidden="true"><small>DAY</small><b>'+n+'</b><small>'+gDate(n).slice(5,10)+'</small></div><div class="gwb">'+(lock?stamp(n):"")+'<div class="wq"><b>'+esc(Q[n-1])+'</b><span class="gtag'+(n===today?" on":n-today>=1&&n-today<=3?" d"+(n-today):"")+'">'+tg+'</span></div>'+
-      (inp?'<textarea data-n="'+n+'" maxlength="2000" placeholder="이 질문에 대한 내 답변을 적어요">'+esc(draft[n]??sv)+'</textarea>':'<div class="wans">'+(sv?esc(sv):'<span class="note">작성하지 않았어요</span>')+'</div>')+'</div></div>'};
+    const rz=n===rushN,rd=!rz&&myR[n]&&mine[n];
+    const tg=rd?"긴급 송부":n>today?(n-today)+"일 뒤":n===today?"오늘":"마감";
+    return '<div class="wcard gw'+(lock?" lock":"")+(n===today?" gtd":"")+(rz?" grush":"")+'"><div class="gws" aria-hidden="true"><small>DAY</small><b>'+n+'</b><small>'+gDate(n).slice(5,10)+'</small></div><div class="gwb">'+(lock?stamp(n):"")+'<div class="wq"><b>'+esc(Q[n-1])+'</b><span class="gtag'+(rd?" rush":n===today?" on":n-today>=1&&n-today<=3?" d"+(n-today):"")+'">'+(rd?"✓ ":"")+tg+'</span></div>'+
+      (rz?'<div class="grushn">오늘 답변을 아직 쓰지 않았어요. 지금 저장하면 <b>긴급 송부</b>로 바로 전달되고, 저장한 뒤에는 고칠 수 없어요.</div>':"")+
+      (inp?'<textarea data-n="'+n+'" maxlength="2000" placeholder="'+(rz?"오늘 질문에 대한 답변을 적어요":"이 질문에 대한 내 답변을 적어요")+'">'+esc(draft[n]??sv)+'</textarea>':'<div class="wans">'+(sv?esc(sv):'<span class="note">작성하지 않았어요</span>')+'</div>')+'</div></div>'};
   $("#view").innerHTML='<div class="savebar wcard"><span class="note" id="sst">'+(wEdit?"편집 중이에요":"저장한 답변은 편집 버튼으로 고쳐요")+'</span><span class="row" style="flex:none"><button class="btn" id="se">편집</button><button class="btn'+(anyD()?" pri":"")+'" id="sv">저장</button></span></div>'+ed.map(n=>card(n,0)).join("")+lk.map(n=>card(n,1)).join("");
   {const q=document.querySelector("#view .wcard:not(.savebar) .wq"),bb=q&&q.querySelector("b");if(bb){const d=bb.getBoundingClientRect().left-q.getBoundingClientRect().left;if(d>0&&d<60)$("#view").style.setProperty("--wi",d.toFixed(2)+"px")}}
   document.querySelectorAll("#view .wcard .pmk.paw").forEach(pw=>{const cd=pw.parentNode,st=cd.querySelector(".pmk:not(.paw)"),W=cd.clientWidth,H=cd.clientHeight,pw_=67,ph=69;
@@ -1067,9 +1093,10 @@ function viewWrite(){
   document.querySelectorAll("textarea[data-n]").forEach(t=>{fit(t);t.addEventListener("input",()=>fit(t))});
   document.querySelectorAll("textarea[data-n]").forEach(t=>t.oninput=()=>{draft[t.dataset.n]=t.value;$("#sst").textContent="저장되지 않은 변경이 있어요";$("#sv").classList.toggle("pri",anyD())});
   $("#se").onclick=()=>{wEdit=true;render()};
-  $("#sv").onclick=async()=>{const next={...(answers[me]||{})};
-    document.querySelectorAll("textarea[data-n]").forEach(t=>{if(t.value)next[t.dataset.n]=t.value;else delete next[t.dataset.n]});
-    try{await db.doc(P("answers/"+me)).set({a:next});answers[me]=next;draft={};wEdit=false;render();$("#sst").textContent="저장됨 ✓"}catch(e){$("#sst").textContent="저장 실패 — 권한을 확인해 주세요"}};
+  $("#sv").onclick=async()=>{const next={...(answers[me]||{})},nr={...(arush[me]||{})};
+    document.querySelectorAll("textarea[data-n]").forEach(t=>{const k=+t.dataset.n;if(k<today||k===today&&k!==rushN)return;if(t.value.trim())next[k]=t.value;else delete next[k]});
+    if(rushN&&next[rushN]&&!mine[rushN])nr[rushN]=Date.now();
+    try{await db.doc(P("answers/"+me)).set({a:next,r:nr});answers[me]=next;arush[me]=nr;draft={};wEdit=false;render();$("#sst").textContent="저장됨 ✓"}catch(e){$("#sst").textContent="저장 실패 — 권한을 확인해 주세요"}};
 }
 function viewMore(){
   $("#view").innerHTML=pairCard()+settingsTop()+roomSetCard()+notifCard()+'<div class="card"><div class="row" style="justify-content:space-between;align-items:center"><b>계정</b><button class="btn" id="glo" type="button">로그아웃</button></div><p class="note" style="margin:8px 0 0">'+kDay(CONF.start)+' 시작 · '+(closeMs()?kDate(closeMs())+' 문답 종료 · ':"")+(CONF.deleteOn?kDay(CONF.deleteOn)+' 사이트와 기록 전체 삭제':"")+'</p></div><div class="gcut" aria-hidden="true"></div><button class="btn pri gbkb" id="bk" type="button">HTML 백업</button>';
@@ -1304,7 +1331,7 @@ async function exportPng(n){
   const btn=$("#exp");if(btn){btn.disabled=true;btn.style.opacity=".5"}
   try{
     const C=gPalNow(),W=1080,F='"Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif',PI=Math.PI;
-    let chat=[];try{const sn=await db.collection(P("chats/d"+n+"/messages")).orderBy("ts").get();chat=sn.docs.map(x=>x.data())}catch(e){}
+    let chat=[];try{const sn=await db.collection(P("chats/d"+n+"/messages")).orderBy("ts").get();chat=gMsgs(sn.docs)}catch(e){}
     const p=partner(),ids=[me,...(p?[p]:[])],names=[p,me].filter(Boolean).map(realName).join(" & "),st=stampsOf(n)[0],dt=gDateObj(n);
     const y8=dt.getFullYear()+String(dt.getMonth()+1).padStart(2,"0")+String(dt.getDate()).padStart(2,"0");
     try{const TX=[Q[n-1],names,cfg.title,...ids.map(id=>(answers[id]||{})[n]||""),...chat.map(m=>m.text||""),"ADMIT TWO No. DAY 0123456789 그날의 오늘의 대화 이후번의 나누었어요 대화가 없었어요 작성하지 않았어요 님이 주사위를 굴렸어요 · & 년월일째"].join(" ");await Promise.all([400,500,700,900].map(w=>document.fonts.load(w+' 30px "Noto Sans KR"',TX)))}catch(e){}
@@ -1325,7 +1352,7 @@ async function exportPng(n){
     // 채팅
     const CH=T1+40,cp=44;let cy=CH+cp+26+30;const items=[],MAXI=8;
     for(const m of chat){const mine=m.uid===me;if(m.dice){items.push({m,dice:1,h:44});continue}
-      let im=null,lines=[],w=0,h=0;const lab=realName(m.uid)+" · "+new Date(m.ts).toLocaleTimeString("ko-KR",{hour:"2-digit",minute:"2-digit"});
+      let im=null,lines=[],w=0,h=0;const lab=realName(m.uid)+" · "+gHM(m.ts);
       if(m.emote&&String(m.emote).startsWith("data:")){im=await loadImg(m.emote);w=184;h=20+28+150+18}
       else{lines=wrap("400 32px "+F,m.emote?"🖼 이모티콘":(m.text||""),620,6);mg.font="400 32px "+F;const tw=Math.max(...lines.map(l=>mg.measureText(l).width));mg.font="500 22px "+F;w=Math.max(tw,mg.measureText(lab).width)+52;h=18+28+lines.length*46+16}
       items.push({m,mine,im,lines,w,h,lab})}
@@ -1401,7 +1428,7 @@ async function buildBackup(ret){
     const T=Q.length,last=Math.min(today,T),e8=(endOf(cfg.start,T)||"").replace(/-/g,"");
     let days="";
     for(let n=1;n<=last;n++){
-      let chat=[];try{const sn=await db.collection(P("chats/d"+n+"/messages")).orderBy("ts").get();chat=sn.docs.map(x=>x.data())}catch(e){}
+      let chat=[];try{const sn=await db.collection(P("chats/d"+n+"/messages")).orderBy("ts").get();chat=gMsgs(sn.docs)}catch(e){}
       const st=stampsOf(n)[0],y8=gDate(n).slice(0,10).replace(/\./g,"");
       const ans=order.slice().reverse().map((id,i)=>'<div class="ans'+(i?" you":" me")+'"><b>'+esc(realName(id))+'</b>'+(answers[id]?.[n]?esc(answers[id][n]):'<em>작성하지 않았어요</em>')+'</div>').join("");
       const bub=chat.length?chat.map(m=>m.dice?'<div class="dice">― '+esc(realName(m.uid))+' 님이 주사위를 굴렸어요 · <b style="color:'+diceCol(m.v,m.dice)+'">'+m.v+'</b> ―</div>':'<div class="m '+(m.uid===me?"r":"l")+'" style="background:'+gMixHex(C.paper,(members[m.uid]?.color||C.main).slice(0,7),.3)+'"><i>'+esc(realName(m.uid))+' · '+gHM(m.ts)+'</i>'+(m.emote?(String(m.emote).startsWith("data:")?'<img class="emo" src="'+m.emote+'" alt="">':"🖼 이모티콘"):esc(m.text||""))+'</div>').join(""):'<div class="none">그날은 대화가 없었어요</div>';
@@ -1523,7 +1550,11 @@ function ppOrder(dk){const ks=Object.keys(PAPERS);return ks.filter(k=>!!PAPERS[k
 function ppPicker(cur){return [["파스텔",false],["다크",true]].map(([g,dk])=>'<div class="ppg"><small>'+g+'</small><div class="ppr">'+ppOrder(dk).map(k=>{const c=PAPERS[k].c;
   return '<button type="button" class="ppb'+(k===cur?" on":"")+'" data-pp="'+k+'" aria-pressed="'+(k===cur)+'"><i style="background:linear-gradient(90deg,'+c.perf+' 50%,transparent 0) 0 50%/6px 2px repeat-x,linear-gradient('+c.paper+' 0 50%,'+c.paperd+' 50%)"><em class="ppink" style="background:'+(c.tx||"#2b211e")+'"></em></i><span>'+PAPERS[k].n+'</span></button>'}).join("")+'</div></div>').join("")}
 const GTABS=["home","cal","write","say","more"];
-function gSlideTo(t,dir){const from=tab,go=()=>{tab=t;sel=null;try{stopChat()}catch(_){}try{stEd.open=false}catch(_){}render();window.scrollTo(0,0)};
+/* 오늘의 문답(하루 티켓) 화면: 좌우로 넘기면 전날·다음 날 문답 (오늘까지만) */
+function gDayStep(d){if(tab!=="cal"||!sel)return;const n=sel+d;if(n<1||n>Math.min(today,Q.length)){const v=document.getElementById("view");if(v&&v.animate)v.animate([{transform:"translateX(0)"},{transform:"translateX("+(-d*14)+"px)"},{transform:"translateX(0)"}],{duration:260,easing:"ease-out"});return}gSlideTo("cal",d,n)}
+document.addEventListener("keydown",e=>{if(e.defaultPrevented||e.altKey||e.ctrlKey||e.metaKey)return;if(e.key!=="ArrowLeft"&&e.key!=="ArrowRight")return;const t=e.target;if(t&&t.closest&&t.closest("input,textarea,select,[contenteditable],.ged,.hlov,.gpop"))return;
+  const ra=document.getElementById("roomApp");if(!ra||ra.hidden||typeof tab==="undefined"||tab!=="cal"||!sel)return;e.preventDefault();gDayStep(e.key==="ArrowRight"?1:-1)});
+function gSlideTo(t,dir,dn){const from=tab,go=()=>{tab=t;sel=dn||null;try{stopChat()}catch(_){}try{stEd.open=false}catch(_){}render();window.scrollTo(0,0)};
   const ra=document.getElementById("roomApp");if(!ra||!ra.animate||matchMedia("(prefers-reduced-motion: reduce)").matches){go();return}
   document.querySelectorAll(".gslide").forEach(x=>x.remove());
   const fade=from==="home"||t==="home",r=ra.getBoundingClientRect(),old=ra.cloneNode(true);old.classList.add("gslide");old.removeAttribute("hidden");
@@ -1543,6 +1574,7 @@ function gSlideTo(t,dir){const from=tab,go=()=>{tab=t;sel=null;try{stopChat()}ca
     ok=!(el.closest&&el.closest("input,textarea,select,canvas,[contenteditable],.chat,.stamps,.stedit,#modal,.ged,.hlov,.gpop"))},{passive:true});
   app.addEventListener("touchend",e=>{if(sx===null||!ok||!cfg){sx=null;return}const t=e.changedTouches[0],dx=t.clientX-sx,dy=t.clientY-sy;sx=null;
     if(Date.now()-st>700||Math.abs(dx)<60||Math.abs(dx)<Math.abs(dy)*1.6)return;if(window.getSelection&&String(getSelection()).length)return;
+    if(tab==="cal"&&sel){gDayStep(dx<0?1:-1);return}
     const i=GTABS.indexOf(tab),j=i+(dx<0?1:-1);if(i<0||j<0||j>=GTABS.length)return;
     gSlideTo(GTABS[j],dx<0?1:-1)},{passive:true})})();
 const MAINPAL={bg:"#1c1c1d",main:"#1c1c1d",sub:"#6b6b70",text:"#1c1c1d",exp:"#1c1c1d"};
@@ -2194,7 +2226,7 @@ function openRoom(rid,pv){
     Q=cfg.q||[];applyPal(cfg.palette);ppNow="";applyPaper(cfg.paper);setFx(cfg.fx||"snow");$("#rtitle").textContent=cfg.title||"";$("#rsubt").textContent=cfg.sub||"";$("#rsub").hidden=!cfg.sub;{const e=endOf(cfg.start,(cfg.q||[]).length).replace(/-/g,"");$("#rbar").textContent=e?"*00"+e+"00*":"";$("#rbar").hidden=!e;try{document.fonts.load('44px "Libre Barcode 39"',e).then(f=>{if(f&&f.length){$("#rbar").classList.add("ok");gFitBar()}})}catch(x){}}document.title=cfg.title||"";today=calcToday();render()},e=>{$("#sub").textContent="데이터를 불러올 수 없어요."}));
   S(db.collection(P("members")).onSnapshot(s=>{if(RID!==rid)return;members={};s.docs.forEach(x=>members[x.id]=x.data());
     if(!members[me]&&!CLOSED&&!ensured){ensured=true;db.doc(P("members/"+me)).set({name:UDOC?.name||"나",color:PL.main,img:""}).catch(()=>{})}refresh()},e=>{$("#sub").textContent="데이터를 불러올 수 없어요."}));
-  S(db.collection(P("answers")).onSnapshot(s=>{if(RID!==rid)return;answers={};s.docs.forEach(x=>answers[x.id]=x.data().a||{});refresh()}));
+  S(db.collection(P("answers")).onSnapshot(s=>{if(RID!==rid)return;answers={};arush={};s.docs.forEach(x=>{answers[x.id]=x.data().a||{};arush[x.id]=x.data().r||{}});refresh()}));
   const L=(c,fn)=>S(db.collection(c).orderBy("ts").onSnapshot(s=>{if(RID!==rid)return;fn(s.docs.map(x=>({id:x.id,...x.data()})))}));
   L(P("stamps"),a=>{stamps=a;refresh()});
   L(P("headers"),a=>{headers=a;renderBanner();if(tab==="more")refresh()});
@@ -2233,7 +2265,7 @@ function gGoToday(rid){try{window.focus()}catch(e){}if(rid&&RID!==rid){try{openR
   stopChat();stEd.open=false;if(today>=1&&today<=Q.length){tab="cal";sel=today}else{tab="home";sel=null}render();window.scrollTo(0,0)}
 var gTodayNext=null;
 function pushN(t,b,tag){try{if(!("Notification" in window)||Notification.permission!=="granted")return;const rid=RID;try{const n=new Notification(t,{body:b,tag});n.onclick=()=>{try{n.close()}catch(e){}gGoToday(rid)}}catch(e){navigator.serviceWorker&&navigator.serviceWorker.getRegistration().then(r=>r&&r.showNotification(t,{body:b,tag,data:{rid}}))}}catch(e){}}
-function nEvent(kind,title,body){if(PREVIEW)return;if(NP.snd)snd(kind,kind==="q"?NP.qs:NP.cs);if(NP[kind])pushN(title,body,kind)}
+function nEvent(kind,title,body){if(PREVIEW)return;if(NP.snd)snd(kind,kind==="q"?NP.qs:NP.cs);if(NP[kind])pushN(title,body,kind+"-"+RID+(kind==="q"?"-"+today:""))}
 function notifCard(){const sw=(k,v)=>'<button class="sw'+(v?" on":"")+'" data-nsw="'+k+'" role="switch" aria-checked="'+v+'"></button>',on=NP.snd;
   const PL_='<svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M7 4l13 8-13 8z"/></svg>';
   const sub=(k,title,arr,cur)=>'<div class="nsub'+(on?"":" off")+(cur<0?" mute":"")+'"><b>'+title+'</b><div class="nsel"><select data-nk="'+k+'">'+arr.map((n,i)=>'<option value="'+i+'"'+(cur===i?" selected":"")+'>'+n+'</option>').join("")+'<option value="-1"'+(cur<0?" selected":"")+'>받지 않음</option></select><button class="pl" data-np="'+k+'" title="미리 듣기"'+(cur<0?" disabled":"")+'>'+PL_+'</button></div></div>';
