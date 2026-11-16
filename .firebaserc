@@ -2,5 +2,21 @@
   "projects": {
     "dev": "our-christmas-diary-2f3e0",
     "prod": "our-christmas-diary-prod"
+  },
+  "targets": {
+    "our-christmas-diary-2f3e0": {
+      "hosting": {
+        "main": [
+          "our-christmas-diary-2f3e0"
+        ]
+      }
+    },
+    "our-christmas-diary-prod": {
+      "hosting": {
+        "main": [
+          "waiting-for-christmas"
+        ]
+      }
+    }
   }
 }

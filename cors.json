@@ -1,7 +1,16 @@
 [
   {
-    "origin": ["https://our-christmas-diary-prod.web.app", "https://our-christmas-diary-prod.firebaseapp.com", "https://our-christmas-diary-2f3e0.web.app", "https://our-christmas-diary-2f3e0.firebaseapp.com"],
-    "method": ["GET"],
+    "origin": [
+      "https://waiting-for-christmas.web.app",
+      "https://waiting-for-christmas.firebaseapp.com",
+      "https://our-christmas-diary-prod.web.app",
+      "https://our-christmas-diary-prod.firebaseapp.com",
+      "https://our-christmas-diary-2f3e0.web.app",
+      "https://our-christmas-diary-2f3e0.firebaseapp.com"
+    ],
+    "method": [
+      "GET"
+    ],
     "maxAgeSeconds": 3600
   }
 ]

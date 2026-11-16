@@ -25,11 +25,11 @@ window.DIARY_ENV = (function () {
       }
     },
     prod: {
-      hosts: [], // 예: ["christmas.example.com"]
+      hosts: ["waiting-for-christmas.web.app", "waiting-for-christmas.firebaseapp.com"], // 운영 주소
       appCheckKey: "6LdzuCIuAAAAAPpRb6pUFdzZdT2WFuYHw_RJxaO9",
       firebase: {
         apiKey: "AIzaSyAvbKhHFEVFaxPMhfzw8CAbtAta-9QK1yk",
-        authDomain: "our-christmas-diary-prod.firebaseapp.com",
+        authDomain: "waiting-for-christmas.web.app", // 로그인 창이 운영 주소에서 열리게 (Safari 등 제3자 쿠키 차단 대비)
         projectId: "our-christmas-diary-prod",
         storageBucket: "our-christmas-diary-prod.firebasestorage.app",
         messagingSenderId: "378627344789",

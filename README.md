@@ -16,6 +16,12 @@
 | `cors.json` | 내보내기·백업이 Storage 이미지를 읽을 수 있게 하는 설정 |
 | `firebase.json`, `.firebaserc` | 배포 설정 (Firebase Hosting) |
 
+## 주소
+
+- 운영(prod): **https://waiting-for-christmas.web.app** (prod 프로젝트 안의 두 번째 Hosting 사이트. `.firebaserc`의 `targets`로 prod 배포가 이 사이트로 가요)
+- 테스트(dev): https://our-christmas-diary-2f3e0.web.app
+- prod 로그인 창(authDomain)도 운영 주소에서 열려요. 주소를 바꾸면 로그인 허용 도메인, API 키 제한, OAuth 클라이언트의 리디렉션 URI(`/__/auth/handler`), reCAPTCHA 도메인, `cors.json`을 같이 고쳐야 해요.
+
 ## 제목·부제·질문
 
 모든 문답이 같은 제목·부제·질문을 써요. `public/index.html`의 `CONTENT`(제목·부제)와 맨 위 `XQ`(질문 30개)에서만 정해요. 문답마다 따로 바꿀 수 없고, 관리자 화면에서도 바꾸지 않아요. 고치려면 코드를 고친 뒤 다시 배포해요.
