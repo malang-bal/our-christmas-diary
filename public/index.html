@@ -216,7 +216,7 @@ body:has(#roomApp:not([hidden])) #fb-out{display:none}
 /* 홈(표지) */
 
 #roomApp .gbar button{width:44px;height:44px;margin-left:-10px;border:0;background:none;color:inherit;display:flex;align-items:center;justify-content:center;cursor:pointer}
-#roomApp .gbar span{font-size:12px;opacity:.8}
+#roomApp[data-tab=home] .gbar{display:flex;align-items:center;justify-content:space-between;color:var(--on);margin:-6px 0 4px}#roomApp .gbar span{font-size:12px;opacity:.8}
 #roomApp[data-tab=home] .shw{filter:none}#roomApp[data-tab=home] .gpair{filter:drop-shadow(0 6px 14px rgba(0,0,0,.3))}
 #roomApp[data-tab=home] #top{-webkit-mask:none;mask:none;border-radius:12px 12px 0 0;overflow:hidden;padding:0 0 18px;margin:0;text-align:center;color:var(--txt);background:linear-gradient(var(--paper),var(--paper)) top/100% 51% no-repeat,radial-gradient(circle at 0 100%,transparent 11px,var(--paper) 11.5px) left bottom/51% 51% no-repeat,radial-gradient(circle at 100% 100%,transparent 11px,var(--paper) 11.5px) right bottom/51% 51% no-repeat}
 #roomApp[data-tab=home] #top:not(:has(.ban)){padding-top:6px}
@@ -1037,7 +1037,7 @@ html.gmodal{overflow:hidden}@media (hover:hover) and (pointer:fine){html{scrollb
 <svg width="0" height="0" style="position:absolute" aria-hidden="true"><symbol id="spk" viewBox="0 0 24 24"><path d="M12 1.5l2.4 7.1 7.1 2.4-7.1 2.4L12 20.5l-2.4-7.1L2.5 11l7.1-2.4z" fill="currentColor" stroke="currentColor" stroke-width="0.9" stroke-linejoin="round" shape-rendering="geometricPrecision"/></symbol></svg>
 <main id="mainApp"><div class="sheet ceil mhead"><h1>Our Christmas Diary</h1><p class="note">불러오는 중…</p></div></main>
 <main id="roomApp" hidden>
-<div class="gbar"><span id="gtop"></span></div><div class="gpair"><div class="shw"><div class="sheet" id="top"><div id="banner"></div><div class="gadm" id="gadm"></div><div class="titlerow"><h1><span style="color:var(--sub);margin-right:6px;position:relative;top:-1px">✦</span><span id="rtitle"></span></h1><span class="sub" id="sub">불러오는 중…</span><span id="who" hidden></span></div><div id="rsub" hidden><span class="ind">✦</span><span id="rsubt"></span></div><div id="rbar" hidden></div>
+<div class="gbar"><span id="gtop" aria-hidden="true">&nbsp;</span></div><div class="gpair"><div class="shw"><div class="sheet" id="top"><div id="banner"></div><div class="gadm" id="gadm"></div><div class="titlerow"><h1><span style="color:var(--sub);margin-right:6px;position:relative;top:-1px">✦</span><span id="rtitle"></span></h1><span class="sub" id="sub">불러오는 중…</span><span id="who" hidden></span></div><div id="rsub" hidden><span class="ind">✦</span><span id="rsubt"></span></div><div id="rbar" hidden></div>
 <div id="talk" class="talk"></div></div></div>
 <div class="gh" id="gh" hidden></div>
 <div class="shw"><div id="view" class="sheet"></div></div></div>
@@ -1101,7 +1101,7 @@ html.gmodal{overflow:hidden}@media (hover:hover) and (pointer:fine){html{scrollb
 </script>
 <script>
 /* 새 버전 알림: 올라간 index.html이 바뀌면 상단에 새로고침 안내를 띄워요 */
-const BUILD_ID="1794828223006";
+const BUILD_ID="1794829581692";
 (function(){
   if(!/^https?:/.test(location.protocol))return;
   let shown=false;
