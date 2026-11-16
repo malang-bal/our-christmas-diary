@@ -1102,7 +1102,7 @@ html.gmodal{overflow:hidden}@media (hover:hover) and (pointer:fine){html{scrollb
 </script>
 <script>
 /* 새 버전 알림: 올라간 index.html이 바뀌면 상단에 새로고침 안내를 띄워요 */
-const BUILD_ID="1794835920369";
+const BUILD_ID="1794843451486";
 (function(){
   if(!/^https?:/.test(location.protocol))return;
   let shown=false;
@@ -1377,7 +1377,12 @@ function renderBanner(){clearInterval(bt);const b=$("#banner");if(!headers.lengt
     const cur=im[bi%im.length],nb=(bi+1)%im.length,nx=im[nb],go=()=>{if(!cur.isConnected||!nx.isConnected)return;cur.classList.remove("on");nx.classList.add("on");bi=nb};
     (nx.decode?nx.decode():Promise.resolve()).then(go,go)},8000)}
 function refresh(){if(!db||!RID)return;const ae=document.activeElement,typing=ae&&((ae.tagName==="INPUT"&&ae.type!=="file")||ae.tagName==="TEXTAREA");
-  if(tab==="say"){renderSayList();render(true)}else if(tab==="write"&&(!!$("#view .gwload")||!!$("#view .grush")!==!!gRushNow())){const f=document.activeElement,fn=f&&f.dataset&&f.dataset.n;render();if(fn){const t=document.querySelector('textarea[data-n="'+fn+'"]');if(t){t.focus();t.selectionStart=t.selectionEnd=t.value.length}}}else if(tab==="write"||(typing&&tab==="more")||(sel&&$("#ci")&&$("#ci").value)||stEd.open)render(true);else render()}
+  if(tab==="say"){renderSayList();render(true)}else if(tab==="write"&&(!!$("#view .gwload")||!!$("#view .grush")!==!!gRushNow())){const f=document.activeElement,fn=f&&f.dataset&&f.dataset.n;render();if(fn){const t=document.querySelector('textarea[data-n="'+fn+'"]');if(t){t.focus();t.selectionStart=t.selectionEnd=t.value.length}}}else if(tab==="write"||(typing&&tab==="more")||(sel&&$("#ci")&&($("#ci").value||ae===$("#ci")))||stEd.open){if(ae&&ae.id==="ci")gChatStale=true;render(true)}else render()}
+/* 채팅 입력칸에 커서가 있는 동안에는 화면을 통째로 다시 그리지 않아요.
+   (입력칸이 새로 만들어지면 휴대폰 키보드의 클립보드·이모지 창이 닫혀 버려요)
+   그동안 미룬 갱신은 입력칸에서 벗어나면 한 번에 반영해요. */
+var gChatStale=false;
+document.addEventListener("focusout",e=>{if(!gChatStale||!e.target||e.target.id!=="ci")return;setTimeout(()=>{const a=document.activeElement;if(gChatStale&&!(a&&a.id==="ci")){gChatStale=false;refresh()}},400)});
 function dims(f){return new Promise((res,rej)=>{const u=URL.createObjectURL(f),i=new Image();i.onload=()=>{res([i.naturalWidth,i.naturalHeight]);URL.revokeObjectURL(u)};i.onerror=()=>rej("읽을 수 없는 이미지");i.src=u})}
 let editing=null;
 const PLANE='<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4z"/></svg>';
