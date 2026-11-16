@@ -1041,7 +1041,7 @@ html.gmodal{overflow:hidden}@media (hover:hover) and (pointer:fine){html{scrollb
 <div id="talk" class="talk"></div></div></div>
 <div class="gh" id="gh" hidden></div>
 <div class="shw"><div id="view" class="sheet"></div></div></div>
-<footer class="gcredit"><span>질문 출처 @4_nb_</span><span>질문의 저작권은 원작자에게 있어요. 답변·채팅·사진의 권리는 작성한 두 분에게 있고, 운영이 끝나면 모두 삭제돼요.</span></footer>
+<footer class="gcredit"><span>마찰@4_nb_, 「크리스마스를 기다리는 30문답」</span><span>질문의 저작권은 원작자에게 있습니다.</span><span>답변·채팅·사진의 권리는 작성자에게 귀속되며, 운영 일자가 종료되면 모두 삭제됩니다.</span></footer>
 <div class="tabs" id="tabs" role="navigation" aria-label="메뉴"></div>
 </main>
 <div id="modal" hidden></div>
@@ -1748,7 +1748,7 @@ document.querySelectorAll(".seg.s1,.seg.s2").forEach(function(e){e.onclick=talk}
 var im=document.querySelectorAll(".ban img");if(im.length>1){var k=0;setInterval(function(){im[k].classList.remove("on");k=(k+1)%im.length;im[k].classList.add("on")},4000)}`;
     const cover='<div class="tk"><div class="cov">'+(hd.length?'<div class="ban">'+hd.map((h,i)=>'<img class="'+(i?"":"on")+'" src="'+h.u+'" style="object-position:50% '+h.y+'%" alt="">').join("")+'</div>':"")+'<div class="adm">ADMIT TWO · No. '+String(T).padStart(4,"0")+'</div><h1>'+esc(cfg.title||"")+'</h1>'+(cfg.sub?'<div class="sub">'+esc(cfg.sub)+'</div>':'<div class="sub">'+esc(names)+'</div>')+(e8?gBar(e8)+'<span class="bn">'+e8+'</span>':"")+'</div>'+
       order.map((id,i)=>'<div class="seg s'+(i+1)+'" id="s'+(i+1)+'" title="눌러서 다른 한마디 보기"></div>').join("")+'<div class="seg end">'+esc(names)+' · 함께한 '+last+'일의 기록</div></div>';
-    let html=`<!DOCTYPE html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${esc(cfg.title)} · ${esc(names)}</title><link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet"><style>${css}</style></head><body><main>${cover}<nav>${tabs}</nav><div class="pn on" id="p0">${days||'<p class="none" style="color:'+C.on+'">아직 열린 날이 없어요</p>'}</div>${sayPanels}<footer>${esc(names)} · ${esc(cfg.title||"")} · 함께한 ${last}일의 기록<br>질문 출처 @4_nb_</footer></main><script id="d" type="application/json">${json}<\/script><script>${SCRIPT+";"+pawPlace.toString()+";document.querySelectorAll('.body .paw').forEach(function(p){pawPlace(p.parentNode,p)})"}<\/script></body></html>`;
+    let html=`<!DOCTYPE html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${esc(cfg.title)} · ${esc(names)}</title><link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet"><style>${css}</style></head><body><main>${cover}<nav>${tabs}</nav><div class="pn on" id="p0">${days||'<p class="none" style="color:'+C.on+'">아직 열린 날이 없어요</p>'}</div>${sayPanels}<footer>${esc(names)} · ${esc(cfg.title||"")} · 함께한 ${last}일의 기록<br>마찰@4_nb_, 「크리스마스를 기다리는 30문답」 · 질문의 저작권은 원작자에게 있습니다.</footer></main><script id="d" type="application/json">${json}<\/script><script>${SCRIPT+";"+pawPlace.toString()+";document.querySelectorAll('.body .paw').forEach(function(p){pawPlace(p.parentNode,p)})"}<\/script></body></html>`;
     {const us=new Set([...stamps.map(x=>x.img),...Object.values(members).map(m=>m.img)].filter(u=>/^https?:/.test(String(u||""))));let miss=0;
       for(const u of us){const d=await toData(u);if(d.startsWith("data:"))html=html.split(u).join(d);else miss++}
       if(miss)alert("이미지 "+miss+"개는 파일 안에 넣지 못했어요. 사이트가 지워지면 그 이미지는 보이지 않아요.")}

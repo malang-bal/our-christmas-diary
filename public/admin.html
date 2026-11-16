@@ -95,7 +95,7 @@ td.code{font:700 15px ui-monospace,Menlo,Consolas,monospace;letter-spacing:.08em
     $("#c-hint").textContent="30일째(마지막 날)는 "+(last.getMonth()+1)+"월 "+last.getDate()+"일이에요. 보통 종료 시각은 그다음 날 0시("+local(end).replace("T"," ")+")로 둬요."};
   $("#c-start").oninput=()=>{hint();const v=$("#c-start").value;if(!v)return;const [y,m,d]=v.split("-").map(Number);
     if(!$("#c-close").dataset.touched)$("#c-close").value=local(new Date(y,m-1,d+30));
-    if(!$("#c-del").dataset.touched)$("#c-del").value=ymd(new Date(y,m-1,d+35))};
+    if(!$("#c-del").dataset.touched)$("#c-del").value=ymd(new Date(y,m-1,d+29+14))/* 마지막 날 + 2주 */};
   $("#c-close").oninput=()=>{$("#c-close").dataset.touched=1};$("#c-del").oninput=()=>{$("#c-del").dataset.touched=1};
   async function loadConf(){try{const c=await db.doc("meta/config").get();if(c.exists){const d=c.data();$("#c-start").value=d.start||"";$("#c-close").value=d.closeAt?local(d.closeAt.toDate()):"";$("#c-del").value=d.deleteOn||"";$("#c-close").dataset.touched=1;$("#c-del").dataset.touched=1}else{const t=new Date();$("#c-start").value="2026-11-26";$("#c-start").oninput()}hint()}catch(e){say("#c-msg","일정을 불러오지 못했어요: "+(e.code||e.message))}}
   async function saveConf(closeAt){const start=$("#c-start").value,del=$("#c-del").value;
