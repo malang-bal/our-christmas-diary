@@ -21,7 +21,7 @@ const st = (u) => (u ? env.authenticatedContext(u) : env.unauthenticatedContext(
 const seed = (fn) => env.withSecurityRulesDisabled((ctx) => fn(ctx.firestore()));
 
 const roomData = (owner, invite, pair) => ({
-  title: "크리스마스를 기다리는 30문답", sub: "", palette: { bg: "#0f3b2a", main: "#c8352b" },
+  palette: { bg: "#0f3b2a", main: "#c8352b" },
   paper: "cream", fx: "snow", memberIds: [owner], owner, invite, pairCode: pair,
   pairExp: Date.now() + 7 * DAY, ts: Date.now(),
 });
@@ -131,6 +131,13 @@ describe("관리자·일정·가입 코드", () => {
   });
   test("코드를 아는 사람은 그 코드 하나만 확인할 수 있다", async () => {
     await assertSucceeds(db(A).doc("invites/" + INV).get());
+    await assertSucceeds(db(A).doc("invites/NOPE0000").get());
+  });
+  test("쓰인 가입 코드는 쓴 사람과 관리자만 확인할 수 있다 (누가 썼는지 남에게 안 보임)", async () => {
+    await assertSucceeds(signup(A));
+    await assertSucceeds(db(A).doc("invites/" + INV).get());
+    await assertSucceeds(db(ADMIN).doc("invites/" + INV).get());
+    await assertFails(db(C).doc("invites/" + INV).get());
   });
   test("사용된 가입 코드는 관리자도 지울 수 없다", async () => {
     await assertSucceeds(signup(A));
@@ -172,14 +179,15 @@ describe("가입 코드로 문답 만들기", () => {
     await assertFails(signup(A, { tweak: (o) => { o.room.memberIds = [C]; } }));
     await assertFails(signup(A, { tweak: (o) => { o.room.owner = C; } }));
   });
-  test("가루눈·효과 색을 골라 만들 수 있다", async () => {
-    await assertSucceeds(signup(A, { tweak: (o) => { o.room.fx = "powder"; o.room.fxc = "gold"; } }));
+  test("가루눈을 골라 만들 수 있다", async () => {
+    await assertSucceeds(signup(A, { tweak: (o) => { o.room.fx = "powder"; } }));
   });
   test("눈 계열이 아닌 효과나 모르는 항목은 넣을 수 없다", async () => {
-    await assertFails(signup(A, { tweak: (o) => { o.room.fxc = "neon"; } }));
+    await assertFails(signup(A, { tweak: (o) => { o.room.fxc = "gold"; } }));
+    await assertFails(signup(A, { tweak: (o) => { o.room.sub = "제목은 공통이라 따로 못 넣음"; } }));
     await assertFails(signup(A, { tweak: (o) => { o.room.fx = "rain"; } }));
     await assertFails(signup(A, { tweak: (o) => { o.room.closed = false; } }));
-    await assertFails(signup(A, { tweak: (o) => { o.room.title = "가".repeat(41); } }));
+    await assertFails(signup(A, { tweak: (o) => { o.room.title = "따로 정한 제목"; } }));
   });
   test("다른 사람 이름으로 코드를 쓴 것처럼 표시할 수 없다", async () => {
     await assertFails(signup(A, { tweak: (o) => { o.invite.usedBy = C; } }));
@@ -202,6 +210,10 @@ describe("짝꿍 코드로 들어가기", () => {
     await assertFails(db(B).doc("rooms/" + RID).get());
     await assertSucceeds(db(B).doc("pairs/" + PAIR).get());
     await assertSucceeds(join(B));
+    // 쓰인 짝꿍 코드는 쓴 사람·만든 사람만 확인할 수 있다
+    await assertSucceeds(db(B).doc("pairs/" + PAIR).get());
+    await assertSucceeds(db(A).doc("pairs/" + PAIR).get());
+    await assertFails(db(C).doc("pairs/" + PAIR).get());
     const r = await assertSucceeds(db(B).doc("rooms/" + RID).get());
     if (r.data().memberIds.join() !== [A, B].join()) throw new Error("memberIds 가 [A,B] 가 아니다");
   });
@@ -301,7 +313,7 @@ describe("문답은 멤버 두 명만", () => {
     await assertFails(d.collection(p + "chats/d1/messages").add({ uid: C, text: "끼어들기", ts: 1 }));
     await assertFails(d.doc(p + "members/" + C).set({ name: "캐럴", color: "#000000", img: "" }));
     await assertFails(d.doc(p + "headers/h2").set({ aid: "https://x/h", y: 50, by: C, ts: 1 }));
-    await assertFails(d.doc("rooms/" + RID).update({ title: "뺏기" }));
+    await assertFails(d.doc("rooms/" + RID).update({ fx: "storm" }));
   });
   test("누구도 전체 문답 목록을 볼 수 없다", async () => {
     await assertFails(db(A).collection("rooms").get());
@@ -385,14 +397,13 @@ describe("문답은 멤버 두 명만", () => {
     await assertFails(db(B).collection(p + "headers").add(h));
     await assertSucceeds(db(B).doc(p + "headers/h1").delete());
   });
-  test("문답 설정은 제목·색·종이·효과·효과 색만 바꿀 수 있다", async () => {
+  test("문답 설정은 색·종이·효과만 바꿀 수 있다 (제목·질문은 공통)", async () => {
     const r = db(B).doc("rooms/" + RID);
-    await assertSucceeds(r.update({ title: "우리의 겨울", palette: { bg: "#111111", main: "#eeeeee" }, paper: "navy", fx: "bigsnow" }));
+    await assertSucceeds(r.update({ palette: { bg: "#111111", main: "#eeeeee" }, paper: "navy", fx: "bigsnow" }));
     await assertFails(r.update({ fx: "rain" }));
-    await assertSucceeds(r.update({ fx: "powder", fxc: "navy" }));
-    await assertSucceeds(r.update({ fxc: "auto" }));
-    await assertFails(r.update({ fxc: "neon" }));
-    await assertFails(r.update({ title: "" }));
+    await assertSucceeds(r.update({ fx: "powder" }));
+    await assertFails(r.update({ fxc: "navy" }));
+    await assertFails(r.update({ title: "우리끼리 제목" }));
     await assertFails(r.update({ memberIds: [B] }));
     await assertFails(r.update({ memberIds: [A, B, C] }));
     await assertFails(r.update({ owner: B }));
@@ -429,7 +440,7 @@ describe("문답은 멤버 두 명만", () => {
       await assertFails(d.doc(p + "headers/h2").set({ aid: "https://x/h", y: 50, by: A, ts: 1 }));
       await assertFails(d.doc(p + "headers/h1").delete());
       await assertFails(d.doc(p + "stamps/d5_" + A).set({ day: 5, uid: A, img: "https://x/y", ts: 1 }));
-      await assertFails(d.doc("rooms/" + RID).update({ title: "늦은 수정" }));
+      await assertFails(d.doc("rooms/" + RID).update({ fx: "storm" }));
     });
   });
 });

@@ -49,7 +49,8 @@ service cloud.firestore {
 
     // ── 가입 코드: 문서 이름이 곧 코드. 코드를 아는 사람만 하나씩 확인할 수 있다 ──
     match /invites/{code} {
-      allow get: if signedIn();
+      // 아직 쓰지 않은 코드만 확인할 수 있다. 쓰인 코드는 쓴 사람과 관리자만 (누가 썼는지 남에게 보이지 않게)
+      allow get: if signedIn() && (resource == null || resource.data.used == false || resource.data.usedBy == uid() || isAdmin());
       allow list: if isAdmin();
       allow create: if isAdmin()
         && request.resource.data.keys().hasOnly(['used', 'createdAt'])
@@ -69,7 +70,8 @@ service cloud.firestore {
 
     // ── 짝꿍 코드 ──
     match /pairs/{code} {
-      allow get: if signedIn();
+      allow get: if signedIn() && (resource == null || resource.data.used == false
+        || resource.data.usedBy == uid() || resource.data.createdBy == uid());
       allow list, delete: if false;
       // 혼자 있는 문답의 주인만 만들 수 있고, 만료는 최대 7일(+여유 1시간)
       allow create: if signedIn() && isOpen()
@@ -110,12 +112,10 @@ service cloud.firestore {
     function validName(n) { return n is string && n.size() >= 1 && n.size() <= 12; }
 
     function validRoom(d) {
-      return d.title is string && d.title.size() >= 1 && d.title.size() <= 40
-        && d.get('sub', '') is string && d.get('sub', '').size() <= 60
-        && d.palette is map
+      // 제목·부제·질문은 모든 문답이 함께 쓰는 값이라 사이트 코드에만 있고, 문답 문서에는 저장하지 않는다
+      return d.palette is map
         && d.paper is string && d.paper.size() <= 20
         && d.fx in ['snow', 'powder', 'bigsnow', 'flake', 'storm', 'blizzard']
-        && d.get('fxc', 'auto') in ['auto', 'light', 'dark', 'gold', 'rose', 'coral', 'mint', 'sky', 'lavender', 'wine', 'mustard', 'forest', 'teal', 'navy', 'plum', 'cocoa']
         && d.pairCode is string && d.pairCode.size() <= 12
         && d.pairExp is number;
     }
@@ -127,7 +127,7 @@ service cloud.firestore {
 
       // 만들기: 쓰지 않은 가입 코드가 있어야 하고, 아직 어떤 문답에도 속하지 않은 사람만
       allow create: if signedIn() && isOpen()
-        && request.resource.data.keys().hasOnly(['title', 'sub', 'palette', 'paper', 'fx', 'fxc', 'memberIds', 'owner', 'invite', 'pairCode', 'pairExp', 'ts'])
+        && request.resource.data.keys().hasOnly(['palette', 'paper', 'fx', 'memberIds', 'owner', 'invite', 'pairCode', 'pairExp', 'ts'])
         && request.resource.data.memberIds == [uid()]
         && request.resource.data.owner == uid()
         && request.resource.data.invite is string
@@ -141,10 +141,10 @@ service cloud.firestore {
 
       allow update: if memberEdit() || partnerJoin();
 
-      // 멤버가 고칠 수 있는 것: 제목·색·종이·효과·효과 색, 그리고(혼자일 때) 짝꿍 코드 재발급
+      // 멤버가 고칠 수 있는 것: 색·종이·효과, 그리고(혼자일 때) 짝꿍 코드 재발급
       function memberEdit() {
         return signedIn() && uid() in resource.data.memberIds && isOpen()
-          && changed().hasOnly(['title', 'sub', 'palette', 'paper', 'fx', 'fxc', 'pairCode', 'pairExp'])
+          && changed().hasOnly(['palette', 'paper', 'fx', 'pairCode', 'pairExp'])
           && validRoom(request.resource.data)
           && (request.resource.data.pairCode == resource.data.pairCode
               || (resource.data.memberIds.size() == 1

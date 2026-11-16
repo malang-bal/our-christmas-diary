@@ -989,11 +989,9 @@ html.gmodal{overflow:hidden}@media (hover:hover) and (pointer:fine){html{scrollb
 @media (max-width:560px){.hlov{backdrop-filter:none;-webkit-backdrop-filter:none;background:rgba(10,10,12,.72)}.gpop{backdrop-filter:none;-webkit-backdrop-filter:none;background:rgba(10,10,12,.66)}#mtrash{backdrop-filter:none;-webkit-backdrop-filter:none;background:rgba(10,10,12,.92)}}
 @media (prefers-reduced-motion:reduce){#mainApp .mlist2:not(.editing) .mt:active{transform:none}}
 /* ================= 모션 레이어 끝 ================= */
-/* 효과 색 고르기: 드롭다운 */
-.fxc{display:flex;align-items:center;gap:8px;margin-top:10px}
-.fxc .fxcl{font-size:12.5px;font-weight:700;margin:0}
-.fxc .fxsw{flex:none;width:16px;height:16px;border-radius:50%;box-shadow:0 0 0 1px rgba(128,128,128,.6)}
-.fxc select{flex:1;min-width:0;max-width:220px}
+/* 질문 출처·권리 안내 (맨 아래 작게) */
+.gcredit{display:flex;flex-direction:column;align-items:center;gap:2px;max-width:560px;margin:22px auto 10px;padding:0 20px;text-align:center;font-size:11px;line-height:1.5;color:var(--homec,#fff);opacity:.55;word-break:keep-all}
+.gcredit span:first-child{font-weight:700;letter-spacing:.02em}
 /* 하단 메뉴바: 살짝 비치게 (80%) (흐림으로 가독성 유지) */
 #roomApp #tabs{background:color-mix(in srgb,var(--bgc) 80%,transparent);-webkit-backdrop-filter:blur(14px) saturate(1.15);backdrop-filter:blur(14px) saturate(1.15)}
 #roomApp #view.gholes .say::after,#roomApp #view.gholes .gcut::after{display:none}
@@ -1043,6 +1041,7 @@ html.gmodal{overflow:hidden}@media (hover:hover) and (pointer:fine){html{scrollb
 <div id="talk" class="talk"></div></div></div>
 <div class="gh" id="gh" hidden></div>
 <div class="shw"><div id="view" class="sheet"></div></div></div>
+<footer class="gcredit"><span>질문 출처 @4_nb_</span><span>질문의 저작권은 원작자에게 있어요. 답변·채팅·사진의 권리는 작성한 두 분에게 있고, 운영이 끝나면 모두 삭제돼요.</span></footer>
 <div class="tabs" id="tabs" role="navigation" aria-label="메뉴"></div>
 </main>
 <div id="modal" hidden></div>
@@ -1090,9 +1089,14 @@ html.gmodal{overflow:hidden}@media (hover:hover) and (pointer:fine){html{scrollb
   const tryGo=()=>{if(user&&go&&window.__boot&&!started){started=true;window.__boot()}};
   window.__fbGo=()=>{go=true;tryGo()};
   auth.onAuthStateChanged(u=>{
+    /* 다른 계정으로 바뀌면 화면에 남은 이전 사람의 기록을 쓰지 않도록 처음부터 다시 열어요 */
+    if(window.__leaving)return;if(started&&(!u||!user||u.uid!==user.uid)){location.reload();return}
     if(u){user=u;const g=document.getElementById("fb-gate");if(g)g.hidden=true;tryGo()}
     else{user=null;try{gBootDone()}catch(e){}login();document.getElementById("fb-in").onclick=async()=>{const pr=new firebase.auth.GoogleAuthProvider();try{await auth.signInWithPopup(pr)}catch(e){if(e.code==="auth/popup-blocked"||e.code==="auth/operation-not-supported-in-this-environment"){auth.signInWithRedirect(pr)}else document.getElementById("fb-err").textContent="로그인에 실패했어요: "+(e.code||e.message)}}}});
-  const o=document.createElement("button");o.id="fb-out";o.textContent="로그아웃";o.style.cssText="position:fixed;left:6px;bottom:4px;z-index:9999;border:0;background:none;color:#888;font-size:11px;opacity:.5;cursor:pointer";o.onclick=()=>{if(confirm("로그아웃할까요?"))auth.signOut().then(()=>location.reload())};document.body.appendChild(o);
+  /* 로그아웃: 이 기기의 오프라인 캐시와 사이트 설정을 지워 다음 사람과 섞이지 않게 해요 */
+  window.gSignOut=async()=>{window.__leaving=true;try{await auth.signOut()}catch(e){}try{await fs.terminate();await fs.clearPersistence()}catch(e){}
+    try{Object.keys(localStorage).forEach(k=>{if(/^(o30|notif|firebase:previous)/.test(k))localStorage.removeItem(k)});sessionStorage.clear()}catch(e){}location.reload()};
+  const o=document.createElement("button");o.id="fb-out";o.textContent="로그아웃";o.style.cssText="position:fixed;left:6px;bottom:4px;z-index:9999;border:0;background:none;color:#888;font-size:11px;opacity:.5;cursor:pointer";o.onclick=()=>{if(confirm("로그아웃할까요?"))window.gSignOut()};document.body.appendChild(o);
 })();
 </script>
 <script>
@@ -1341,7 +1345,7 @@ function viewWrite(){
 function viewMore(){
   if(!gMemOk){$("#view").innerHTML='<div class="card"><span class="note">불러오는 중…</span></div>';return}
   $("#view").innerHTML=pairCard()+settingsTop()+roomSetCard()+notifCard()+'<div class="card"><div class="gfxm"><b>배경 움직임</b>'+gFxSeg("gfxm-r")+'</div><p class="note gfxmn">이 기기에서만 적용돼요. 조용히는 입자 수와 속도를 줄여요.</p></div><div class="card"><div class="row" style="justify-content:space-between;align-items:center"><b>계정</b><button class="btn" id="glo" type="button">로그아웃</button></div><p class="note" style="margin:8px 0 0">'+kDay(CONF.start)+' 시작 · '+(closeMs()?kDate(closeMs())+' 문답 종료 · ':"")+(CONF.deleteOn?kDay(CONF.deleteOn)+' 사이트와 기록 전체 삭제':"")+'</p></div><div class="gcut" aria-hidden="true"></div><button class="btn pri gbkb" id="bk" type="button">HTML 백업</button>';
-  wireSettings();wireNotif();wirePair();gFxSegWire("gfxm-r");$("#bk").onclick=()=>buildBackup();{const g=$("#glo");if(g)g.onclick=()=>{if(window.firebase&&firebase.auth&&confirm("로그아웃할까요?"))firebase.auth().signOut().then(()=>location.reload())}}
+  wireSettings();wireNotif();wirePair();gFxSegWire("gfxm-r");$("#bk").onclick=()=>buildBackup();{const g=$("#glo");if(g)g.onclick=()=>{if(confirm("로그아웃할까요?"))window.gSignOut()}}
 }
 const bg=id=>{const c=members[id]?.color;return c?"background:"+c+"4d":""};
 const blob=id=>String(id||"");const emoSrc=blob;
@@ -1744,7 +1748,7 @@ document.querySelectorAll(".seg.s1,.seg.s2").forEach(function(e){e.onclick=talk}
 var im=document.querySelectorAll(".ban img");if(im.length>1){var k=0;setInterval(function(){im[k].classList.remove("on");k=(k+1)%im.length;im[k].classList.add("on")},4000)}`;
     const cover='<div class="tk"><div class="cov">'+(hd.length?'<div class="ban">'+hd.map((h,i)=>'<img class="'+(i?"":"on")+'" src="'+h.u+'" style="object-position:50% '+h.y+'%" alt="">').join("")+'</div>':"")+'<div class="adm">ADMIT TWO · No. '+String(T).padStart(4,"0")+'</div><h1>'+esc(cfg.title||"")+'</h1>'+(cfg.sub?'<div class="sub">'+esc(cfg.sub)+'</div>':'<div class="sub">'+esc(names)+'</div>')+(e8?gBar(e8)+'<span class="bn">'+e8+'</span>':"")+'</div>'+
       order.map((id,i)=>'<div class="seg s'+(i+1)+'" id="s'+(i+1)+'" title="눌러서 다른 한마디 보기"></div>').join("")+'<div class="seg end">'+esc(names)+' · 함께한 '+last+'일의 기록</div></div>';
-    let html=`<!DOCTYPE html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${esc(cfg.title)} · ${esc(names)}</title><link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet"><style>${css}</style></head><body><main>${cover}<nav>${tabs}</nav><div class="pn on" id="p0">${days||'<p class="none" style="color:'+C.on+'">아직 열린 날이 없어요</p>'}</div>${sayPanels}<footer>${esc(names)} · ${esc(cfg.title||"")} · 함께한 ${last}일의 기록</footer></main><script id="d" type="application/json">${json}<\/script><script>${SCRIPT+";"+pawPlace.toString()+";document.querySelectorAll('.body .paw').forEach(function(p){pawPlace(p.parentNode,p)})"}<\/script></body></html>`;
+    let html=`<!DOCTYPE html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${esc(cfg.title)} · ${esc(names)}</title><link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet"><style>${css}</style></head><body><main>${cover}<nav>${tabs}</nav><div class="pn on" id="p0">${days||'<p class="none" style="color:'+C.on+'">아직 열린 날이 없어요</p>'}</div>${sayPanels}<footer>${esc(names)} · ${esc(cfg.title||"")} · 함께한 ${last}일의 기록<br>질문 출처 @4_nb_</footer></main><script id="d" type="application/json">${json}<\/script><script>${SCRIPT+";"+pawPlace.toString()+";document.querySelectorAll('.body .paw').forEach(function(p){pawPlace(p.parentNode,p)})"}<\/script></body></html>`;
     {const us=new Set([...stamps.map(x=>x.img),...Object.values(members).map(m=>m.img)].filter(u=>/^https?:/.test(String(u||""))));let miss=0;
       for(const u of us){const d=await toData(u);if(d.startsWith("data:"))html=html.split(u).join(d);else miss++}
       if(miss)alert("이미지 "+miss+"개는 파일 안에 넣지 못했어요. 사이트가 지워지면 그 이미지는 보이지 않아요.")}
@@ -1890,8 +1894,8 @@ function progTxt(r){if(!r.start)return"";const n=dayOf(r.start),len=(r.q||[]).le
 const SPK_SVG=c=>'<span style="flex:none;font-size:19px;line-height:1;margin-right:-1px;position:relative;top:-1px;color:'+c+'">✦</span>';
 const palInputs=(p,pal)=>Object.keys(PALN).map(k=>'<div class="prow"><span>'+PALN[k]+'</span><input type="color" id="'+p+'-'+k+'" value="'+pal[k]+'"></div>').join("");
 const readPal=p=>{const o={};Object.keys(PALN).forEach(k=>o[k]=$("#"+p+"-"+k).value);return o};
-const fxSelect=(p,v,c)=>'<div class="fxrow"><select id="'+p+'-fx">'+FXG.map(g=>'<optgroup label="'+g[0]+'">'+g[1].map(k=>'<option value="'+k+'"'+(k===v?" selected":"")+'>'+FXI[k][0]+(/^(storm|pour|hud)$/.test(k)?" · 움직임 많음":"")+'</option>').join("")+'</optgroup>').join("")+'</select><span class="note" id="'+p+'-fxd"></span>'+fxColorPick(p,c)+'</div>';
-const wireFx=p=>{const s=$("#"+p+"-fx"),d=$("#"+p+"-fxd");if(!s||!d)return;const bg=$("#"+p+"-bg");wireFxColor(p);
+const fxSelect=(p,v)=>'<div class="fxrow"><select id="'+p+'-fx">'+FXG.map(g=>'<optgroup label="'+g[0]+'">'+g[1].map(k=>'<option value="'+k+'"'+(k===v?" selected":"")+'>'+FXI[k][0]+(/^(storm|pour|hud)$/.test(k)?" · 움직임 많음":"")+'</option>').join("")+'</optgroup>').join("")+'</select><span class="note" id="'+p+'-fxd"></span></div>';
+const wireFx=p=>{const s=$("#"+p+"-fx"),d=$("#"+p+"-fxd");if(!s||!d)return;const bg=$("#"+p+"-bg");
   const u=()=>{d.textContent=FXI[s.value]?FXI[s.value][1]:""};
   const ch=()=>{u();if(window.fxPrev)window.fxPrev.show(s.value,bg,s)};
   s.onchange=ch;s.oninput=ch;s.onfocus=ch;s.onblur=()=>{if(window.fxPrev)window.fxPrev.hide()};
@@ -2388,7 +2392,7 @@ if(cv&&!matchMedia("(prefers-reduced-motion: reduce)").matches){
  const g=cv.getContext("2d"),LC=[document.createElement("canvas")],MAXPX=gCoarse()?400000:700000,FPS=30;/* 9단계: 휴대폰은 종이가 화면 대부분을 덮어 40만 픽셀이면 충분해요 */
  let layer=null,mode="",T=16,F=200,W=0,H=0,cw=0,ch=0,rsU=1,rsMax=1,t0=performance.now(),last=0,ema=0,nf=0;
  const size=()=>{cw=Math.max(2,innerWidth);ch=Math.max(2,innerHeight);const rs=Math.min(rsU,Math.sqrt(MAXPX/(cw*ch)));W=Math.max(2,Math.round(cw*rs));H=Math.max(2,Math.round(ch*rs));if(cv.width!==W||cv.height!==H){cv.width=W;cv.height=H}};
- const draw=u=>{const c=window.gFxTintC;layer.useColor=!!c;if(c)layer.color=c;renderFrame(g,W,H,u,null,null,LC,[layer],cw,ch,T,F)};
+ const draw=u=>renderFrame(g,W,H,u,null,null,LC,[layer],cw,ch,T,F);
  setF=n=>{const m=FX[n]?n:"snow";if(m===mode&&layer)return;mode=m;const d=Object.assign({},SD0,SD[m]);
   const fm=gFxMode(),ka=(gCoarse()?.7:1)*(fm==="calm"?.5:1);layer={fx:m,on:true,amt:d.amt*ka,size:d.size,str:d.str*(fm==="calm"?.8:1),spd:d.spd*(fm==="calm"?.7:1),dir:FX[m].dir==null?0:FX[m].dir,cells:[1,1,1,1,1,1,1,1,1],seed:(Math.random()*1e9)|0,useColor:false,color:"#ffffff",blend:"source-over"};
   T=d.T;F=Math.round(T*12.5);rsU=rsMax=d.rs;ema=0;nf=0;size();t0=performance.now()};
@@ -2413,7 +2417,7 @@ if(cv&&!matchMedia("(prefers-reduced-motion: reduce)").matches){
  const ptick=now=>{if(!pOn)return;requestAnimationFrame(ptick);
   if(pSel&&!pSel.isConnected){pHide();return}
   if(document.hidden||!pLayer||now-plast<1000/FPS-3)return;plast=now;
-  if(pBg&&pBg.value!==pbg){pbg=pBg.value;pvBox.style.background=pbg}{const b=pbg||getComputedStyle(document.documentElement).getPropertyValue("--bgc").trim()||"#000";const fc=pSel&&pSel.closest&&pSel.closest(".fxrow"),fm=fc&&fc.querySelector(".fxc select")?fc.querySelector(".fxc select").value:gFxC,lt=gFxDark(fm,b);if(pLayer){const tc=FXCOL[fm];pLayer.useColor=!!tc;if(tc)pLayer.color=tc}if(pvBox.dataset.lt!==String(lt)){pvBox.dataset.lt=lt;pvBox.classList.toggle("glt",lt)}}
+  if(pBg&&pBg.value!==pbg){pbg=pBg.value;pvBox.style.background=pbg}{const b=pbg||getComputedStyle(document.documentElement).getPropertyValue("--bgc").trim()||"#000";const lt=gFxDark(b);if(pvBox.dataset.lt!==String(lt)){pvBox.dataset.lt=lt;pvBox.classList.toggle("glt",lt)}}
   if(pc.width!==pW||pc.height!==pH){pc.width=pW;pc.height=pH}
   const u=(((now-pt0)/1000)/pT)%1;try{renderFrame(pg,pW,pH,u,null,null,PLC,[pLayer],pcw,pch,pT,pF)}catch(e){}};
  window.fxPrev={show(key,bgEl,selEl){pBg=bgEl||null;pSel=selEl||null;pbg="";if(!pBg)pvBox.style.background="";pSet(key);pSize();pvBox.classList.add("on");if(!pOn){pOn=true;requestAnimationFrame(ptick)}},hide:pHide};
@@ -2425,7 +2429,7 @@ window.setFx=setF;
 })();
 
 /* ===== 부팅 · 코드 입력 · 시작 화면 ===== */
-const shell=m=>{$("#mainApp").innerHTML=m;$("#mainApp").hidden=false;$("#roomApp").hidden=true;try{gBootDone()}catch(e){}};
+const shell=m=>{$("#mainApp").innerHTML=m+$("#roomApp .gcredit").outerHTML;$("#mainApp").hidden=false;$("#roomApp").hidden=true;try{gBootDone()}catch(e){}};
 const TITLE="Our Christmas Diary";
 const msgBox=t=>shell('<div class="sheet ceil mhead"><h1>'+TITLE+'</h1><p class="note">'+t+'</p></div>');
 const closeMs=()=>CONF&&CONF.closeAt&&CONF.closeAt.toMillis?CONF.closeAt.toMillis():0;
@@ -2434,6 +2438,8 @@ const kDay=ymdS=>{if(!ymdS)return"";const [y,m,d]=ymdS.split("-").map(Number);re
 const CODE_A="ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
 const newCode=()=>{const a=new Uint32Array(8);crypto.getRandomValues(a);return Array.from(a,v=>CODE_A[v%CODE_A.length]).join("")};
 const cleanCode=v=>String(v||"").toUpperCase().replace(/[^A-Z0-9]/g,"").slice(0,12);
+/* 모든 문답이 함께 쓰는 제목·부제·질문. 배포할 때 여기서만 정해요 (질문은 맨 위 XQ) */
+const CONTENT={title:"크리스마스를 기다리는 30문답",sub:"Waiting For Christmas",q:XQ.slice()};
 async function boot(){
   applyPal(MAINPAL);setFx("snow");document.title=TITLE;
   const t=setTimeout(()=>msgBox("아직 연결되지 않았어요. 잠시만 기다려 주세요…"),10000);
@@ -2456,9 +2462,11 @@ function showGate(){
   inp.oninput=()=>{err.textContent=""};inp.onkeydown=e=>{if(e.key==="Enter"&&!e.isComposing)ok.click()};
   ok.onclick=async()=>{const code=cleanCode(inp.value);if(code.length<6){err.textContent="코드를 확인해 주세요";return}
     ok.disabled=true;err.textContent="";
-    try{const iv=await db.doc("invites/"+code).get({source:"server"});
+    /* 이미 쓰인 코드는 규칙상 열어 볼 수 없어서(누가 썼는지 감추려고) 권한 오류로 와요 */
+    const den=e=>e&&(e.code==="permission-denied"||/permission/i.test(e.message||""));
+    try{let iv=null;try{iv=await db.doc("invites/"+code).get({source:"server"})}catch(e){if(den(e)){err.textContent="이미 사용된 코드예요";ok.disabled=false;return}throw e}
       if(iv.exists){if(iv.data().used){err.textContent="이미 사용된 가입 코드예요";ok.disabled=false;return}showStart(code);return}
-      const pv=await db.doc("pairs/"+code).get({source:"server"});
+      let pv=null;try{pv=await db.doc("pairs/"+code).get({source:"server"})}catch(e){if(den(e)){err.textContent="이미 사용된 짝꿍 코드예요. 짝꿍에게 새 코드를 받아 주세요";ok.disabled=false;return}throw e}
       if(pv.exists){const p=pv.data();if(p.used){err.textContent="이미 사용된 짝꿍 코드예요. 짝꿍에게 새 코드를 받아 주세요";ok.disabled=false;return}
         if(p.exp&&p.exp.toMillis()<Date.now()){err.textContent="만료된 짝꿍 코드예요. 짝꿍에게 새 코드를 받아 주세요";ok.disabled=false;return}
         showJoin(code,p);return}
@@ -2466,20 +2474,19 @@ function showGate(){
     catch(e){err.textContent="확인하지 못했어요. 연결을 확인해 주세요";ok.disabled=false}}}
 /* 가입 코드 → 처음 한 번만: 내 이름 · 문답 제목 · 색 · 종이 · 눈 효과 */
 function showStart(code){let paper="cream";const pal={...DEF};
-  shell('<div class="sheet ceil mhead"><h1>'+TITLE+'</h1></div><div class="sheet fpad" id="gate"><h2 style="margin:0 0 6px;font-size:18px">우리 문답 만들기</h2><p class="note" style="margin:0 0 4px">가입 코드가 확인됐어요. 아래 내용은 나중에 설정에서 바꿀 수 있어요.</p>'+
+  shell('<div class="sheet ceil mhead"><h1>'+TITLE+'</h1></div><div class="sheet fpad" id="gate"><h2 style="margin:0 0 6px;font-size:18px">우리 문답 만들기</h2><p class="note" style="margin:0 0 4px">가입 코드가 확인됐어요. 색·종이·눈 효과는 나중에 설정에서 바꿀 수 있어요.</p>'+
     '<label for="s-n">내 이름</label><input id="s-n" maxlength="12" placeholder="짝꿍에게 보일 이름" value="'+esc(String((firebase.auth().currentUser||{}).displayName||"").slice(0,12))+'">'+
-    '<label for="s-t">문답 제목</label><input id="s-t" maxlength="40" value="크리스마스를 기다리는 30문답"><label for="s-s">부제 <span class="note">(선택)</span></label><input id="s-s" maxlength="60" placeholder="예) 12월 한 달, 우리 둘이 나누는 이야기">'+
     '<label>컬러 팔레트</label>'+palInputs("s",pal)+'<label>종이</label><div class="ppk" id="s-pp">'+ppPicker(paper)+'</div><label>배경 움직임 효과</label>'+fxSelect("s","snow")+
     '<p class="gerr" id="s-err"></p><div class="mbtns" style="justify-content:space-between"><button class="sq" id="s-x">코드 다시 입력</button><button class="sq pri" id="s-go">시작하기</button></div>'+privNote()+'</div>');
   wireFx("s");
   document.querySelectorAll("#s-pp .ppb").forEach(b=>b.onclick=()=>{paper=b.dataset.pp;document.querySelectorAll("#s-pp .ppb").forEach(x=>{x.classList.toggle("on",x===b);x.setAttribute("aria-pressed",x===b)})});
   $("#s-fx").addEventListener("change",()=>setFx($("#s-fx").value));
   $("#s-x").onclick=showGate;
-  $("#s-go").onclick=async()=>{const err=$("#s-err"),name=$("#s-n").value.trim().slice(0,12),title=$("#s-t").value.trim().slice(0,40);
-    if(!name){err.textContent="이름을 입력해 주세요";$("#s-n").focus();return}if(!title){err.textContent="문답 제목을 입력해 주세요";$("#s-t").focus();return}
+  $("#s-go").onclick=async()=>{const err=$("#s-err"),name=$("#s-n").value.trim().slice(0,12);
+    if(!name){err.textContent="이름을 입력해 주세요";$("#s-n").focus();return}
     const b=$("#s-go");b.disabled=true;err.textContent="만드는 중…";
     const rid="r"+Date.now().toString(36)+newCode().slice(0,4).toLowerCase(),pair=newCode(),exp=Date.now()+PAIR_DAYS*864e5,now=Date.now();
-    const room={title,sub:$("#s-s").value.trim().slice(0,60),palette:readPal("s"),paper,fx:$("#s-fx").value,fxc:($("#s-fxc")||{}).value||"auto",memberIds:[me],owner:me,invite:code,pairCode:pair,pairExp:exp,ts:now};
+    const room={palette:readPal("s"),paper,fx:$("#s-fx").value,memberIds:[me],owner:me,invite:code,pairCode:pair,pairExp:exp,ts:now};
     const bt=db.batch();
     bt.set(db.doc("rooms/"+rid),room);
     bt.update(db.doc("invites/"+code),{used:true,usedBy:me,usedAt:now,roomId:rid});
@@ -2558,8 +2565,8 @@ function gTabInd(){const T=$("#tabs"),on=T&&T.querySelector("button.on");if(!T||
   if(gTabInd.x!=null&&gTabInd.x!==x&&!gRM()&&i.animate)i.animate([{transform:"translateX("+gTabInd.x+"px)"},{transform:"translateX("+x+"px)"}],{duration:160,easing:GEO});gTabInd.x=x}
 function mPaperVars(k){const P0=PAPERS[k]||PAPERS.cream,p=P0.c;return"--mpaper:"+p.paper+";--mpaperd:"+p.paperd+";--mperf:"+p.perf+";--mmute:"+p.mute+";--mtx:"+(p.tx||"#2b211e")}
 const GLOCK="o30c.loc",GIDLE=10*60*1000;
-function gLoc(){try{return JSON.parse(localStorage.getItem(GLOCK)||"null")}catch(e){return null}}
-function gSaveLoc(o){try{localStorage.setItem(GLOCK,JSON.stringify({...o,t:Date.now()}))}catch(e){}}
+function gLoc(){try{const o=JSON.parse(localStorage.getItem(GLOCK)||"null");return o&&o.u===me?o:null}catch(e){return null}}
+function gSaveLoc(o){try{localStorage.setItem(GLOCK,JSON.stringify({...o,u:me,t:Date.now()}))}catch(e){}}
 function goHome(){tab="home";sel=null;try{stopChat()}catch(e){}render();window.scrollTo(0,0)}
 function modal(html,wire){document.documentElement.classList.add("gmodal");const m=$("#modal");m.innerHTML='<div class="mbox">'+html+'</div>';m.hidden=false;if(wire)wire(m)}
 function closeModal(){document.documentElement.classList.remove("gmodal");const m=$("#modal");m.hidden=true;m.innerHTML=""}
@@ -2572,9 +2579,9 @@ function openRoom(rid,pv){
   cfg=null;members={};answers={};arush={};gAnsOk=false;gMemOk=false;headers=[];says=[];stamps=[];tab=gRT&&["home","cal","write","say","more"].includes(gRT)?gRT:"home";gRT=null;sel=null;draft={};wEdit=false;editing=null;pend={};tk={};today=0;Q=[];stEd={open:false,img:null,zoom:1,ox:0,oy:0};
   $("#mainApp").hidden=true;$("#roomApp").hidden=false;$("#view").innerHTML="";$("#tabs").innerHTML="";$("#talk").innerHTML="";$("#sub").textContent="불러오는 중…";$("#rtitle").textContent="";$("#rsub").hidden=true;renderBanner();window.scrollTo(0,0);
   const S=x=>{if(typeof x==="function")unsubs.push(x)};
-  S(db.doc("rooms/"+rid).onSnapshot(s=>{if(RID!==rid)return;cfg=s.exists?{...s.data(),q:XQ,start:CONF.start}:null;
+  S(db.doc("rooms/"+rid).onSnapshot(s=>{if(RID!==rid)return;cfg=s.exists?{...s.data(),title:CONTENT.title,sub:CONTENT.sub,q:CONTENT.q,start:CONF.start}:null;
     if(!cfg){$("#sub").textContent="문답을 열 수 없어요";$("#view").innerHTML="";return}
-    Q=cfg.q||[];gFxC=cfg.fxc||"auto";applyPal(cfg.palette);ppNow="";applyPaper(cfg.paper);setFx(cfg.fx||"snow");$("#rtitle").textContent=cfg.title||"";$("#rsubt").textContent=cfg.sub||"";$("#rsub").hidden=!cfg.sub;{const e=endOf(cfg.start,(cfg.q||[]).length).replace(/-/g,"");$("#rbar").textContent=e?"*00"+e+"00*":"";$("#rbar").hidden=!e;try{document.fonts.load('44px "Libre Barcode 39"',e).then(f=>{if(f&&f.length){$("#rbar").classList.add("ok");gFitBar()}})}catch(x){}}document.title=cfg.title||"";today=calcToday();render()},e=>{$("#sub").textContent="데이터를 불러올 수 없어요."}));
+    Q=cfg.q||[];applyPal(cfg.palette);ppNow="";applyPaper(cfg.paper);setFx(cfg.fx||"snow");$("#rtitle").textContent=cfg.title||"";$("#rsubt").textContent=cfg.sub||"";$("#rsub").hidden=!cfg.sub;{const e=endOf(cfg.start,(cfg.q||[]).length).replace(/-/g,"");$("#rbar").textContent=e?"*00"+e+"00*":"";$("#rbar").hidden=!e;try{document.fonts.load('44px "Libre Barcode 39"',e).then(f=>{if(f&&f.length){$("#rbar").classList.add("ok");gFitBar()}})}catch(x){}}document.title=cfg.title||"";today=calcToday();render()},e=>{$("#sub").textContent="데이터를 불러올 수 없어요."}));
   S(db.collection(P("members")).onSnapshot(s=>{if(RID!==rid)return;members={};s.docs.forEach(x=>members[x.id]=x.data());
     if(!(s.metadata&&s.metadata.fromCache))gMemOk=true;if(gMemOk&&!members[me]&&!CLOSED&&!ensured){ensured=true;const mr=db.doc(P("members/"+me));/* 서버에서 정말 없는지 한 번 더 확인하고 만들어요 (프로필 덮어쓰기 방지) */Promise.resolve().then(()=>mr.get({source:"server"})).then(d=>{if(!d.exists)return mr.set({name:UDOC?.name||"나",color:PL.main,img:""})}).catch(()=>{ensured=false})}refresh()},e=>{$("#sub").textContent="데이터를 불러올 수 없어요."}));
   S(db.collection(P("answers")).onSnapshot(s=>{if(RID!==rid)return;answers={};arush={};s.docs.forEach(x=>{answers[x.id]=x.data().a||{};arush[x.id]=x.data().r||{}});if(!(s.metadata&&s.metadata.fromCache))gAnsOk=true;refresh()}));
@@ -2615,24 +2622,9 @@ function snd(kind,i){const a=actx();if(!a||i<0)return;if(i>=4){sfx(kind,i-4,.56)
 function gGoToday(rid){try{window.focus()}catch(e){}if(rid&&RID!==rid){try{openRoom(rid)}catch(e){}gTodayNext=rid;return}
   stopChat();stEd.open=false;if(today>=1&&today<=Q.length){tab="cal";sel=today}else{tab="home";sel=null}render();window.scrollTo(0,0)}
 var gTodayNext=null;
-/* ===== 배경 효과 색: 자동(배경 명도에 맞춘 권장) / 흰색 / 검은색 ===== */
-var gFxC="auto";
-const FXCN={auto:"자동",light:"흰색",dark:"검은색",gold:"골드",rose:"로즈",coral:"코랄",mint:"민트",sky:"하늘",lavender:"라벤더",wine:"와인",mustard:"머스터드",forest:"포레스트",teal:"딥 틸",navy:"네이비",plum:"플럼",cocoa:"코코아"};
-const FXCOL={gold:"#f3cf7a",rose:"#f4a3b8",coral:"#f2967a",mint:"#9fe0c4",sky:"#9fd2f4",lavender:"#c6b3f1",wine:"#8c2a3c",mustard:"#b8862b",forest:"#2f6b4a",teal:"#1f6a72",navy:"#2b3f7a",plum:"#6b3a7d",cocoa:"#6b4532"};
-const gFxRec=bg=>gOn(bg||"#000")==="#fff"?"light":"dark";
-const FXCG=[["기본",["auto","light","dark"]],["파스텔",["gold","rose","coral","mint","sky","lavender"]],["딥",["wine","mustard","forest","teal","navy","plum","cocoa"]]];
-function fxColorPick(p,c){c=FXCN[c]?c:"auto";return '<div class="fxc"><label class="fxcl" for="'+p+'-fxc">효과 색</label><i class="fxsw" id="'+p+'-fxcs"></i><select id="'+p+'-fxc">'+
-  FXCG.map(g=>'<optgroup label="'+g[0]+'">'+g[1].map(k=>'<option value="'+k+'"'+(k===c?" selected":"")+'>'+FXCN[k]+'</option>').join("")+'</optgroup>').join("")+'</select></div>'}
-function wireFxColor(p){const w=$("#"+p+"-fxc");if(!w)return;const bg=$("#"+p+"-bg"),sw=$("#"+p+"-fxcs");
-  const swc=()=>{const v=w.value,b=bg?bg.value:getComputedStyle(document.documentElement).getPropertyValue("--bgc").trim();
-    if(sw){sw.style.background=FXCOL[v]||(v==="dark"||(v==="auto"&&gFxRec(b)==="dark")?"#222":"#fff")}};
-  const ch=()=>{swc();if(p==="ms"||p==="rs"){gFxC=w.value;gFxApply(bg?bg.value:null)}const s=$("#"+p+"-fx");if(s&&window.fxPrev)window.fxPrev.show(s.value,bg,s)};
-  w.onchange=ch;w.oninput=ch;
-  /* 효과 고르기처럼: 선택된 상태에서 마우스 휠로 다음·이전 색 */
-  let acc=0;w.addEventListener("wheel",e=>{if(document.activeElement!==w)return;e.preventDefault();acc+=e.deltaY;if(Math.abs(acc)<40)return;const i=w.selectedIndex+(acc>0?1:-1);acc=0;if(i<0||i>=w.options.length)return;w.selectedIndex=i;ch()},{passive:false});
-  if(bg)bg.addEventListener("input",swc);swc()}
-function gFxDark(mode,bg){if(FXCOL[mode])return false;return mode==="dark"||(mode!=="light"&&gFxRec(bg)==="dark")}
-function gFxApply(bg){window.gFxTintC=FXCOL[gFxC]||null;const b=bg||getComputedStyle(document.documentElement).getPropertyValue("--bgc").trim()||"#000";document.documentElement.classList.toggle("gfxd",gFxDark(gFxC,b))}
+/* ===== 배경 효과 색: 배경이 밝으면 효과를 어둡게 ===== */
+const gFxDark=bg=>gOn(bg||"#000")!=="#fff";
+function gFxApply(bg){const b=bg||getComputedStyle(document.documentElement).getPropertyValue("--bgc").trim()||"#000";document.documentElement.classList.toggle("gfxd",gFxDark(b))}
 
 function pushN(t,b,tag){try{if(!("Notification" in window)||Notification.permission!=="granted")return;const rid=RID;try{const n=new Notification(t,{body:b,tag});n.onclick=()=>{try{n.close()}catch(e){}gGoToday(rid)}}catch(e){navigator.serviceWorker&&navigator.serviceWorker.getRegistration().then(r=>r&&r.showNotification(t,{body:b,tag,data:{rid}}))}}catch(e){}}
 function nEvent(kind,title,body){if(PREVIEW)return;if(NP.snd)snd(kind,kind==="q"?NP.qs:NP.cs);if(NP[kind])pushN(title,body,kind+"-"+RID+(kind==="q"?"-"+today:""))}
@@ -2656,13 +2648,13 @@ function wireNotif(){const c=$("#ncard");if(!c)return;{const h=c.querySelector("
   c.querySelectorAll(".pl").forEach(b=>b.onclick=()=>{const k=b.dataset.np;if(NP[k]>=0)snd(k==="qs"?"q":"c",NP[k])})}
 function roomSetCard(){const c=cfg||{},pal={...DEF,...(c.palette||{})};
   const view='<p class="note" style="margin:8px 0 0"><b>'+esc(c.title||"")+'</b>'+(c.sub?' · '+esc(c.sub):"")+'<br>시작일 '+esc(c.start||"")+' · 마지막 날 '+esc(endOf(c.start,(c.q||[]).length))+' · 배경 효과 '+esc((FXI[c.fx||"snow"]||FXI.snow)[0])+'</p><div class="chips">'+Object.keys(PALN).map(k=>'<span class="chipw"><span class="chip" style="background:'+pal[k]+'"></span><small>'+PALN[k].split(" ")[0]+'</small></span>').join("")+'<span class="chipw"><span class="chip" style="background:'+(PAPERS[c.paper]||PAPERS.cream).c.paper+';box-shadow:inset 0 0 0 1px rgba(0,0,0,.15)"></span><small>종이 · '+(PAPERS[c.paper]||PAPERS.cream).n+'</small></span></div>';
-  const edit='<div class="note" style="margin-top:8px">문답 제목</div><input id="rs-t" maxlength="40" value="'+esc(c.title||"")+'"><div class="note" style="margin-top:8px">부제 (선택)</div><input id="rs-s" maxlength="60" value="'+esc(c.sub||"")+'"><div class="note" style="margin-top:10px">컬러 팔레트</div>'+palInputs("rs",pal)+'<div class="note" style="margin-top:10px">종이</div><div class="ppk" id="rs-pp">'+ppPicker(PAPERS[c.paper]?c.paper:"cream")+'</div><div class="note" style="margin-top:6px">배경 움직임 효과</div>'+fxSelect("rs",c.fx||"snow",c.fxc)+'<p class="note" id="rs-st" style="margin:8px 0 0"></p>';
+  const edit='<p class="note" style="margin:8px 0 0">제목·부제·질문은 모든 문답이 함께 써요.</p><div class="note" style="margin-top:10px">컬러 팔레트</div><span id="rs-on" hidden></span>'+palInputs("rs",pal)+'<div class="note" style="margin-top:10px">종이</div><div class="ppk" id="rs-pp">'+ppPicker(PAPERS[c.paper]?c.paper:"cream")+'</div><div class="note" style="margin-top:6px">배경 움직임 효과</div>'+fxSelect("rs",c.fx||"snow")+'<p class="note" id="rs-st" style="margin:8px 0 0"></p>';
   return secCard("room","문답 설정",view,edit)}
-function wireRoomSet(){window.rsSave=null;if(!$("#rs-t")){ppSel=null;return}wireFx("rs");
+function wireRoomSet(){window.rsSave=null;if(!$("#rs-on")){ppSel=null;return}wireFx("rs");
   if(!ppSel)ppSel=PAPERS[cfg?.paper]?cfg.paper:"cream";
   document.querySelectorAll("#rs-pp .ppb").forEach(b=>{b.classList.toggle("on",b.dataset.pp===ppSel);b.setAttribute("aria-pressed",b.dataset.pp===ppSel);b.onclick=()=>{ppSel=b.dataset.pp;document.querySelectorAll("#rs-pp .ppb").forEach(x=>{x.classList.toggle("on",x===b);x.setAttribute("aria-pressed",x===b)});applyPaper(ppSel)}});
-  window.rsSave=async()=>{const title=$("#rs-t").value.trim().slice(0,40);if(!title){$("#rs-st").textContent="제목을 입력해 주세요";return}
-    try{await db.doc("rooms/"+RID).update({title,sub:$("#rs-s").value.trim().slice(0,60),palette:readPal("rs"),fx:$("#rs-fx").value,fxc:($("#rs-fxc")||{}).value||"auto",paper:ppSel||"cream"});editing=null;window.rsSave=null;ppSel=null;render()}catch(e){$("#rs-st").textContent="저장하지 못했어요. 연결을 확인해 주세요"}}}
+  window.rsSave=async()=>{
+    try{await db.doc("rooms/"+RID).update({palette:readPal("rs"),fx:$("#rs-fx").value,paper:ppSel||"cream"});editing=null;window.rsSave=null;ppSel=null;render()}catch(e){$("#rs-st").textContent="저장하지 못했어요. 연결을 확인해 주세요"}}}
 const homeIc='<svg class="ti" viewBox="0 0 24 24"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg>';
 (function(){const fit=()=>{const vw=document.documentElement.clientWidth;let w=Math.min(640,vw);if((vw-w)%2)w-=1;document.querySelectorAll("body>main").forEach(m=>m.style.width=w+"px")};fit();addEventListener("resize",fit);if(window.ResizeObserver)new ResizeObserver(fit).observe(document.documentElement)})();
 try{document.addEventListener("touchstart",function(){},{passive:true})}catch(e){}
