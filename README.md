@@ -20,6 +20,7 @@
 
 - 운영(prod): **https://waiting-for-christmas.web.app** (prod 프로젝트 안의 두 번째 Hosting 사이트. `.firebaserc`의 `targets`로 prod 배포가 이 사이트로 가요)
 - 테스트(dev): https://our-christmas-diary-2f3e0.web.app
+- 프로젝트 기본 주소(`our-christmas-diary-prod.web.app`)는 쓰지 않아서 꺼 뒀어요. 기본 사이트라 프로젝트가 있는 동안 지울 수는 없어요.
 - prod 로그인 창(authDomain)도 운영 주소에서 열려요. 주소를 바꾸면 로그인 허용 도메인, API 키 제한, OAuth 클라이언트의 리디렉션 URI(`/__/auth/handler`), reCAPTCHA 도메인, `cors.json`을 같이 고쳐야 해요.
 
 ## 제목·부제·질문
@@ -147,11 +148,13 @@ gsutil cors set cors.json gs://[storageBucket 값]
 1. 시작 전부터 종료일과 삭제일을 공지해요 (가입 화면과 설정 화면에도 표시돼요).
 2. 문답 종료 시각이 지나면 쓰기가 자동으로 막혀요. 일찍 닫아야 하면 관리자 화면의 **지금 바로 닫기**를 눌러요.
 3. 삭제일까지 열람·이미지 내보내기·HTML 백업만 열어 둬요.
-4. 삭제일에:
-   - 사이트 내리기: `npx firebase hosting:disable --project prod`
+4. 삭제일(2027-01-08)에:
+   - 사이트 내리기: `npx firebase hosting:disable --project prod --site waiting-for-christmas`
    - 데이터 지우기: Firebase 콘솔 → Firestore에서 컬렉션 삭제, Storage에서 `rooms` 폴더 삭제
-   - (또는 프로젝트 설정 → 프로젝트 삭제로 한 번에)
-5. 결제 계정 연결을 끊어요.
+   - (또는 프로젝트 설정 → 프로젝트 삭제로 한 번에. 프로젝트를 지우면 `waiting-for-christmas.web.app` 이름도 함께 사라져요)
+5. 테스트용 **dev 프로젝트**(`our-christmas-diary-2f3e0`)도 프로젝트째 삭제해요. 테스트 계정·문답·코드가 같이 지워져요.
+6. reCAPTCHA 관리 콘솔에서 `christmas-diary-prod`, `christmas-diary-dev` 키를 삭제해요.
+7. 결제 계정 연결을 끊어요 (두 프로젝트 모두). 예산 알림도 함께 사라져요.
 
 ## 규칙 요약
 
