@@ -1101,7 +1101,7 @@ html.gmodal{overflow:hidden}@media (hover:hover) and (pointer:fine){html{scrollb
 </script>
 <script>
 /* 새 버전 알림: 올라간 index.html이 바뀌면 상단에 새로고침 안내를 띄워요 */
-const BUILD_ID="1794821453685";
+const BUILD_ID="1794823621633";
 (function(){
   if(!/^https?:/.test(location.protocol))return;
   let shown=false;
@@ -2582,9 +2582,10 @@ function openRoom(rid,pv){
   S(db.doc("rooms/"+rid).onSnapshot(s=>{if(RID!==rid)return;cfg=s.exists?{...s.data(),title:CONTENT.title,sub:CONTENT.sub,q:CONTENT.q,start:CONF.start}:null;
     if(!cfg){$("#sub").textContent="문답을 열 수 없어요";$("#view").innerHTML="";return}
     Q=cfg.q||[];applyPal(cfg.palette);ppNow="";applyPaper(cfg.paper);setFx(cfg.fx||"snow");$("#rtitle").textContent=cfg.title||"";$("#rsubt").textContent=cfg.sub||"";$("#rsub").hidden=!cfg.sub;{const e=endOf(cfg.start,(cfg.q||[]).length).replace(/-/g,"");$("#rbar").textContent=e?"*00"+e+"00*":"";$("#rbar").hidden=!e;try{document.fonts.load('44px "Libre Barcode 39"',e).then(f=>{if(f&&f.length){$("#rbar").classList.add("ok");gFitBar()}})}catch(x){}}document.title=cfg.title||"";today=calcToday();render()},e=>{$("#sub").textContent="데이터를 불러올 수 없어요."}));
-  S(db.collection(P("members")).onSnapshot(s=>{if(RID!==rid)return;members={};s.docs.forEach(x=>members[x.id]=x.data());
-    if(!(s.metadata&&s.metadata.fromCache))gMemOk=true;if(gMemOk&&!members[me]&&!CLOSED&&!ensured){ensured=true;const mr=db.doc(P("members/"+me));/* 서버에서 정말 없는지 한 번 더 확인하고 만들어요 (프로필 덮어쓰기 방지) */Promise.resolve().then(()=>mr.get({source:"server"})).then(d=>{if(!d.exists)return mr.set({name:UDOC?.name||"나",color:PL.main,img:""})}).catch(()=>{ensured=false})}refresh()},e=>{$("#sub").textContent="데이터를 불러올 수 없어요."}));
-  S(db.collection(P("answers")).onSnapshot(s=>{if(RID!==rid)return;answers={};arush={};s.docs.forEach(x=>{answers[x.id]=x.data().a||{};arush[x.id]=x.data().r||{}});if(!(s.metadata&&s.metadata.fromCache))gAnsOk=true;refresh()}));
+  /* 캐시가 이미 최신이면 서버 확인 신호(fromCache:false)가 메타데이터 변경으로만 와요 → includeMetadataChanges로 받아요 */
+  S(db.collection(P("members")).onSnapshot({includeMetadataChanges:true},s=>{if(RID!==rid)return;const w0=gMemOk;members={};s.docs.forEach(x=>members[x.id]=x.data());
+    if(!(s.metadata&&s.metadata.fromCache))gMemOk=true;if(gMemOk&&!members[me]&&!CLOSED&&!ensured){ensured=true;const mr=db.doc(P("members/"+me));/* 서버에서 정말 없는지 한 번 더 확인하고 만들어요 (프로필 덮어쓰기 방지) */Promise.resolve().then(()=>mr.get({source:"server"})).then(d=>{if(!d.exists)return mr.set({name:UDOC?.name||"나",color:PL.main,img:""})}).catch(()=>{ensured=false})}if(w0===gMemOk&&!s.docChanges().length)return;refresh()},e=>{$("#sub").textContent="데이터를 불러올 수 없어요."}));
+  S(db.collection(P("answers")).onSnapshot({includeMetadataChanges:true},s=>{if(RID!==rid)return;const w0=gAnsOk;answers={};arush={};s.docs.forEach(x=>{answers[x.id]=x.data().a||{};arush[x.id]=x.data().r||{}});if(!(s.metadata&&s.metadata.fromCache))gAnsOk=true;if(w0===gAnsOk&&!s.docChanges().length)return;refresh()},e=>{$("#sub").textContent="데이터를 불러올 수 없어요."}));
   const L=(c,fn)=>S(db.collection(c).orderBy("ts").onSnapshot(s=>{if(RID!==rid)return;fn(s.docs.map(x=>({id:x.id,...x.data()})))}));
   L(P("stamps"),a=>{stamps=a;refresh()});
   L(P("headers"),a=>{headers=a;renderBanner();if(tab==="more")refresh()});
