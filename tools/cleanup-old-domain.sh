@@ -8,7 +8,7 @@ echo "== 이전 사이트 끄기"
 npx firebase hosting:disable --project prod --site our-christmas-diary-prod --force 2>&1 | tail -1
 echo "== 로그인 허용 도메인"
 curl -s -X PATCH "${H[@]}" "https://identitytoolkit.googleapis.com/admin/v2/projects/$P/config?updateMask=authorizedDomains" \
-  -d '{"authorizedDomains":["waiting-for-christmas.web.app","waiting-for-christmas.firebaseapp.com"]}' \
+  -d '{"authorizedDomains":["our-christmas-diary-prod.firebaseapp.com","waiting-for-christmas.web.app","waiting-for-christmas.firebaseapp.com"]}' \
   | python3 -c 'import json,sys;print(json.load(sys.stdin).get("authorizedDomains"))'
 echo "== API 키 웹사이트 제한"
 K=$(gcloud services api-keys list --project $P --filter='displayName~Browser' --format='value(name)' | head -1)
