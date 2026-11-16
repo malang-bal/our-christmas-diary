@@ -21,6 +21,18 @@ const db = (u) => (u ? env.authenticatedContext(u) : env.unauthenticatedContext(
 const st = (u) => (u ? env.authenticatedContext(u) : env.unauthenticatedContext()).storage();
 const seed = (fn) => env.withSecurityRulesDisabled((ctx) => fn(ctx.firestore()));
 
+// 앱과 같은 방식으로 채팅·한마디 보내기: rate/{uid} 순번을 올리면서 'uid_순번' 이름으로 쓴다
+// wait=true 면 1초 간격 규칙을 맞추려고 직전 순번 시각을 과거로 돌려 둔다(테스트 시간 절약)
+async function post(u, items, { wait = true, ids = null, bump = null } = {}) {
+  const rp = "rooms/" + RID + "/rate/" + u;
+  let n0 = 0;
+  await seed(async (d) => { const x = await d.doc(rp).get(); n0 = x.exists ? x.data().n : 0;
+    if (wait && x.exists) await d.doc(rp).set({ t: TS.fromMillis(Date.now() - 5000), n: n0 }); });
+  const d = db(u), b = d.batch();
+  b.set(d.doc(rp), { t: FV.serverTimestamp(), n: n0 + (bump ?? items.length) });
+  items.forEach(([c, o], i) => b.set(d.doc("rooms/" + RID + "/" + c + "/" + (ids ? ids[i] : u + "_" + (n0 + i + 1))), o));
+  return b.commit();
+}
 const roomData = (owner, invite, pair) => ({
   palette: { bg: "#0f3b2a", main: "#c8352b" },
   paper: "cream", fx: "snow", memberIds: [owner], owner, invite, pairCode: pair,
@@ -310,8 +322,8 @@ describe("문답은 멤버 두 명만", () => {
   test("다른 사람은 문답 안에 아무것도 쓸 수 없다", async () => {
     const d = db(C);
     await assertFails(d.doc(p + "answers/" + C).set({ a: { 1: "끼어들기" } }));
-    await assertFails(d.collection(p + "says").add({ uid: C, text: "끼어들기", ts: 1 }));
-    await assertFails(d.collection(p + "chats/d1/messages").add({ uid: C, text: "끼어들기", ts: 1 }));
+    await assertFails(post(C, [["says", { uid: C, text: "끼어들기", ts: 1 }]]));
+    await assertFails(post(C, [["chats/d1/messages", { uid: C, text: "끼어들기", ts: 1 }]]));
     await assertFails(d.doc(p + "members/" + C).set({ name: "캐럴", color: "#000000", img: "" }));
     await assertFails(d.doc(p + "headers/h2").set({ aid: U("h"), y: 50, by: C, ts: 1 }));
     await assertFails(d.doc("rooms/" + RID).update({ fx: "storm" }));
@@ -355,35 +367,57 @@ describe("문답은 멤버 두 명만", () => {
     await assertSucceeds(db(B).doc(p + "members/" + B).set({ name: "밥", color: "#2f6b4f", img: U("profiles/b") }));
   });
   test("한마디는 본인 이름으로만 쓰고 본인 것만 지운다", async () => {
-    await assertSucceeds(db(B).collection(p + "says").add({ uid: B, text: "보고 싶다", ts: 2 }));
-    await assertFails(db(B).collection(p + "says").add({ uid: A, text: "사칭", ts: 2 }));
-    await assertFails(db(B).collection(p + "says").add({ uid: B, text: "가".repeat(201), ts: 2 }));
+    await assertSucceeds(post(B, [["says", { uid: B, text: "보고 싶다", ts: 2 }]]));
+    await assertFails(post(B, [["says", { uid: A, text: "사칭", ts: 2 }]]));
+    await assertFails(post(B, [["says", { uid: B, text: "가".repeat(201), ts: 2 }]]));
     await assertFails(db(B).doc(p + "says/s1").delete());
     await assertFails(db(A).doc(p + "says/s1").update({ text: "수정" }));
     await assertSucceeds(db(A).doc(p + "says/s1").delete());
   });
   test("채팅은 본인 이름으로만, 1~30일 방에만, 고치거나 지울 수 없다", async () => {
-    const c = db(B).collection(p + "chats/d1/messages");
-    await assertSucceeds(c.add({ uid: B, text: "안녕", ts: 2 }));
-    await assertSucceeds(c.add({ uid: B, dice: 6, v: 3, ts: 3 }));
-    await assertSucceeds(db(B).collection(p + "chats/d30/messages").add({ uid: B, text: "마지막 날", ts: 2 }));
-    await assertFails(c.add({ uid: A, text: "사칭", ts: 2 }));
-    await assertFails(c.add({ uid: B, text: "가".repeat(501), ts: 2 }));
-    await assertFails(c.add({ uid: B, dice: 6, v: 7, ts: 3 }));
-    await assertFails(c.add({ uid: B, dice: 1000, v: 999, ts: 3 }));
-    await assertFails(c.add({ uid: B, text: "덤", extra: 1, ts: 2 }));
+    const c = "chats/d1/messages", ch = (o) => post(B, [[c, o]]);
+    await assertSucceeds(ch({ uid: B, text: "안녕", ts: 2 }));
+    await assertSucceeds(ch({ uid: B, dice: 6, v: 3, ts: 3 }));
+    await assertSucceeds(post(B, [["chats/d30/messages", { uid: B, text: "마지막 날", ts: 2 }]]));
+    await assertFails(ch({ uid: A, text: "사칭", ts: 2 }));
+    await assertFails(ch({ uid: B, text: "가".repeat(501), ts: 2 }));
+    await assertFails(ch({ uid: B, dice: 6, v: 7, ts: 3 }));
+    await assertFails(ch({ uid: B, dice: 1000, v: 999, ts: 3 }));
+    await assertFails(ch({ uid: B, text: "덤", extra: 1, ts: 2 }));
     // 정렬용 서버 시각: 서버 시각만 허용, 기기 시계 값은 거절
-    await assertSucceeds(c.add({ uid: B, text: "서버 시각", ts: 4, st: FV.serverTimestamp() }));
-    await assertSucceeds(c.add({ uid: B, dice: 10, v: 4, ts: 5, st: FV.serverTimestamp() }));
-    await assertFails(c.add({ uid: B, text: "가짜 시각", ts: 4, st: TS.fromMillis(Date.now() + 864e5) }));
-    // af: 보낼 때 화면 맨 아래 글의 정렬 열쇠. 숫자만 허용
-    await assertSucceeds(c.add({ uid: B, text: "순서 고정", ts: 6, st: FV.serverTimestamp(), af: 1794800000000 }));
-    await assertSucceeds(c.add({ uid: B, dice: 6, v: 2, ts: 7, st: FV.serverTimestamp(), af: 1794800000000 }));
-    await assertFails(c.add({ uid: B, text: "문자 af", ts: 6, af: "x" }));
-    await assertFails(db(B).collection(p + "chats/d31/messages").add({ uid: B, text: "없는 날", ts: 2 }));
-    await assertFails(db(B).collection(p + "chats/d0/messages").add({ uid: B, text: "없는 날", ts: 2 }));
+    await assertSucceeds(ch({ uid: B, text: "서버 시각", ts: 4, st: FV.serverTimestamp() }));
+    await assertFails(ch({ uid: B, text: "가짜 시각", ts: 4, st: TS.fromMillis(Date.now() + 864e5) }));
+    // af: 숫자만 허용. 글 + 주사위는 한 번에 같이 보낸다
+    await assertSucceeds(post(B, [[c, { uid: B, text: "[d6] 순서 고정", ts: 6, st: FV.serverTimestamp(), af: 1794800000000 }], [c, { uid: B, dice: 6, v: 2, ts: 7, st: FV.serverTimestamp(), af: 1794800000000 }]]));
+    await assertFails(ch({ uid: B, text: "문자 af", ts: 6, af: "x" }));
+    await assertFails(post(B, [["chats/d31/messages", { uid: B, text: "없는 날", ts: 2 }]]));
+    await assertFails(post(B, [["chats/d0/messages", { uid: B, text: "없는 날", ts: 2 }]]));
     await assertFails(db(A).doc(p + "chats/d1/messages/m1").update({ text: "수정" }));
     await assertFails(db(A).doc(p + "chats/d1/messages/m1").delete());
+  });
+  test("도배 방지: 순번을 올리지 않거나, 1초 안에 또 보내거나, 한 번에 7개 이상은 막힌다", async () => {
+    const c = "chats/d1/messages", m = (t) => [c, { uid: B, text: t, ts: 1 }];
+    // 순번 없이 아무 이름으로 쓰기 (예전 방식) → 거절
+    await assertFails(db(B).collection(p + c).add({ uid: B, text: "순번 없음", ts: 1 }));
+    await assertSucceeds(post(B, [m("하나")]));
+    // 1초 안에 또 → 거절
+    await assertFails(post(B, [m("바로 또")], { wait: false }));
+    // 한 번에 7개 → 거절, 6개(글 1 + 주사위 5)까지는 된다
+    await assertFails(post(B, [1, 2, 3, 4, 5, 6, 7].map((i) => m("묶음" + i))));
+    await assertSucceeds(post(B, [1, 2, 3, 4, 5, 6].map((i) => m("묶음" + i))));
+    // 순번 범위 밖 이름, 남의 uid 이름 → 거절
+    await assertFails(post(B, [m("범위 밖")], { ids: [B + "_999"] }));
+    await assertFails(post(B, [m("이미 쓴 번호")], { ids: [B + "_1"] }));
+    await assertFails(post(B, [m("남의 이름")], { ids: [A + "_100"] }));
+    // 순번만 크게 건너뛰기, 남의 순번 건드리기, 기기 시계로 시각 넣기 → 거절
+    await assertFails(post(B, [m("건너뛰기")], { bump: 7 }));
+    await assertFails(db(B).doc(p + "rate/" + A).set({ t: FV.serverTimestamp(), n: 1 }));
+    await assertFails(db(B).doc(p + "rate/" + B).set({ t: TS.fromMillis(Date.now()), n: 99 }));
+    // 한마디도 같은 규칙
+    await assertFails(db(B).collection(p + "says").add({ uid: B, text: "순번 없음", ts: 1 }));
+    await assertSucceeds(post(B, [["says", { uid: B, text: "순번 있음", ts: 1 }]]));
+    // 바깥 사람은 순번 문서도 못 만든다
+    await assertFails(db(C).doc(p + "rate/" + C).set({ t: FV.serverTimestamp(), n: 1 }));
   });
   test("우표는 정해진 이름으로 한 번만 붙이고 바꿀 수 없다", async () => {
     const ok = { day: 2, uid: B, img: U("y"), ts: 1 };
@@ -445,9 +479,9 @@ describe("문답은 멤버 두 명만", () => {
       await assertSucceeds(d.collection(p + "answers").get());
       await assertSucceeds(d.collection(p + "chats/d1/messages").get());
       await assertFails(d.doc(p + "answers/" + A).set({ a: { 1: "늦은 답변" } }));
-      await assertFails(d.collection(p + "says").add({ uid: A, text: "늦은 한마디", ts: 9 }));
+      await assertFails(post(A, [["says", { uid: A, text: "늦은 한마디", ts: 9 }]]));
       await assertFails(d.doc(p + "says/s1").delete());
-      await assertFails(d.collection(p + "chats/d30/messages").add({ uid: A, text: "늦은 채팅", ts: 9 }));
+      await assertFails(post(A, [["chats/d30/messages", { uid: A, text: "늦은 채팅", ts: 9 }]]));
       await assertFails(d.doc(p + "members/" + A).set({ name: "앨리스", color: "#000000", img: "" }));
       await assertFails(d.doc(p + "headers/h2").set({ aid: U("h"), y: 50, by: A, ts: 1 }));
       await assertFails(d.doc(p + "headers/h1").delete());

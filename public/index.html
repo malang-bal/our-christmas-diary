@@ -1101,7 +1101,7 @@ html.gmodal{overflow:hidden}@media (hover:hover) and (pointer:fine){html{scrollb
 </script>
 <script>
 /* 새 버전 알림: 올라간 index.html이 바뀌면 상단에 새로고침 안내를 띄워요 */
-const BUILD_ID="1794833009859";
+const BUILD_ID="1794833704908";
 (function(){
   if(!/^https?:/.test(location.protocol))return;
   let shown=false;
@@ -1136,6 +1136,16 @@ function gDiceSnd(n,ms,c){if(GDS.day!==n){GDS.day=n;GDS.seen=new Set();GDS.ready
    - 서버 확인 전(보내는 중)에는 af+1 자리. 확인 뒤 열쇠는 그보다 작아질 수 없어서 위로 튀지 않아요 (확인 시각을 기기 시계로 어림하지 않음)
    - af가 없는 예전 글은 st, 그것도 없으면 보낸 시각(ts) */
 const gLocalIds=new Set();
+/* 도배 방지: 채팅·한마디는 내 순번(rate/{me}.n)을 올리면서 그 번호를 글 이름으로 써요.
+   규칙상 1초에 한 번만 보낼 수 있어서, 연달아 보내면 잠깐 기다렸다가 보내요 (한 번에 최대 6개) */
+let gLastPost=0,gPostQ=Promise.resolve();
+function gPost(items){const run=async()=>{const w=1150-(Date.now()-gLastPost);if(w>0)await new Promise(r=>setTimeout(r,w));
+    const rr=db.doc(P("rate/"+me)),go=()=>db.runTransaction(async tx=>{const d=await tx.get(rr),n0=d.exists?(d.data().n||0):0;
+      tx.set(rr,{t:firebase.firestore.FieldValue.serverTimestamp(),n:n0+items.length});
+      return items.map(([c,o],i)=>{const ref=db.collection(c).doc(me+"_"+(n0+i+1));tx.set(ref,o);return ref.id})});
+    try{const ids=await go();gLastPost=Date.now();return ids}
+    catch(e){if(!/permission/i.test((e&&(e.code||e.message))||""))throw e;await new Promise(r=>setTimeout(r,1200));const ids=await go();gLastPost=Date.now();return ids}};
+  const p=gPostQ.then(run,run);gPostQ=p.catch(()=>{});return p}
 function gSt(o){try{o.st=firebase.firestore.FieldValue.serverTimestamp()}catch(e){}return o}
 function gAf(){let a=0;const c=$("#chat");if(c)for(const x of c.children){const v=+x.dataset.at;if(v>a)a=v}for(const m of msgs)if((m._at||0)>a)a=m._at;return a}
 function gMsgs(docs){return docs.map((x,i)=>{let d;try{d=x.data({serverTimestamps:"none"})}catch(e){d=x.data()}
@@ -1276,7 +1286,7 @@ function viewDay(){
   $("#view").innerHTML='<div class="gtk"><div class="card dcard">'+stampArea(n,live)+'<div class="gadm2">ADMIT TWO · No. '+String(n).padStart(4,"0")+'</div><div class="dhead" style="'+dheadStyle(n,live)+'"><span class="gday">DAY '+n+'</span><span class="gdate">'+gDate(n)+'</span><span class="badge '+(live?"":"closed")+'">'+(live?"채팅 열림":"종료·보관됨")+'</span>'+stampText(n)+stampBtn(n,live)+'</div>'+stEditor(n,live)+'<div class="q">'+esc(Q[n-1])+"</div>"+a(me,"me")+(p?a(p,"you"):'<div class="note">상대가 아직 참여하지 않았어요.</div>')+
   '</div>'+gStub(n,live)+'</div><div class="card gchat"><div class="gchh">'+(live?"오늘의 대화":"그날의 대화")+'</div><div class="chat" id="chat"></div>'+(live?'<div class="row"><div class="ibox"><textarea id="ci" rows="1" placeholder="이 주제로 이야기해요" maxlength="500" autocomplete="off" enterkeyhint="send"></textarea></div><button class="btn pri sendb" id="cs" title="보내기"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4z"/></svg></button></div>':'<div class="row" style="justify-content:flex-start;align-items:center;gap:8px"><span class="note">이 날의 대화는 닫혔어요. 기록만 볼 수 있어요.</span></div>')+"</div>";
   wireStamp(n);
-  if(live){/* 입력칸은 한 줄짜리 글상자: 안드로이드 크롬의 자동 완성 줄(열쇠·카드·위치)이 뜨지 않게. 쓰는 만큼 4줄까지 늘어나요 */const gCiFit=()=>{const c=$("#ci");if(!c)return;c.style.height="";c.style.height=Math.min(c.scrollHeight+2,120)+"px"};const send=async()=>{const t=$("#ci").value.trim();if(!t)return;$("#ci").value="";gCiFit();try{const ts0=Date.now(),af=gAf(),col=db.collection(P("chats/d"+n+"/messages")),w=[col.add(gSt({uid:me,text:t,ts:ts0,af}))];const dm=[...t.matchAll(DICE_RE)].slice(0,5);for(let i=0;i<dm.length;i++){const dn=+dm[i][1];w.push(col.add(gSt({uid:me,dice:dn,v:1+Math.floor(Math.random()*dn),ts:ts0+i+1,af})))}await Promise.all(w)}catch(e){alert("전송하지 못했어요. 연결을 확인하거나, 문답이 닫혔는지 확인해 주세요.")}};$("#cs").onclick=()=>{send();const ci=$("#ci");if(ci&&document.activeElement!==ci)ci.focus({preventScroll:true})};{const cb=$("#cs");/* 보내기 버튼을 눌러도 입력칸이 포커스를 잃지 않게 → 키보드가 내려가지 않아요 */["pointerdown","mousedown","touchstart"].forEach(t=>cb.addEventListener(t,e=>{if(document.activeElement===$("#ci"))e.preventDefault()},{passive:false}));cb.addEventListener("touchend",e=>{if(document.activeElement===$("#ci")){e.preventDefault();cb.click()}},{passive:false})}$("#ci").onkeydown=e=>{if(e.key==="Enter"&&!e.shiftKey&&!e.isComposing){e.preventDefault();send()}};$("#ci").oninput=gCiFit}
+  if(live){/* 입력칸은 한 줄짜리 글상자: 안드로이드 크롬의 자동 완성 줄(열쇠·카드·위치)이 뜨지 않게. 쓰는 만큼 4줄까지 늘어나요 */const gCiFit=()=>{const c=$("#ci");if(!c)return;c.style.height="";c.style.height=Math.min(c.scrollHeight+2,120)+"px"};const send=async()=>{const t=$("#ci").value.trim();if(!t)return;$("#ci").value="";gCiFit();try{const ts0=Date.now(),af=gAf(),cp=P("chats/d"+n+"/messages"),items=[[cp,gSt({uid:me,text:t,ts:ts0,af})]];const dm=[...t.matchAll(DICE_RE)].slice(0,5);for(let i=0;i<dm.length;i++){const dn=+dm[i][1];items.push([cp,gSt({uid:me,dice:dn,v:1+Math.floor(Math.random()*dn),ts:ts0+i+1,af})])}await gPost(items)}catch(e){const ci=$("#ci");if(ci&&!ci.value.trim()){ci.value=t;gCiFit()}alert("전송하지 못했어요. 연결을 확인하거나, 문답이 닫혔는지 확인해 주세요.")}};$("#cs").onclick=()=>{send();const ci=$("#ci");if(ci&&document.activeElement!==ci)ci.focus({preventScroll:true})};{const cb=$("#cs");/* 보내기 버튼을 눌러도 입력칸이 포커스를 잃지 않게 → 키보드가 내려가지 않아요 */["pointerdown","mousedown","touchstart"].forEach(t=>cb.addEventListener(t,e=>{if(document.activeElement===$("#ci"))e.preventDefault()},{passive:false}));cb.addEventListener("touchend",e=>{if(document.activeElement===$("#ci")){e.preventDefault();cb.click()}},{passive:false})}$("#ci").onkeydown=e=>{if(e.key==="Enter"&&!e.shiftKey&&!e.isComposing){e.preventDefault();send()}};$("#ci").oninput=gCiFit}
   {const c0=$("#chat"),k0=RID+"|"+n;if(c0&&gChatCache.has(k0)&&!c0.dataset.gk){c0.innerHTML=gChatCache.get(k0);c0.scrollTop=c0.scrollHeight}}
   stopChat();
   unsubChat=db.collection(P("chats/d"+n+"/messages")).orderBy("ts").onSnapshot(s=>{
@@ -1387,7 +1397,7 @@ function viewSay(){
   const ring=()=>{const n=$("#sx").value.length,left=200-n,r=$("#sc");if(!r)return;r.classList.toggle("on",n>0);r.classList.toggle("warn",left<=20);r.classList.toggle("full",left<=0);
     r.querySelector(".rf").setAttribute("stroke-dasharray",Math.min(100,n/2)+" 100");r.querySelector("b").textContent=left<=20?left:"";r.setAttribute("aria-label",left+"자 남음")};
   const send=async()=>{const t=$("#sx").value.trim();if(!t)return;$("#sx").value="";$("#sx").style.height="";ring();
-    try{const o={uid:me,text:t,ts:Date.now()},ref=await db.collection(P("says")).add(o);says=[...says.filter(x=>x.id!==ref.id),{id:ref.id,...o}];renderSayList();renderTalk(true)}catch(e){alert("전송하지 못했어요. 연결을 확인하거나, 문답이 닫혔는지 확인해 주세요.")}};
+    try{const o={uid:me,text:t,ts:Date.now()},[id]=await gPost([[P("says"),o]]);says=[...says.filter(x=>x.id!==id),{id,...o}];renderSayList();renderTalk(true)}catch(e){const sx=$("#sx");if(sx&&!sx.value.trim())sx.value=t;alert("전송하지 못했어요. 연결을 확인하거나, 문답이 닫혔는지 확인해 주세요.")}};
   $("#sb").onclick=send;$("#sx").oninput=ring;ring();
   $("#sx").onkeydown=e=>{if(e.key==="Enter"&&(e.ctrlKey||e.metaKey))send()};
   renderSayList()}

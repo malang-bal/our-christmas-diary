@@ -109,6 +109,16 @@ service cloud.firestore {
         && validName(request.resource.data.name);
     }
 
+    // 도배 방지: 채팅·한마디는 rooms/{rid}/rate/{내 uid} 의 순번(n)을 같은 묶음에서 올리면서만 쓸 수 있다.
+    //  · 순번 올리기는 1초에 한 번, 한 번에 최대 6 (글 1 + 주사위 5), 시즌 전체 3만 개까지
+    //  · 글 문서 이름은 '내uid_순번' 이고, 이번에 올린 범위 안의 번호만 쓸 수 있다
+    function ratePath(rid) { return /databases/$(database)/documents/rooms/$(rid)/rate/$(uid()); }
+    function seqOk(rid, id) {
+      return id.matches('^' + uid() + '_[0-9]{1,9}$')
+        && getAfter(ratePath(rid)).data.t == request.time
+        && int(id.split('_')[1]) > (exists(ratePath(rid)) ? get(ratePath(rid)).data.n : 0)
+        && int(id.split('_')[1]) <= getAfter(ratePath(rid)).data.n;
+    }
     function validName(n) { return n is string && n.size() >= 1 && n.size() <= 12; }
     // 화면에 그대로 들어가는 값은 형식을 못 박는다 (짝꿍이 콘솔로 이상한 값을 넣어 상대 화면을 망가뜨리지 못하게)
     function isHex(c) { return c is string && c.matches('^#[0-9a-fA-F]{6}$'); }
@@ -200,7 +210,7 @@ service cloud.firestore {
       // 한마디: 본인 이름으로만 쓰고, 본인 것만 지운다
       match /says/{sid} {
         allow read: if isMember(rid);
-        allow create: if canWrite(rid)
+        allow create: if canWrite(rid) && seqOk(rid, sid)
           && request.resource.data.keys().hasOnly(['uid', 'text', 'ts'])
           && request.resource.data.uid == uid()
           && request.resource.data.text is string
@@ -237,12 +247,30 @@ service cloud.firestore {
         allow delete: if canWrite(rid);
       }
 
+      // 도배 방지 순번 (본인 것만)
+      match /rate/{id} {
+        allow get: if signedIn() && id == uid() && isMember(rid);
+        allow list, delete: if false;
+        allow create: if canWrite(rid) && id == uid()
+          && request.resource.data.keys().hasOnly(['t', 'n'])
+          && request.resource.data.t == request.time
+          && request.resource.data.n is int && request.resource.data.n >= 1 && request.resource.data.n <= 6;
+        allow update: if canWrite(rid) && id == uid()
+          && request.resource.data.keys().hasOnly(['t', 'n'])
+          && request.resource.data.t == request.time
+          && request.time > resource.data.t + duration.value(1, 's')
+          && request.resource.data.n is int
+          && request.resource.data.n > resource.data.n
+          && request.resource.data.n <= resource.data.n + 6
+          && request.resource.data.n <= 30000;
+      }
+
       // 채팅: 1~30일 방에만, 본인 이름으로만. 고치거나 지울 수 없다
       // st = 서버가 받은 시각(정렬용). 넣으려면 반드시 서버 시각이어야 한다
       // af = 보낼 때 화면 맨 아래 글의 정렬 열쇠(숫자). 내가 보낸 글이 이미 보이던 글 위로 가지 않게
       match /chats/{day}/messages/{mid} {
         allow read: if isMember(rid);
-        allow create: if canWrite(rid)
+        allow create: if canWrite(rid) && seqOk(rid, mid)
           && day.matches('^d([1-9]|[12][0-9]|30)$')
           && request.resource.data.uid == uid()
           && request.resource.data.ts is number
