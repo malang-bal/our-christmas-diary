@@ -26,7 +26,9 @@ window.DIARY_ENV = (function () {
     },
     prod: {
       hosts: ["waiting-for-christmas.web.app", "waiting-for-christmas.firebaseapp.com"], // 운영 주소
-      appCheckKey: "6LdzuCIuAAAAAPpRb6pUFdzZdT2WFuYHw_RJxaO9",
+      // App Check: 운영 앱이 App Check에 등록돼 있지 않아 토큰 요청이 계속 실패해서 꺼 둠 (2026-11-16).
+      // 다시 쓰려면 콘솔 App Check에서 웹 앱을 등록한 뒤 아래 키를 되살린다: 6LdzuCIuAAAAAPpRb6pUFdzZdT2WFuYHw_RJxaO9
+      appCheckKey: "",
       firebase: {
         apiKey: "AIzaSyAvbKhHFEVFaxPMhfzw8CAbtAta-9QK1yk",
         authDomain: "waiting-for-christmas.web.app", // 로그인 창이 운영 주소에서 열리게 (Safari 등 제3자 쿠키 차단 대비)

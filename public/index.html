@@ -159,7 +159,8 @@ body{transition:background .3s}
 .rtitle{position:absolute;z-index:1;left:21px;bottom:24px;max-width:calc(100% - 48px);background:#fff;padding:5px 12px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .rtitle b{font-size:15px;color:var(--rm)}.rtitle small{font-size:11px;color:#888}
 .redit{display:flex;gap:8px;justify-content:flex-end;padding:10px 16px 12px}.redit .sq{padding:6px 12px;font-size:13px}
-.prow{display:flex;align-items:center;gap:10px;margin:6px 0}.prow span{width:150px;font-size:14px}.prow input[type=color]{width:56px;height:32px;padding:0!important;border:1px solid rgba(0,0,0,.2)!important;border-radius:8px!important;background:transparent!important;box-shadow:none!important;overflow:hidden;cursor:pointer;-webkit-appearance:none;appearance:none}.prow input[type=color]::-webkit-color-swatch-wrapper{padding:0}.prow input[type=color]::-webkit-color-swatch{border:0;border-radius:7px}.prow input[type=color]::-moz-color-swatch{border:0;border-radius:7px}
+.prow{display:flex;align-items:center;gap:10px;margin:6px 0}.prow span{width:150px;font-size:14px}#pc{flex:none;width:56px;height:40px;padding:0!important;border:1px solid rgba(0,0,0,.2)!important;border-radius:8px!important;background:transparent!important;box-shadow:none!important;overflow:hidden;cursor:pointer;-webkit-appearance:none;appearance:none}#pc::-webkit-color-swatch-wrapper{padding:0}#pc::-webkit-color-swatch{border:0;border-radius:7px}#pc::-moz-color-swatch{border:0;border-radius:7px}
+.prow input[type=color]{width:56px;height:32px;padding:0!important;border:1px solid rgba(0,0,0,.2)!important;border-radius:8px!important;background:transparent!important;box-shadow:none!important;overflow:hidden;cursor:pointer;-webkit-appearance:none;appearance:none}.prow input[type=color]::-webkit-color-swatch-wrapper{padding:0}.prow input[type=color]::-webkit-color-swatch{border:0;border-radius:7px}.prow input[type=color]::-moz-color-swatch{border:0;border-radius:7px}
 .fxrow{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
 .chips{display:flex;gap:12px;flex-wrap:wrap;margin-top:10px}.chipw{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--mute)}.chip{width:18px;height:18px;border:1px solid #ddd;display:inline-block}
 .qlist{margin:6px 0 0;padding-left:22px;max-height:36vh;overflow:auto;font-size:14px}
@@ -1101,7 +1102,7 @@ html.gmodal{overflow:hidden}@media (hover:hover) and (pointer:fine){html{scrollb
 </script>
 <script>
 /* 새 버전 알림: 올라간 index.html이 바뀌면 상단에 새로고침 안내를 띄워요 */
-const BUILD_ID="1794833704908";
+const BUILD_ID="1794834249614";
 (function(){
   if(!/^https?:/.test(location.protocol))return;
   let shown=false;
@@ -1421,7 +1422,7 @@ function settingsTop(){const m=members[me]||{},col=m.color||"#c2492f";
   const imgSec=(k,title,acc,arr,hint)=>sec(k,title+' <span class="note">'+arr.length+'개</span>',imgs(k,arr,false),'<p class="note" style="margin:6px 0 0">'+hint+'</p>'+imgs(k,arr,true)+'<p></p><input type="file" id="up-'+k+'" accept="'+acc+'"'+(k==="headers"?"":" multiple")+'>'+(k==="headers"?'<div id="hd-ed"></div>':"")+'<div class="note" id="us-'+k+'"></div>');
   return sec("profile","내 프로필",
     '<div class="row" style="align-items:center;margin-top:8px">'+avH(me)+'<div><span style="display:inline-block;width:12px;height:12px;border-radius:50%;vertical-align:middle;background:'+col+'"></span> <b>'+esc(m.name||"이름 없음")+'</b><div class="note">참여자: '+Object.values(members).map(x=>esc(x.name)).join(", ")+'</div></div></div>',
-    '<div class="row" style="align-items:center"><span id="pv">'+(pend.img?'<img class="av" src="'+pend.img+'" alt="">':avH(me))+'</span><input type="file" id="pi" accept="image/*"></div><div id="pied"></div><p class="note">사진을 고르면 위치와 크기를 맞출 수 있어요</p><div class="row"><input id="pn" value="'+esc(pend.name??m.name??"")+'" maxlength="12"><input type="color" id="pc" value="'+(pend.color||col)+'" style="width:56px;padding:2px"></div><p class="note">이름과 말풍선 색 (연하게 깔려요)</p><span class="note" id="pst"></span>')+
+    '<div class="row" style="align-items:center"><span id="pv">'+(pend.img?'<img class="av" src="'+pend.img+'" alt="">':avH(me))+'</span><input type="file" id="pi" accept="image/*"></div><div id="pied"></div><p class="note">사진을 고르면 위치와 크기를 맞출 수 있어요</p><div class="row"><input id="pn" value="'+esc(pend.name??m.name??"")+'" maxlength="12" style="flex:0 1 220px;width:220px;max-width:100%;min-width:0"><input type="color" id="pc" value="'+esc(pend.color||col)+'"></div><p class="note">이름과 말풍선 색 (연하게 깔려요)</p><span class="note" id="pst"></span>')+
   sec("headers",'헤더 이미지 <span class="note">'+headers.length+' / '+HMAX+'</span>',hThumbs(false),'<p class="note" style="margin:6px 0 0">실제 헤더는 가로로 길게(약 5:1) 올라가요.</p><div id="hd-ed"></div>'+hThumbs(true)+''+(headers.length<HMAX?'<div class="hbtns"><label class="btn pri hfile">파일 선택<input type="file" id="up-headers" accept="image/*" hidden></label></div>':'<p class="note">헤더는 '+HMAX+'개까지예요. 바꾸려면 하나를 먼저 빼 주세요.</p>')+'<div class="note" id="us-headers"></div>')}
 /* ===== 헤더: 문답마다 최대 4개 (h1~h4 칸) · 가로 960px JPEG로 Cloud Storage에 저장 ===== */
 const HMAX=4,HW=960,HH=195;let hEd=null;
