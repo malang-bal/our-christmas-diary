@@ -14,26 +14,26 @@ window.DIARY_ENV = (function () {
   var ENVS = {
     dev: {
       hosts: [],
-      appCheckKey: "", // reCAPTCHA v3 사이트 키
+      appCheckKey: "6Ld7uCIuAAAAAO7xharXQW8J6KNQLRF4yyP6zTL5", // reCAPTCHA v3 사이트 키
       firebase: {
-        apiKey: "",
-        authDomain: "",
-        projectId: "",
-        storageBucket: "",
-        messagingSenderId: "",
-        appId: ""
+        apiKey: "AIzaSyCA84Du5qDpqrgtvWwOyg3tlAOYeuWCsOw",
+        authDomain: "our-christmas-diary-2f3e0.firebaseapp.com",
+        projectId: "our-christmas-diary-2f3e0",
+        storageBucket: "our-christmas-diary-2f3e0.firebasestorage.app",
+        messagingSenderId: "643155281290",
+        appId: "1:643155281290:web:ce10a9f211d0965d3b3473"
       }
     },
     prod: {
       hosts: [], // 예: ["christmas.example.com"]
-      appCheckKey: "",
+      appCheckKey: "6LdzuCIuAAAAAPpRb6pUFdzZdT2WFuYHw_RJxaO9",
       firebase: {
-        apiKey: "",
-        authDomain: "",
-        projectId: "",
-        storageBucket: "",
-        messagingSenderId: "",
-        appId: ""
+        apiKey: "AIzaSyAvbKhHFEVFaxPMhfzw8CAbtAta-9QK1yk",
+        authDomain: "our-christmas-diary-prod.firebaseapp.com",
+        projectId: "our-christmas-diary-prod",
+        storageBucket: "our-christmas-diary-prod.firebasestorage.app",
+        messagingSenderId: "378627344789",
+        appId: "1:378627344789:web:9fccea4eeb792034cace9c"
       }
     }
   };

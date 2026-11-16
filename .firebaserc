@@ -1,6 +1,6 @@
 {
   "projects": {
-    "dev": "YOUR-DEV-PROJECT",
-    "prod": "YOUR-PROD-PROJECT"
+    "dev": "our-christmas-diary-2f3e0",
+    "prod": "our-christmas-diary-prod"
   }
 }

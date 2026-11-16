@@ -1,6 +1,6 @@
 [
   {
-    "origin": ["https://YOUR-PROD-PROJECT.web.app", "https://YOUR-PROD-PROJECT.firebaseapp.com", "https://YOUR-DEV-PROJECT.web.app", "https://YOUR-DEV-PROJECT.firebaseapp.com"],
+    "origin": ["https://our-christmas-diary-prod.web.app", "https://our-christmas-diary-prod.firebaseapp.com", "https://our-christmas-diary-2f3e0.web.app", "https://our-christmas-diary-2f3e0.firebaseapp.com"],
     "method": ["GET"],
     "maxAgeSeconds": 3600
   }
