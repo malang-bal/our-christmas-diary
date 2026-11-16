@@ -1101,7 +1101,7 @@ html.gmodal{overflow:hidden}@media (hover:hover) and (pointer:fine){html{scrollb
 </script>
 <script>
 /* 새 버전 알림: 올라간 index.html이 바뀌면 상단에 새로고침 안내를 띄워요 */
-const BUILD_ID="1794825539389";
+const BUILD_ID="1794828223006";
 (function(){
   if(!/^https?:/.test(location.protocol))return;
   let shown=false;
@@ -1344,7 +1344,7 @@ function viewWrite(){
 }
 function viewMore(){
   if(!gMemOk){$("#view").innerHTML='<div class="card"><span class="note">불러오는 중…</span></div>';return}
-  $("#view").innerHTML=pairCard()+settingsTop()+roomSetCard()+notifCard()+'<div class="card"><div class="gfxm"><b>배경 움직임</b>'+gFxSeg("gfxm-r")+'</div><p class="note gfxmn">이 기기에서만 적용돼요. 조용히는 입자 수와 속도를 줄여요.</p></div><div class="card"><div class="row" style="justify-content:space-between;align-items:center"><b>계정</b><button class="btn" id="glo" type="button">로그아웃</button></div><p class="note" style="margin:8px 0 0">'+kDay(CONF.start)+' 시작 · '+(closeMs()?kDate(closeMs())+' 문답 종료 · ':"")+(CONF.deleteOn?kDay(CONF.deleteOn)+' 사이트와 기록 전체 삭제':"")+'</p></div><div class="gcut" aria-hidden="true"></div><button class="btn pri gbkb" id="bk" type="button">HTML 백업</button>';
+  $("#view").innerHTML=pairCard()+settingsTop()+roomSetCard()+notifCard()+'<div class="card"><div class="gfxm"><b>배경 움직임</b>'+gFxSeg("gfxm-r")+'</div><p class="note gfxmn">이 기기에서만 적용돼요. 조용히는 입자 수와 속도를 줄여요.</p></div><div class="card"><div class="row" style="justify-content:space-between;align-items:center"><b>계정</b><button class="btn" id="glo" type="button">로그아웃</button></div><p class="note" style="margin:8px 0 0">'+kDay(CONF.start)+' 시작 · '+(closeMs()?kDate(closeMs()-1)+' 문답 종료 · ':"")+(CONF.deleteOn?kDay(CONF.deleteOn)+' 사이트와 기록 전체 삭제':"")+'</p></div><div class="gcut" aria-hidden="true"></div><button class="btn pri gbkb" id="bk" type="button">HTML 백업</button>';
   wireSettings();wireNotif();wirePair();gFxSegWire("gfxm-r");$("#bk").onclick=()=>buildBackup();{const g=$("#glo");if(g)g.onclick=()=>{if(confirm("로그아웃할까요?"))window.gSignOut()}}
 }
 const bg=id=>{const c=members[id]?.color;return c?"background:"+c+"4d":""};
@@ -2455,7 +2455,7 @@ async function boot(){
     showGate();
   }catch(e){console.error(e);msgBox("오류가 발생했어요. 새로고침해 주세요.")}
 }
-function privNote(){return '<div class="gpriv">· '+kDay(CONF.start)+'에 모든 문답이 함께 시작해서 30일 동안 진행돼요.<br>· '+(closeMs()?kDate(closeMs())+'부터는 쓰기가 닫히고, ':"")+(CONF.deleteOn?kDay(CONF.deleteOn)+'에 사이트와 모든 기록(답변·채팅·이미지)이 삭제돼요.':"운영이 끝나면 사이트와 모든 기록이 삭제돼요.")+' 그 전에 설정의 HTML 백업으로 저장해 두세요.<br>· 기록은 짝꿍 두 사람만 볼 수 있지만, 사이트 관리자는 운영 도구(콘솔)에서 저장된 데이터를 볼 수 있어요.<br>· 알림은 사이트가 열려 있을 때만 와요.</div>'}
+function privNote(){return '<div class="gpriv">· '+kDay(CONF.start)+'에 모든 문답이 함께 시작해서 30일 동안 진행돼요.<br>· '+(closeMs()?kDate(closeMs()-1)+'이 지나면 쓰기가 닫히고, ':"")+(CONF.deleteOn?kDay(CONF.deleteOn)+'에 사이트와 모든 기록(답변·채팅·이미지)이 삭제돼요.':"운영이 끝나면 사이트와 모든 기록이 삭제돼요.")+' 그 전에 설정의 HTML 백업으로 저장해 두세요.<br>· 기록은 짝꿍 두 사람만 볼 수 있지만, 사이트 관리자는 운영 도구(콘솔)에서 저장된 데이터를 볼 수 있어요.<br>· 알림은 사이트가 열려 있을 때만 와요.</div>'}
 function showGate(){
   shell('<div class="sheet ceil mhead"><h1>'+TITLE+'</h1></div><div class="sheet fpad" id="gate"><h2 style="margin:0 0 6px;font-size:18px">초대 코드가 필요해요</h2><p class="note" style="margin:0 0 4px">관리자에게 받은 <b>가입 코드</b>나, 짝꿍에게 받은 <b>짝꿍 코드</b>를 입력해 주세요.</p><label for="g-code">코드</label><input id="g-code" class="gcode" maxlength="14" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="ABCD2345"><p class="gerr" id="g-err"></p><div class="mbtns" style="justify-content:flex-end"><button class="sq pri" id="g-ok">확인</button></div>'+privNote()+'</div>');
   const inp=$("#g-code"),err=$("#g-err"),ok=$("#g-ok");inp.focus();
