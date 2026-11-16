@@ -1101,7 +1101,7 @@ html.gmodal{overflow:hidden}@media (hover:hover) and (pointer:fine){html{scrollb
 </script>
 <script>
 /* 새 버전 알림: 올라간 index.html이 바뀌면 상단에 새로고침 안내를 띄워요 */
-const BUILD_ID="1794830508003";
+const BUILD_ID="1794830779646";
 (function(){
   if(!/^https?:/.test(location.protocol))return;
   let shown=false;
@@ -2482,7 +2482,7 @@ function showGate(){gatePreview(null);
 /* 가입 코드 → 처음 한 번만: 내 이름 · 문답 제목 · 색 · 종이 · 눈 효과 */
 function showStart(code){let paper="cream";const pal={...DEF};
   shell('<div class="sheet ceil mhead"><h1>'+TITLE+'</h1></div><div class="sheet fpad" id="gate"><h2 style="margin:0 0 6px;font-size:18px">우리 문답 만들기</h2><p class="note" style="margin:0 0 4px">가입 코드가 확인됐어요. 이름·색상·종이·효과는 나중에 설정에서 바꿀 수 있어요.</p>'+
-    '<label for="s-n">내 이름</label><input id="s-n" maxlength="12" placeholder="짝꿍에게 보일 이름·나중에 수정할 수 있어요" value="'+esc(String((firebase.auth().currentUser||{}).displayName||"").slice(0,12))+'">'+
+    '<label for="s-n">내 이름</label><input id="s-n" maxlength="12" placeholder="문답에 적힐 이름·나중에 수정할 수 있어요" value="'+esc(String((firebase.auth().currentUser||{}).displayName||"").slice(0,12))+'">'+
     '<label>컬러 팔레트</label>'+palInputs("s",pal)+'<label>종이</label><div class="ppk" id="s-pp">'+ppPicker(paper)+'</div><label>배경 움직임 효과</label>'+fxSelect("s","snow")+
     '<p class="gerr" id="s-err"></p><div class="mbtns" style="justify-content:space-between"><button class="sq" id="s-x">코드 다시 입력</button><button class="sq pri" id="s-go">시작하기</button></div>'+privNote()+'</div>');
   wireFx("s");
@@ -2505,7 +2505,7 @@ function showStart(code){let paper="cream";const pal={...DEF};
     catch(e){console.error(e);err.textContent="만들지 못했어요. 코드가 방금 사용됐거나, 이미 다른 문답에 들어가 있을 수 있어요.";b.disabled=false}}}
 /* 짝꿍 코드 → 이름만 정하고 들어가기 */
 function showJoin(code,p){
-  shell('<div class="sheet ceil mhead"><h1>'+TITLE+'</h1></div><div class="sheet fpad" id="gate"><h2 style="margin:0 0 6px;font-size:18px">짝꿍의 문답에 들어가기</h2><p class="note" style="margin:0 0 4px">짝꿍 코드가 확인됐어요. 들어가면 이 문답은 두 사람만 쓸 수 있게 잠겨요.</p><label for="j-n">내 이름</label><input id="j-n" maxlength="12" placeholder="짝꿍에게 보일 이름·나중에 수정할 수 있어요" value="'+esc(String((firebase.auth().currentUser||{}).displayName||"").slice(0,12))+'"><p class="gerr" id="j-err"></p><div class="mbtns" style="justify-content:space-between"><button class="sq" id="j-x">코드 다시 입력</button><button class="sq pri" id="j-go">들어가기</button></div>'+privNote()+'</div>');
+  shell('<div class="sheet ceil mhead"><h1>'+TITLE+'</h1></div><div class="sheet fpad" id="gate"><h2 style="margin:0 0 6px;font-size:18px">짝꿍의 문답에 들어가기</h2><p class="note" style="margin:0 0 4px">짝꿍 코드가 확인됐어요. 들어가면 이 문답은 두 사람만 쓸 수 있게 잠겨요.</p><label for="j-n">내 이름</label><input id="j-n" maxlength="12" placeholder="문답에 적힐 이름·나중에 수정할 수 있어요" value="'+esc(String((firebase.auth().currentUser||{}).displayName||"").slice(0,12))+'"><p class="gerr" id="j-err"></p><div class="mbtns" style="justify-content:space-between"><button class="sq" id="j-x">코드 다시 입력</button><button class="sq pri" id="j-go">들어가기</button></div>'+privNote()+'</div>');
   $("#j-x").onclick=showGate;
   $("#j-go").onclick=async()=>{const err=$("#j-err"),name=$("#j-n").value.trim().slice(0,12);if(!name){err.textContent="이름을 입력해 주세요";return}
     const b=$("#j-go");b.disabled=true;err.textContent="들어가는 중…";const now=Date.now(),bt=db.batch();
