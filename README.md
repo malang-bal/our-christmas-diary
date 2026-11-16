@@ -12,7 +12,7 @@
 | `public/admin.html` | 관리자 화면 (운영 일정, 가입 코드 발급·사용 현황) |
 | `public/config.js` | Firebase 설정값 (dev·prod) — **여기만 채우면 돼요** |
 | `firestore.rules`, `storage.rules` | 보안 규칙 (문답 멤버 두 명만 읽고 쓰기) |
-| `tests/rules.test.mjs` | 보안 규칙 테스트 55개 (에뮬레이터에서만 실행) |
+| `tests/rules.test.mjs` | 보안 규칙 테스트 53개 (에뮬레이터에서만 실행) |
 | `cors.json` | 내보내기·백업이 Storage 이미지를 읽을 수 있게 하는 설정 |
 | `firebase.json`, `.firebaserc` | 배포 설정 (Firebase Hosting) |
 
