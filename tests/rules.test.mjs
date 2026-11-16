@@ -172,7 +172,11 @@ describe("가입 코드로 문답 만들기", () => {
     await assertFails(signup(A, { tweak: (o) => { o.room.memberIds = [C]; } }));
     await assertFails(signup(A, { tweak: (o) => { o.room.owner = C; } }));
   });
+  test("가루눈·효과 색을 골라 만들 수 있다", async () => {
+    await assertSucceeds(signup(A, { tweak: (o) => { o.room.fx = "powder"; o.room.fxc = "gold"; } }));
+  });
   test("눈 계열이 아닌 효과나 모르는 항목은 넣을 수 없다", async () => {
+    await assertFails(signup(A, { tweak: (o) => { o.room.fxc = "neon"; } }));
     await assertFails(signup(A, { tweak: (o) => { o.room.fx = "rain"; } }));
     await assertFails(signup(A, { tweak: (o) => { o.room.closed = false; } }));
     await assertFails(signup(A, { tweak: (o) => { o.room.title = "가".repeat(41); } }));
@@ -354,6 +358,10 @@ describe("문답은 멤버 두 명만", () => {
     await assertSucceeds(c.add({ uid: B, text: "서버 시각", ts: 4, st: FV.serverTimestamp() }));
     await assertSucceeds(c.add({ uid: B, dice: 10, v: 4, ts: 5, st: FV.serverTimestamp() }));
     await assertFails(c.add({ uid: B, text: "가짜 시각", ts: 4, st: TS.fromMillis(Date.now() + 864e5) }));
+    // af: 보낼 때 화면 맨 아래 글의 정렬 열쇠. 숫자만 허용
+    await assertSucceeds(c.add({ uid: B, text: "순서 고정", ts: 6, st: FV.serverTimestamp(), af: 1794800000000 }));
+    await assertSucceeds(c.add({ uid: B, dice: 6, v: 2, ts: 7, st: FV.serverTimestamp(), af: 1794800000000 }));
+    await assertFails(c.add({ uid: B, text: "문자 af", ts: 6, af: "x" }));
     await assertFails(db(B).collection(p + "chats/d31/messages").add({ uid: B, text: "없는 날", ts: 2 }));
     await assertFails(db(B).collection(p + "chats/d0/messages").add({ uid: B, text: "없는 날", ts: 2 }));
     await assertFails(db(A).doc(p + "chats/d1/messages/m1").update({ text: "수정" }));
@@ -377,10 +385,13 @@ describe("문답은 멤버 두 명만", () => {
     await assertFails(db(B).collection(p + "headers").add(h));
     await assertSucceeds(db(B).doc(p + "headers/h1").delete());
   });
-  test("문답 설정은 제목·색·종이·효과만 바꿀 수 있다", async () => {
+  test("문답 설정은 제목·색·종이·효과·효과 색만 바꿀 수 있다", async () => {
     const r = db(B).doc("rooms/" + RID);
     await assertSucceeds(r.update({ title: "우리의 겨울", palette: { bg: "#111111", main: "#eeeeee" }, paper: "navy", fx: "bigsnow" }));
     await assertFails(r.update({ fx: "rain" }));
+    await assertSucceeds(r.update({ fx: "powder", fxc: "navy" }));
+    await assertSucceeds(r.update({ fxc: "auto" }));
+    await assertFails(r.update({ fxc: "neon" }));
     await assertFails(r.update({ title: "" }));
     await assertFails(r.update({ memberIds: [B] }));
     await assertFails(r.update({ memberIds: [A, B, C] }));

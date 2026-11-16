@@ -114,7 +114,8 @@ service cloud.firestore {
         && d.get('sub', '') is string && d.get('sub', '').size() <= 60
         && d.palette is map
         && d.paper is string && d.paper.size() <= 20
-        && d.fx in ['snow', 'bigsnow', 'flake', 'storm', 'blizzard']
+        && d.fx in ['snow', 'powder', 'bigsnow', 'flake', 'storm', 'blizzard']
+        && d.get('fxc', 'auto') in ['auto', 'light', 'dark', 'gold', 'rose', 'coral', 'mint', 'sky', 'lavender', 'wine', 'mustard', 'forest', 'teal', 'navy', 'plum', 'cocoa']
         && d.pairCode is string && d.pairCode.size() <= 12
         && d.pairExp is number;
     }
@@ -126,7 +127,7 @@ service cloud.firestore {
 
       // 만들기: 쓰지 않은 가입 코드가 있어야 하고, 아직 어떤 문답에도 속하지 않은 사람만
       allow create: if signedIn() && isOpen()
-        && request.resource.data.keys().hasOnly(['title', 'sub', 'palette', 'paper', 'fx', 'memberIds', 'owner', 'invite', 'pairCode', 'pairExp', 'ts'])
+        && request.resource.data.keys().hasOnly(['title', 'sub', 'palette', 'paper', 'fx', 'fxc', 'memberIds', 'owner', 'invite', 'pairCode', 'pairExp', 'ts'])
         && request.resource.data.memberIds == [uid()]
         && request.resource.data.owner == uid()
         && request.resource.data.invite is string
@@ -140,10 +141,10 @@ service cloud.firestore {
 
       allow update: if memberEdit() || partnerJoin();
 
-      // 멤버가 고칠 수 있는 것: 제목·색·종이·효과, 그리고(혼자일 때) 짝꿍 코드 재발급
+      // 멤버가 고칠 수 있는 것: 제목·색·종이·효과·효과 색, 그리고(혼자일 때) 짝꿍 코드 재발급
       function memberEdit() {
         return signedIn() && uid() in resource.data.memberIds && isOpen()
-          && changed().hasOnly(['title', 'sub', 'palette', 'paper', 'fx', 'pairCode', 'pairExp'])
+          && changed().hasOnly(['title', 'sub', 'palette', 'paper', 'fx', 'fxc', 'pairCode', 'pairExp'])
           && validRoom(request.resource.data)
           && (request.resource.data.pairCode == resource.data.pairCode
               || (resource.data.memberIds.size() == 1
@@ -231,6 +232,7 @@ service cloud.firestore {
 
       // 채팅: 1~30일 방에만, 본인 이름으로만. 고치거나 지울 수 없다
       // st = 서버가 받은 시각(정렬용). 넣으려면 반드시 서버 시각이어야 한다
+      // af = 보낼 때 화면 맨 아래 글의 정렬 열쇠(숫자). 내가 보낸 글이 이미 보이던 글 위로 가지 않게
       match /chats/{day}/messages/{mid} {
         allow read: if isMember(rid);
         allow create: if canWrite(rid)
@@ -238,12 +240,13 @@ service cloud.firestore {
           && request.resource.data.uid == uid()
           && request.resource.data.ts is number
           && (!('st' in request.resource.data) || request.resource.data.st == request.time)
+          && (!('af' in request.resource.data) || request.resource.data.af is number)
           && (
-            (request.resource.data.keys().hasOnly(['uid', 'text', 'ts', 'st'])
+            (request.resource.data.keys().hasOnly(['uid', 'text', 'ts', 'st', 'af'])
               && request.resource.data.text is string
               && request.resource.data.text.size() >= 1 && request.resource.data.text.size() <= 500)
             ||
-            (request.resource.data.keys().hasOnly(['uid', 'dice', 'v', 'ts', 'st'])
+            (request.resource.data.keys().hasOnly(['uid', 'dice', 'v', 'ts', 'st', 'af'])
               && request.resource.data.dice in [6, 10, 100]
               && request.resource.data.v is int
               && request.resource.data.v >= 1 && request.resource.data.v <= request.resource.data.dice)
