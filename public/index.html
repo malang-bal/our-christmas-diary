@@ -765,7 +765,7 @@ html.gdk #roomApp ::placeholder{color:color-mix(in srgb,var(--txt) 45%,transpare
 .thumbs.headers button{background:var(--txt,#333);color:var(--paper,#fff);font-size:14px}
 #hd-ed:not(:empty){margin:10px 0 4px}
 #hd-ed .ged{padding:12px}
-.hbtns{display:flex;gap:8px;margin-top:12px}
+.hbtns{display:flex;gap:8px;margin-top:12px}.pfile{display:inline-flex;align-items:center;justify-content:center;min-height:40px;padding:0 16px;box-sizing:border-box;cursor:pointer}
 .hbtns .btn{flex:1;justify-content:center;display:inline-flex;align-items:center;min-height:40px;box-sizing:border-box}
 .hfile{cursor:pointer}
 #pied:not(:empty){margin:10px 0}
@@ -1102,7 +1102,7 @@ html.gmodal{overflow:hidden}@media (hover:hover) and (pointer:fine){html{scrollb
 </script>
 <script>
 /* 새 버전 알림: 올라간 index.html이 바뀌면 상단에 새로고침 안내를 띄워요 */
-const BUILD_ID="1794834249614";
+const BUILD_ID="1794834653674";
 (function(){
   if(!/^https?:/.test(location.protocol))return;
   let shown=false;
@@ -1422,7 +1422,7 @@ function settingsTop(){const m=members[me]||{},col=m.color||"#c2492f";
   const imgSec=(k,title,acc,arr,hint)=>sec(k,title+' <span class="note">'+arr.length+'개</span>',imgs(k,arr,false),'<p class="note" style="margin:6px 0 0">'+hint+'</p>'+imgs(k,arr,true)+'<p></p><input type="file" id="up-'+k+'" accept="'+acc+'"'+(k==="headers"?"":" multiple")+'>'+(k==="headers"?'<div id="hd-ed"></div>':"")+'<div class="note" id="us-'+k+'"></div>');
   return sec("profile","내 프로필",
     '<div class="row" style="align-items:center;margin-top:8px">'+avH(me)+'<div><span style="display:inline-block;width:12px;height:12px;border-radius:50%;vertical-align:middle;background:'+col+'"></span> <b>'+esc(m.name||"이름 없음")+'</b><div class="note">참여자: '+Object.values(members).map(x=>esc(x.name)).join(", ")+'</div></div></div>',
-    '<div class="row" style="align-items:center"><span id="pv">'+(pend.img?'<img class="av" src="'+pend.img+'" alt="">':avH(me))+'</span><input type="file" id="pi" accept="image/*"></div><div id="pied"></div><p class="note">사진을 고르면 위치와 크기를 맞출 수 있어요</p><div class="row"><input id="pn" value="'+esc(pend.name??m.name??"")+'" maxlength="12" style="flex:0 1 220px;width:220px;max-width:100%;min-width:0"><input type="color" id="pc" value="'+esc(pend.color||col)+'"></div><p class="note">이름과 말풍선 색 (연하게 깔려요)</p><span class="note" id="pst"></span>')+
+    '<div class="row" style="align-items:center"><span id="pv">'+(pend.img?'<img class="av" src="'+pend.img+'" alt="">':avH(me))+'</span><label class="btn pfile">사진 선택<input type="file" id="pi" accept="image/*" hidden></label></div><div id="pied"></div><p class="note">사진을 고르면 위치와 크기를 맞출 수 있어요</p><div class="row"><input id="pn" value="'+esc(pend.name??m.name??"")+'" maxlength="12" style="flex:0 1 220px;width:220px;max-width:100%;min-width:0"><input type="color" id="pc" value="'+esc(pend.color||col)+'"></div><p class="note">이름과 말풍선 색 (연하게 깔려요)</p><span class="note" id="pst"></span>')+
   sec("headers",'헤더 이미지 <span class="note">'+headers.length+' / '+HMAX+'</span>',hThumbs(false),'<p class="note" style="margin:6px 0 0">실제 헤더는 가로로 길게(약 5:1) 올라가요.</p><div id="hd-ed"></div>'+hThumbs(true)+''+(headers.length<HMAX?'<div class="hbtns"><label class="btn pri hfile">파일 선택<input type="file" id="up-headers" accept="image/*" hidden></label></div>':'<p class="note">헤더는 '+HMAX+'개까지예요. 바꾸려면 하나를 먼저 빼 주세요.</p>')+'<div class="note" id="us-headers"></div>')}
 /* ===== 헤더: 문답마다 최대 4개 (h1~h4 칸) · 가로 960px JPEG로 Cloud Storage에 저장 ===== */
 const HMAX=4,HW=960,HH=195;let hEd=null;
