@@ -1102,7 +1102,7 @@ html.gmodal{overflow:hidden}@media (hover:hover) and (pointer:fine){html{scrollb
 </script>
 <script>
 /* 새 버전 알림: 올라간 index.html이 바뀌면 상단에 새로고침 안내를 띄워요 */
-const BUILD_ID="1794835693479";
+const BUILD_ID="1794835920369";
 (function(){
   if(!/^https?:/.test(location.protocol))return;
   let shown=false;
@@ -1452,8 +1452,9 @@ function pMount(){const box=$("#pied");if(!box||!pend.edImg)return;const im=pend
     paint:(cv,st)=>{const g=cv.getContext("2d"),sc=gCoverClamp(im,S,S,st),dw=im.naturalWidth*sc,dh=im.naturalHeight*sc;g.clearRect(0,0,S,S);g.drawImage(im,(S-dw)/2+st.ox,(S-dh)/2+st.oy,dw,dh)},
     onCancel:()=>{pend.edImg=null;box.innerHTML=""},
     onSave:async st=>{const o=document.createElement("canvas");o.width=o.height=128;const g=o.getContext("2d"),sc=gCoverClamp(im,S,S,st)*128/S,dw=im.naturalWidth*sc,dh=im.naturalHeight*sc;
-      g.drawImage(im,(128-dw)/2+st.ox*128/S,(128-dh)/2+st.oy*128/S,dw,dh);pend.img=o.toDataURL("image/jpeg",.88);pend.edImg=null;box.innerHTML="";
-      const pv=$("#pv");if(pv)pv.innerHTML='<img class="av" src="'+pend.img+'" alt="">'}})}
+      g.drawImage(im,(128-dw)/2+st.ox*128/S,(128-dh)/2+st.oy*128/S,dw,dh);pend.img=o.toDataURL("image/jpeg",.88);pend.edImg=null;pend.edSt=null;box.innerHTML="";
+      /* 미리보기만 바꾸지 않고 프로필 칸을 다시 그려요 → 삭제 버튼도 지금 상태에 맞게 다시 보여요 */
+      render()}})}
 /* 팝업: 바깥(어두운 영역)을 누르면 취소(null) */
 function gPop(o){return new Promise(res=>{const w=document.createElement("div");w.className="gpop";
   const ra=document.getElementById("roomApp"),cs=ra?getComputedStyle(ra):null;if(cs)["--paper","--paperd","--txt","--main","--perf","--mute2"].forEach(k=>w.style.setProperty(k,cs.getPropertyValue(k)));
