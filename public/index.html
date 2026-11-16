@@ -607,21 +607,21 @@ body:has(#mainApp:not([hidden])):not(:has(#su-n)) #fb-out{display:none}
 #mainApp .mhead{background:none;-webkit-mask:none;mask:none;padding:6px 2px 4px;margin-bottom:14px;text-align:left}
 #mainApp .mhead h1{color:var(--mon);font-size:24px;letter-spacing:-.03em}
 #mainApp .mhead .note{color:var(--mon);opacity:.72}
-#mainApp .sheet.fpad{position:relative;background:var(--mpaper);color:#2b211e;border-radius:12px;padding:22px 22px 20px;-webkit-mask:none;mask:none;filter:drop-shadow(0 6px 14px rgba(0,0,0,.35))}
+#mainApp .sheet.fpad{position:relative;background:var(--mpaper);color:var(--mtx,#2b211e);border-radius:12px;padding:22px 22px 20px;-webkit-mask:none;mask:none;filter:drop-shadow(0 6px 14px rgba(0,0,0,.35))}
 #mainApp .fpad label{font-size:11px;font-weight:700;letter-spacing:.06em;color:var(--mmute);margin:18px 0 4px}
 #mainApp .fpad>label:first-child{margin-top:0}
 #mainApp .fpad label .note{font-weight:500;letter-spacing:0}
-#mainApp .fpad input:not([type=color]),#mainApp .fpad textarea{width:100%;box-sizing:border-box;background:transparent;border:0;border-bottom:1.5px solid var(--mperf);border-radius:0;padding:8px 0;font:inherit;font-size:16px;color:#2b211e}
+#mainApp .fpad input:not([type=color]),#mainApp .fpad textarea{width:100%;box-sizing:border-box;background:transparent;border:0;border-bottom:1.5px solid var(--mperf);border-radius:0;padding:8px 0;font:inherit;font-size:16px;color:var(--mtx,#2b211e)}
 #mainApp .fpad #f-t{font-size:20px;font-weight:900}
 #mainApp .fpad textarea{border:1.5px solid var(--mperf);border-radius:8px;padding:10px 12px;line-height:1.6;font-size:15px;background:color-mix(in srgb,var(--mpaper) 60%,#fff)}
-#mainApp .fpad input:not([type=color]):focus,#mainApp .fpad textarea:focus{outline:none;border-color:#c8352b}
-#mainApp .fpad select{border:1.5px solid var(--mperf);border-radius:8px;background:transparent;min-height:40px}
+#mainApp .fpad input:not([type=color]):focus,#mainApp .fpad textarea:focus{outline:none;border-color:var(--macc,#c8352b)}
+#mainApp .fpad select{border:1.5px solid var(--mperf);border-radius:8px;background:transparent;min-height:40px;color:var(--mtx,#2b211e)}#mainApp .fpad select option{color:#2b211e}#gate h2{color:var(--mink,inherit)}
 #mainApp .fpad .prow{border-bottom:1px dashed var(--mperf)}
 #mainApp .fpad .mbtns{position:relative;margin:22px -22px 0;padding:20px 22px 0;gap:8px}
 #mainApp .fpad .mbtns::before{content:"";position:absolute;left:12px;right:12px;top:0;border-top:2px dashed var(--mperf)}
 #mainApp .fpad .mbtns::after{content:"";position:absolute;left:-11px;right:-11px;top:-11px;height:22px;pointer-events:none;background:radial-gradient(circle,var(--bgc) 10.5px,transparent 11px) left center/22px 22px no-repeat,radial-gradient(circle,var(--bgc) 10.5px,transparent 11px) right center/22px 22px no-repeat}
-#mainApp .fpad .mbtns .sq{min-height:48px;padding:0 18px;border-radius:10px;border:1.5px solid #2b211e;background:transparent;color:#2b211e;font-weight:700}
-#mainApp .fpad .mbtns .sq.pri{background:#c8352b;border-color:#c8352b;color:#fff}
+#mainApp .fpad .mbtns .sq{min-height:48px;padding:0 18px;border-radius:10px;border:1.5px solid var(--mtx,#2b211e);background:transparent;color:var(--mtx,#2b211e);font-weight:700}
+#mainApp .fpad .mbtns .sq.pri{background:var(--macc,#c8352b);border-color:var(--macc,#c8352b);color:#fff}
 #mainApp .fpad .mbtns .sq:hover{filter:brightness(.96)}
 /* 메인 상태 필터 버튼: 마우스오버 · 누름 */
 #mainApp .mfb{transition:background-color .15s,box-shadow .15s,transform .1s,color .15s}
@@ -670,10 +670,10 @@ body:has(#mainApp:not([hidden])):not(:has(#su-n)) #fb-out{display:none}
 #mainApp .fpad .ppk{display:flex;flex-direction:column;gap:6px;margin-top:4px}
 #mainApp .fpad .ppg>small{display:block;font-size:11px;font-weight:700;color:var(--mmute);margin-bottom:2px}
 #mainApp .fpad .ppr{display:flex;flex-wrap:wrap;gap:6px}
-#mainApp .fpad .ppb{width:64px;min-height:64px;padding:6px 2px;box-sizing:border-box;border:1.5px solid transparent;border-radius:10px;background:none;font:inherit;font-size:12px;line-height:1.2;color:#2b211e;display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer}
+#mainApp .fpad .ppb{width:64px;min-height:64px;padding:6px 2px;box-sizing:border-box;border:1.5px solid transparent;border-radius:10px;background:none;font:inherit;font-size:12px;line-height:1.2;color:var(--mtx,#2b211e);display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer}
 #mainApp .fpad .ppb i{display:block;width:38px;height:38px;border-radius:8px;box-shadow:inset 0 0 0 1px rgba(0,0,0,.14)}
 #mainApp .fpad .ppb:hover{background:var(--mpaperd)}
-#mainApp .fpad .ppb.on{border-color:#c8352b}
+#mainApp .fpad .ppb.on{border-color:var(--macc,#c8352b)}
 #mainApp .fpad .ppb.on span{font-weight:700}
 #mainApp .sheet.fpad{transition:background-color .2s}
 .gslide{overflow:hidden}
@@ -863,7 +863,7 @@ body:has(#gate) #fb-out{display:block!important}
 #gclosed b{display:block;font-size:15px}
 #gate .gcode{font:700 22px/1.2 ui-monospace,Menlo,Consolas,monospace;letter-spacing:.18em;text-transform:uppercase;text-align:center}
 #gate .gerr{color:#c8352b;min-height:1.4em;margin:6px 0 0;font-size:14px}
-#gate .gpriv{margin:14px 0 0;padding:10px 12px;border-radius:8px;background:rgba(0,0,0,.05);font-size:13px;line-height:1.6;color:#555}
+#gate .gpriv{margin:14px 0 0;padding:10px 12px;border-radius:8px;background:color-mix(in srgb,var(--mtx,#000) 6%,transparent);font-size:13px;line-height:1.6;color:var(--mmute,#555)}
 .pcode{display:flex;align-items:center;gap:10px;margin:8px 0 4px;flex-wrap:wrap}
 .pcode b{font:700 22px/1.2 ui-monospace,Menlo,Consolas,monospace;letter-spacing:.16em}
 
@@ -1101,7 +1101,7 @@ html.gmodal{overflow:hidden}@media (hover:hover) and (pointer:fine){html{scrollb
 </script>
 <script>
 /* 새 버전 알림: 올라간 index.html이 바뀌면 상단에 새로고침 안내를 띄워요 */
-const BUILD_ID="1794829581692";
+const BUILD_ID="1794830233268";
 (function(){
   if(!/^https?:/.test(location.protocol))return;
   let shown=false;
@@ -1806,7 +1806,7 @@ const gLum=h=>{const c=gRGB(h).map(x=>{x/=255;return x<=.04045?x/12.92:Math.pow(
 const gCR=(a,b)=>{const x=gLum(a),y=gLum(b);return(Math.max(x,y)+.05)/(Math.min(x,y)+.05)};
 const gOn=bg=>{const dk=gDark(bg,.82);return gCR("#ffffff",bg)>=gCR(dk,bg)?"#fff":dk};
 const gDark=(h,t)=>"#"+gRGB(h).map(v=>Math.round(v*(1-t)).toString(16).padStart(2,"0")).join("");
-let ppSel=null,ppNow="";
+let ppSel=null,ppNow="",rsPal=null,rsDirty=false;
 const gLite=(h,t)=>"#"+gRGB(h).map(v=>Math.round(v+(255-v)*t).toString(16).padStart(2,"0")).join("");
 function gInk(m,p,dk){for(let i=0;i<14&&gCR(m,p.paperd)<3;i++)m=dk?gLite(m,.09):gDark(m,.07);return m}
 function gPaperTx(p){return p.tx||"#2b211e"}
@@ -2456,7 +2456,14 @@ async function boot(){
   }catch(e){console.error(e);msgBox("오류가 발생했어요. 새로고침해 주세요.")}
 }
 function privNote(){return '<div class="gpriv">· '+kDay(CONF.start)+'에 모든 문답이 함께 시작해서 30일 동안 진행돼요.<br>· '+(closeMs()?kDate(closeMs()-1)+'이 지나면 쓰기가 닫히고, ':"")+(CONF.deleteOn?kDay(CONF.deleteOn)+'에 사이트와 모든 기록(답변·채팅·이미지)이 삭제돼요.':"운영이 끝나면 사이트와 모든 기록이 삭제돼요.")+' 그 전에 설정의 HTML 백업으로 저장해 두세요.<br>· 기록은 짝꿍 두 사람만 볼 수 있지만, 사이트 관리자는 운영 도구(콘솔)에서 저장된 데이터를 볼 수 있어요.<br>· 알림은 사이트가 열려 있을 때만 와요.</div>'}
-function showGate(){
+/* 가입: 색·종이를 고르면 화면에 바로 비춰 보기 */
+const GPV=["--mon","--macc","--mink","--mpaper","--mpaperd","--mperf","--mmute","--mtx"];
+function gatePreview(pal,paper){const m=$("#mainApp");if(!m)return;
+  if(!pal){applyPal(MAINPAL);GPV.forEach(v=>m.style.removeProperty(v));return}
+  applyPal(pal);const P0=PAPERS[paper]||PAPERS.cream,p=P0.c,dk=!!P0.dk;
+  m.style.setProperty("--mon",gOn(pal.bg));m.style.setProperty("--macc",pal.main);m.style.setProperty("--mink",gInk(pal.main,p,dk));
+  m.style.setProperty("--mpaper",p.paper);m.style.setProperty("--mpaperd",p.paperd);m.style.setProperty("--mperf",p.perf);m.style.setProperty("--mmute",p.mute);m.style.setProperty("--mtx",gPaperTx(p,dk))}
+function showGate(){gatePreview(null);
   shell('<div class="sheet ceil mhead"><h1>'+TITLE+'</h1></div><div class="sheet fpad" id="gate"><h2 style="margin:0 0 6px;font-size:18px">초대 코드가 필요해요</h2><p class="note" style="margin:0 0 4px">관리자에게 받은 <b>가입 코드</b>나, 짝꿍에게 받은 <b>짝꿍 코드</b>를 입력해 주세요.</p><label for="g-code">코드</label><input id="g-code" class="gcode" maxlength="14" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="ABCD2345"><p class="gerr" id="g-err"></p><div class="mbtns" style="justify-content:flex-end"><button class="sq pri" id="g-ok">확인</button></div>'+privNote()+'</div>');
   const inp=$("#g-code"),err=$("#g-err"),ok=$("#g-ok");inp.focus();
   inp.oninput=()=>{err.textContent=""};inp.onkeydown=e=>{if(e.key==="Enter"&&!e.isComposing)ok.click()};
@@ -2474,12 +2481,14 @@ function showGate(){
     catch(e){err.textContent="확인하지 못했어요. 연결을 확인해 주세요";ok.disabled=false}}}
 /* 가입 코드 → 처음 한 번만: 내 이름 · 문답 제목 · 색 · 종이 · 눈 효과 */
 function showStart(code){let paper="cream";const pal={...DEF};
-  shell('<div class="sheet ceil mhead"><h1>'+TITLE+'</h1></div><div class="sheet fpad" id="gate"><h2 style="margin:0 0 6px;font-size:18px">우리 문답 만들기</h2><p class="note" style="margin:0 0 4px">가입 코드가 확인됐어요. 색·종이·눈 효과는 나중에 설정에서 바꿀 수 있어요.</p>'+
-    '<label for="s-n">내 이름</label><input id="s-n" maxlength="12" placeholder="짝꿍에게 보일 이름" value="'+esc(String((firebase.auth().currentUser||{}).displayName||"").slice(0,12))+'">'+
+  shell('<div class="sheet ceil mhead"><h1>'+TITLE+'</h1></div><div class="sheet fpad" id="gate"><h2 style="margin:0 0 6px;font-size:18px">우리 문답 만들기</h2><p class="note" style="margin:0 0 4px">가입 코드가 확인됐어요. 이름·색상·종이·효과는 나중에 설정에서 바꿀 수 있어요.</p>'+
+    '<label for="s-n">내 이름</label><input id="s-n" maxlength="12" placeholder="짝꿍에게 보일 이름·나중에 수정할 수 있어요" value="'+esc(String((firebase.auth().currentUser||{}).displayName||"").slice(0,12))+'">'+
     '<label>컬러 팔레트</label>'+palInputs("s",pal)+'<label>종이</label><div class="ppk" id="s-pp">'+ppPicker(paper)+'</div><label>배경 움직임 효과</label>'+fxSelect("s","snow")+
     '<p class="gerr" id="s-err"></p><div class="mbtns" style="justify-content:space-between"><button class="sq" id="s-x">코드 다시 입력</button><button class="sq pri" id="s-go">시작하기</button></div>'+privNote()+'</div>');
   wireFx("s");
-  document.querySelectorAll("#s-pp .ppb").forEach(b=>b.onclick=()=>{paper=b.dataset.pp;document.querySelectorAll("#s-pp .ppb").forEach(x=>{x.classList.toggle("on",x===b);x.setAttribute("aria-pressed",x===b)})});
+  const pv=()=>gatePreview(readPal("s"),paper);pv();
+  Object.keys(PALN).forEach(k=>{const i=$("#s-"+k);if(i)i.oninput=pv});
+  document.querySelectorAll("#s-pp .ppb").forEach(b=>b.onclick=()=>{paper=b.dataset.pp;document.querySelectorAll("#s-pp .ppb").forEach(x=>{x.classList.toggle("on",x===b);x.setAttribute("aria-pressed",x===b)});pv()});
   $("#s-fx").addEventListener("change",()=>setFx($("#s-fx").value));
   $("#s-x").onclick=showGate;
   $("#s-go").onclick=async()=>{const err=$("#s-err"),name=$("#s-n").value.trim().slice(0,12);
@@ -2496,7 +2505,7 @@ function showStart(code){let paper="cream";const pal={...DEF};
     catch(e){console.error(e);err.textContent="만들지 못했어요. 코드가 방금 사용됐거나, 이미 다른 문답에 들어가 있을 수 있어요.";b.disabled=false}}}
 /* 짝꿍 코드 → 이름만 정하고 들어가기 */
 function showJoin(code,p){
-  shell('<div class="sheet ceil mhead"><h1>'+TITLE+'</h1></div><div class="sheet fpad" id="gate"><h2 style="margin:0 0 6px;font-size:18px">짝꿍의 문답에 들어가기</h2><p class="note" style="margin:0 0 4px">짝꿍 코드가 확인됐어요. 들어가면 이 문답은 두 사람만 쓸 수 있게 잠겨요.</p><label for="j-n">내 이름</label><input id="j-n" maxlength="12" placeholder="짝꿍에게 보일 이름" value="'+esc(String((firebase.auth().currentUser||{}).displayName||"").slice(0,12))+'"><p class="gerr" id="j-err"></p><div class="mbtns" style="justify-content:space-between"><button class="sq" id="j-x">코드 다시 입력</button><button class="sq pri" id="j-go">들어가기</button></div>'+privNote()+'</div>');
+  shell('<div class="sheet ceil mhead"><h1>'+TITLE+'</h1></div><div class="sheet fpad" id="gate"><h2 style="margin:0 0 6px;font-size:18px">짝꿍의 문답에 들어가기</h2><p class="note" style="margin:0 0 4px">짝꿍 코드가 확인됐어요. 들어가면 이 문답은 두 사람만 쓸 수 있게 잠겨요.</p><label for="j-n">내 이름</label><input id="j-n" maxlength="12" placeholder="짝꿍에게 보일 이름·나중에 수정할 수 있어요" value="'+esc(String((firebase.auth().currentUser||{}).displayName||"").slice(0,12))+'"><p class="gerr" id="j-err"></p><div class="mbtns" style="justify-content:space-between"><button class="sq" id="j-x">코드 다시 입력</button><button class="sq pri" id="j-go">들어가기</button></div>'+privNote()+'</div>');
   $("#j-x").onclick=showGate;
   $("#j-go").onclick=async()=>{const err=$("#j-err"),name=$("#j-n").value.trim().slice(0,12);if(!name){err.textContent="이름을 입력해 주세요";return}
     const b=$("#j-go");b.disabled=true;err.textContent="들어가는 중…";const now=Date.now(),bt=db.batch();
@@ -2647,15 +2656,16 @@ function wireNotif(){const c=$("#ncard");if(!c)return;{const h=c.querySelector("
     NP[k]=true;nSave();redraw()});
   c.querySelectorAll("select[data-nk]").forEach(o=>o.onchange=()=>{const k=o.dataset.nk,i=+o.value;NP[k]=i;nSave();redraw();if(i>=0)snd(k==="qs"?"q":"c",i);else if(NP.qs<0&&NP.cs<0)setTimeout(()=>{if(NP.snd&&NP.qs<0&&NP.cs<0){const sb=$("[data-nsw=snd]");if(sb)sb.click()}},400)});
   c.querySelectorAll(".pl").forEach(b=>b.onclick=()=>{const k=b.dataset.np;if(NP[k]>=0)snd(k==="qs"?"q":"c",NP[k])})}
-function roomSetCard(){const c=cfg||{},pal={...DEF,...(c.palette||{})};
+function roomSetCard(){const c=cfg||{},pal={...DEF,...(c.palette||{})},palE={...pal,...(rsPal||{})};
   const view='<p class="note" style="margin:8px 0 0"><b>'+esc(c.title||"")+'</b>'+(c.sub?' · '+esc(c.sub):"")+'<br>시작일 '+esc(c.start||"")+' · 마지막 날 '+esc(endOf(c.start,(c.q||[]).length))+' · 배경 효과 '+esc((FXI[c.fx||"snow"]||FXI.snow)[0])+'</p><div class="chips">'+Object.keys(PALN).map(k=>'<span class="chipw"><span class="chip" style="background:'+pal[k]+'"></span><small>'+PALN[k].split(" ")[0]+'</small></span>').join("")+'<span class="chipw"><span class="chip" style="background:'+(PAPERS[c.paper]||PAPERS.cream).c.paper+';box-shadow:inset 0 0 0 1px rgba(0,0,0,.15)"></span><small>종이 · '+(PAPERS[c.paper]||PAPERS.cream).n+'</small></span></div>';
-  const edit='<p class="note" style="margin:8px 0 0">제목·부제·질문은 모든 문답이 함께 써요.</p><div class="note" style="margin-top:10px">컬러 팔레트</div><span id="rs-on" hidden></span>'+palInputs("rs",pal)+'<div class="note" style="margin-top:10px">종이</div><div class="ppk" id="rs-pp">'+ppPicker(PAPERS[c.paper]?c.paper:"cream")+'</div><div class="note" style="margin-top:6px">배경 움직임 효과</div>'+fxSelect("rs",c.fx||"snow")+'<p class="note" id="rs-st" style="margin:8px 0 0"></p>';
+  const edit='<p class="note" style="margin:8px 0 0">제목·부제·질문은 모든 문답이 함께 써요.</p><div class="note" style="margin-top:10px">컬러 팔레트</div><span id="rs-on" hidden></span>'+palInputs("rs",palE)+'<div class="note" style="margin-top:10px">종이</div><div class="ppk" id="rs-pp">'+ppPicker(PAPERS[c.paper]?c.paper:"cream")+'</div><div class="note" style="margin-top:6px">배경 움직임 효과</div>'+fxSelect("rs",c.fx||"snow")+'<p class="note" id="rs-st" style="margin:8px 0 0"></p>';
   return secCard("room","문답 설정",view,edit)}
-function wireRoomSet(){window.rsSave=null;if(!$("#rs-on")){ppSel=null;return}wireFx("rs");
+function wireRoomSet(){window.rsSave=null;if(!$("#rs-on")){ppSel=null;rsPal=null;if(rsDirty&&cfg){rsDirty=false;applyPal(cfg.palette);ppNow="";applyPaper(cfg.paper)}return}wireFx("rs");
+  Object.keys(PALN).forEach(k=>{const i=$("#rs-"+k);if(i)i.oninput=()=>{rsPal=readPal("rs");rsDirty=true;applyPal({...(cfg?.palette||{}),...rsPal});ppNow="";applyPaper(ppSel||cfg?.paper)}});
   if(!ppSel)ppSel=PAPERS[cfg?.paper]?cfg.paper:"cream";
-  document.querySelectorAll("#rs-pp .ppb").forEach(b=>{b.classList.toggle("on",b.dataset.pp===ppSel);b.setAttribute("aria-pressed",b.dataset.pp===ppSel);b.onclick=()=>{ppSel=b.dataset.pp;document.querySelectorAll("#rs-pp .ppb").forEach(x=>{x.classList.toggle("on",x===b);x.setAttribute("aria-pressed",x===b)});applyPaper(ppSel)}});
+  document.querySelectorAll("#rs-pp .ppb").forEach(b=>{b.classList.toggle("on",b.dataset.pp===ppSel);b.setAttribute("aria-pressed",b.dataset.pp===ppSel);b.onclick=()=>{ppSel=b.dataset.pp;rsDirty=true;document.querySelectorAll("#rs-pp .ppb").forEach(x=>{x.classList.toggle("on",x===b);x.setAttribute("aria-pressed",x===b)});applyPaper(ppSel)}});
   window.rsSave=async()=>{
-    try{await db.doc("rooms/"+RID).update({palette:readPal("rs"),fx:$("#rs-fx").value,paper:ppSel||"cream"});editing=null;window.rsSave=null;ppSel=null;render()}catch(e){$("#rs-st").textContent="저장하지 못했어요. 연결을 확인해 주세요"}}}
+    try{await db.doc("rooms/"+RID).update({palette:readPal("rs"),fx:$("#rs-fx").value,paper:ppSel||"cream"});editing=null;window.rsSave=null;ppSel=null;rsPal=null;rsDirty=false;render()}catch(e){$("#rs-st").textContent="저장하지 못했어요. 연결을 확인해 주세요"}}}
 const homeIc='<svg class="ti" viewBox="0 0 24 24"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg>';
 (function(){const fit=()=>{const vw=document.documentElement.clientWidth;let w=Math.min(640,vw);if((vw-w)%2)w-=1;document.querySelectorAll("body>main").forEach(m=>m.style.width=w+"px")};fit();addEventListener("resize",fit);if(window.ResizeObserver)new ResizeObserver(fit).observe(document.documentElement)})();
 try{document.addEventListener("touchstart",function(){},{passive:true})}catch(e){}
