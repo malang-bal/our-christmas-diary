@@ -43,10 +43,16 @@ console.log("전체 방 수:", rooms.length);
 if (cmd === "inspect") process.exit(0);
 
 if (cmd === "restore") {
-  await patch("/meta/config", { start: REAL_START }, ["start"]);
-  console.log("시작일을", REAL_START, "로 되돌렸어요"); process.exit(0);
+  const RID = inv.roomId, R = "/rooms/" + RID;
+  let del = 0;
+  for (let day = 1; day <= 30; day++) {
+    const col = R + "/chats/d" + day + "/messages";
+    for (const id of await listIds(col)) if (id.startsWith("sample-")) { await req("DELETE", col + "/" + id); del++; }
+  }
+  for (const id of await listIds(R + "/says")) if (id.startsWith("sample-")) { await req("DELETE", R + "/says/" + id); del++; }
+  globalThis.__RESTORE = { R, del };
 }
-if (cmd !== "apply") { console.log("모르는 명령"); process.exit(1); }
+if (cmd !== "apply" && cmd !== "restore") { console.log("모르는 명령"); process.exit(1); }
 if (!inv.used || !inv.roomId) { console.log("아직 아무도 이 코드로 가입하지 않았어요. 먼저 가입이 필요해요."); process.exit(1); }
 const RID = inv.roomId, R = "/rooms/" + RID;
 const room = await get(R);
@@ -65,6 +71,17 @@ const A_ME = ["설렘 반 걱정 반! 30일 동안 하루도 안 빠지고 써 �
 const A_PT = ["일단 매일 쓰는 게 목표. 빼먹으면 혼내 줘.", "솔직히 예전엔 그냥 쉬는 날이었는데 요즘은 기다려져.", "귤 한 박스 다 먹은 거 아직도 기억나.", "네가 골라 준 거면 뭐든.", "비밀. 근데 분명 좋아할 거야.", "초코 케이크! 생크림은 네가 먹어.", "구매. 대신 제일 맛있는 집으로.", "가족이랑 눈썰매장 갔다가 넘어져서 운 날.", "그린 크리스마스. 추운 거 싫어…", "보는 건 좋은데 치우는 건 싫어.", "사람 없는 바닷가도 좋을 것 같아.", "맨정신! 기억하고 싶으니까.", "핫초코에 마시멜로.", "조명을 전부 따뜻한 색으로 바꾸기.", "12월 1일부터가 국룰.", "산타는 지금도 믿어.", "한 번도 안 써 봤는데 올해는 써 볼게.", "1위. 이유는 너.", "걸어 두면 뭐 넣어 줄 거야?", "갓 구운 빵 냄새.", "하얀색.", "창밖으로 보이는 트리 불빛.", "네가 웃고 있는 사진 한 장.", "이유가 꼭 필요해? 그냥 너니까.", "기대 안 하려고 했는데 이미 100.", "너 따라 자정까지."];
 const A_ME_TODAY = "같이 케이크 만들기! 반죽은 내가 할게.";
 
+if (cmd === "restore") {
+  for (const [who, list, extra] of [[ME, A_ME, { [LAST + 1]: A_ME_TODAY }], [PT, A_PT, {}]]) {
+    const cur = await get(R + "/answers/" + who); if (!cur) continue;
+    const a = { ...(cur.a || {}) }, r = { ...(cur.r || {}) }, S = { ...Object.fromEntries(list.map((t, i) => [i + 1, t])), ...extra };
+    let n = 0; for (const k of Object.keys(a)) if (a[k] === S[k]) { delete a[k]; n++; }
+    if (who === PT && r[26] === at(26, 23, 41).getTime()) delete r[26];
+    await patch(R + "/answers/" + who, { a, r }); console.log("답변 정리", who, n + "칸 삭제, 남은 칸", Object.keys(a).length);
+  }
+  await patch("/meta/config", { start: REAL_START }, ["start"]);
+  console.log(JSON.stringify({ deleted: globalThis.__RESTORE.del, start: REAL_START })); process.exit(0);
+}
 const ans = await get(R + "/answers/" + ME);
 const mine = { ...(ans?.a || {}) };
 A_ME.slice(0, LAST).forEach((t, i) => { if (!mine[i + 1]) mine[i + 1] = t; });
