@@ -1101,7 +1101,7 @@ html.gmodal{overflow:hidden}@media (hover:hover) and (pointer:fine){html{scrollb
 </script>
 <script>
 /* 새 버전 알림: 올라간 index.html이 바뀌면 상단에 새로고침 안내를 띄워요 */
-const BUILD_ID="1794830779646";
+const BUILD_ID="1794831191011";
 (function(){
   if(!/^https?:/.test(location.protocol))return;
   let shown=false;
@@ -1404,7 +1404,7 @@ function renderSayList(){{const gh=$("#gh");if(gh&&tab==="say")gh.innerHTML=gSay
   el.querySelectorAll("[data-sd]").forEach(b=>b.onclick=async()=>{if(!b.dataset.armed){b.dataset.armed="1";b.textContent="정말 삭제?";setTimeout(()=>{if(b.isConnected){delete b.dataset.armed;b.textContent="삭제"}},3000);return}
     try{await db.doc(P("says/"+b.dataset.sd)).delete();says=says.filter(x=>x.id!==b.dataset.sd);renderSayList();renderTalk()}catch(e){alert("삭제 실패")}})}
 function settingsTop(){const m=members[me]||{},col=m.color||"#c2492f";
-  const sec=(k,title,view,edit)=>'<div class="card"><div class="row" style="justify-content:space-between;align-items:center"><b>'+title+'</b>'+(CLOSED?"":'<button class="btn'+(editing===k?" pri":"")+'" data-edit="'+k+'">'+(editing===k?"완료":"편집")+'</button>')+'</div>'+(editing===k&&!CLOSED?edit:view)+'</div>';
+  const sec=(k,title,view,edit)=>'<div class="card"><div class="row" style="justify-content:space-between;align-items:center"><b>'+title+'</b>'+(CLOSED?"":(editing===k?'<span class="row" style="gap:6px;flex-wrap:nowrap"><button class="btn" data-cancel="'+k+'">취소</button><button class="btn pri" data-edit="'+k+'">완료</button></span>':'<button class="btn" data-edit="'+k+'">편집</button>'))+'</div>'+(editing===k&&!CLOSED?edit:view)+'</div>';
   const imgs=(k,arr,ed)=>'<div class="thumbs '+k+'">'+(arr.map(x=>{const del=ed?'<button data-del="'+k+'/'+x.id+'" data-aid="'+(x.aid||"")+'" title="삭제">×</button>':"";
     if(k==="headers"){const y=x.y??50;return '<span class="hs"><div class="hp"'+(ed?' data-hadj="'+x.id+'" title="눌러서 위치·크기 조정"':"")+'><img src="'+blob(x.aid)+'" style="object-position:50% '+y+'%" alt=""></div>'+del+'</span>'}
     return '<span><img src="'+(x.data||blob(x.aid))+'" alt="">'+del+'</span>'}).join("")||'<span class="note">아직 없어요</span>')+'</div>';
@@ -1453,6 +1453,8 @@ function gPop(o){return new Promise(res=>{const w=document.createElement("div");
   document.body.appendChild(w);const f=w.querySelector(".btn.pri")||w.querySelector(".btn");if(f)f.focus()})}
 function wireSettings(){wireAcct();wireRoomSet();
   document.querySelectorAll("[data-edit]").forEach(b=>b.onclick=()=>{if(editing==="room"&&b.dataset.edit==="room"&&window.rsSave){window.rsSave();return}if(editing==="profile"&&b.dataset.edit==="profile"&&window.profSave){window.profSave();return}pend={};editing=editing===b.dataset.edit?null:b.dataset.edit;render()});
+  /* 취소: 고친 내용은 버리고 저장된 상태로 (색·종이 미리보기도 되돌림) */
+  document.querySelectorAll("[data-cancel]").forEach(b=>b.onclick=()=>{pend={};rsPal=null;ppSel=null;window.rsSave=null;window.profSave=null;editing=null;render()});
   if($("#pn")){
     $("#pn").oninput=e=>{pend.name=e.target.value};$("#pc").oninput=e=>{pend.color=e.target.value};
     $("#pi").onchange=async e=>{const f=e.target.files[0];e.target.value="";if(!f)return;try{pend.edImg=await gLoadImg(f);pend.edSt={z:1,ox:0,oy:0};pMount()}catch(x){alert("이미지를 읽을 수 없어요")}};
@@ -2601,7 +2603,7 @@ function openRoom(rid,pv){
   L(P("says"),a=>{says=a;renderSayList();renderTalk()});
   $("#talk").onclick=()=>{renderTalk(true);if($("#talk").children.length)sfx("t",Math.floor(Math.random()*4),.315)};
   timers.push(setInterval(()=>renderTalk(true),20000),setInterval(()=>{if(!CLOSED&&Date.now()>=closeMs()){CLOSED=true;render()}const t2=calcToday();if(t2!==today){if(t2>today&&t2<=Q.length)nEvent("q","🎄 새 문답이 열렸어요",Q[t2-1]||"");today=t2;render()}},60000))}
-function secCard(k,title,view,edit){return '<div class="card"><div class="row" style="justify-content:space-between;align-items:center"><b>'+title+'</b>'+(CLOSED?"":'<button class="btn'+(editing===k?" pri":"")+'" data-edit="'+k+'">'+(editing===k?"완료":"편집")+'</button>')+'</div>'+(editing===k&&!CLOSED?edit:view)+'</div>'}
+function secCard(k,title,view,edit){return '<div class="card"><div class="row" style="justify-content:space-between;align-items:center"><b>'+title+'</b>'+(CLOSED?"":(editing===k?'<span class="row" style="gap:6px;flex-wrap:nowrap"><button class="btn" data-cancel="'+k+'">취소</button><button class="btn pri" data-edit="'+k+'">완료</button></span>':'<button class="btn" data-edit="'+k+'">편집</button>'))+'</div>'+(editing===k&&!CLOSED?edit:view)+'</div>'}
 const endOf=(st,n)=>{if(!st)return"";const [y,m,d]=st.split("-").map(Number);return ymd(new Date(y,m-1,d+n-1))};
 /* 알림 · 알림음 */
 const NQ=["반짝 개봉","포장 뜯기","오르골","종소리","팝업 1","팝업 2","팝업 3"],NC=["뽁","띠링","삐록","톡","멀티팝 1","멀티팝 2","멀티팝 3"],NDEF={q:false,c:false,snd:true,qs:0,cs:0};
