@@ -91,6 +91,12 @@ Firebase 콘솔(console.firebase.google.com)에서 각각 다음을 해요.
 5. **Storage** → 시작하기 (같은 위치)
 6. 프로젝트 설정 → 일반 → 내 앱 → 웹 앱(`</>`) 추가 → **Firebase Hosting도 설정** 체크 → 나오는 `firebaseConfig` 값을 `public/config.js`의 `dev` 또는 `prod`에 옮겨 적기
 
+7. **Storage가 Firestore를 읽을 권한** (꼭 필요): Storage 규칙이 문답 멤버를 확인하려고 Firestore를 읽어요. 새 프로젝트는 이 권한이 없어서 사진 올리기가 `storage/unauthorized`로 막혀요. Cloud Shell에서 프로젝트마다 한 번:
+   ```
+   gcloud projects add-iam-policy-binding [프로젝트ID] --member=serviceAccount:service-[프로젝트번호]@gcp-sa-firebasestorage.iam.gserviceaccount.com --role=roles/firebaserules.firestoreServiceAgent --condition=None
+   ```
+   (dev·prod 모두 적용함)
+
 ### 2. App Check (사이트 밖에서 DB에 접근하는 것 막기)
 
 1. reCAPTCHA 관리 콘솔(www.google.com/recaptcha/admin)에서 **reCAPTCHA v3** 사이트 키 만들기. 도메인에는 `[프로젝트ID].web.app`, `[프로젝트ID].firebaseapp.com`(직접 연결한 도메인이 있으면 그것도)을 넣어요.
