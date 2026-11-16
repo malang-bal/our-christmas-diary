@@ -14,6 +14,7 @@ const FV = firebase.firestore.FieldValue;
 const DAY = 864e5;
 const INV = "INVITE01", INV2 = "INVITE02", PAIR = "PAIRCD01", RID = "room1";
 const A = "alice", B = "bob", C = "carol", ADMIN = "admin";
+const U = (s) => "https://firebasestorage.googleapis.com/v0/b/demo/o/rooms%2Froom1%2F" + s + ".jpg?alt=media&token=t-1";
 
 let env;
 const db = (u) => (u ? env.authenticatedContext(u) : env.unauthenticatedContext()).firestore();
@@ -289,8 +290,8 @@ describe("문답은 멤버 두 명만", () => {
       await d.doc(p + "members/" + A).set({ name: "앨리스", color: "#c8352b", img: "" });
       await d.doc(p + "answers/" + A).set({ a: { 1: "비밀 답변" } });
       await d.doc(p + "says/s1").set({ uid: A, text: "안녕", ts: 1 });
-      await d.doc(p + "stamps/d1_" + A).set({ day: 1, uid: A, img: "https://x/y", ts: 1 });
-      await d.doc(p + "headers/h1").set({ aid: "https://x/h", y: 50, by: A, ts: 1 });
+      await d.doc(p + "stamps/d1_" + A).set({ day: 1, uid: A, img: U("y"), ts: 1 });
+      await d.doc(p + "headers/h1").set({ aid: U("h"), y: 50, by: A, ts: 1 });
       await d.doc(p + "chats/d1/messages/m1").set({ uid: A, text: "채팅", ts: 1 });
     });
   });
@@ -312,7 +313,7 @@ describe("문답은 멤버 두 명만", () => {
     await assertFails(d.collection(p + "says").add({ uid: C, text: "끼어들기", ts: 1 }));
     await assertFails(d.collection(p + "chats/d1/messages").add({ uid: C, text: "끼어들기", ts: 1 }));
     await assertFails(d.doc(p + "members/" + C).set({ name: "캐럴", color: "#000000", img: "" }));
-    await assertFails(d.doc(p + "headers/h2").set({ aid: "https://x/h", y: 50, by: C, ts: 1 }));
+    await assertFails(d.doc(p + "headers/h2").set({ aid: U("h"), y: 50, by: C, ts: 1 }));
     await assertFails(d.doc("rooms/" + RID).update({ fx: "storm" }));
   });
   test("누구도 전체 문답 목록을 볼 수 없다", async () => {
@@ -347,6 +348,11 @@ describe("문답은 멤버 두 명만", () => {
     await assertFails(db(B).doc(p + "members/" + A).set({ name: "가짜", color: "#2f6b4f", img: "" }));
     await assertFails(db(B).doc(p + "members/" + B).set({ name: "밥", color: "#2f6b4f", img: "x".repeat(601) }));
     await assertFails(db(B).doc(p + "members/" + B).set({ name: "가".repeat(13), color: "#2f6b4f", img: "" }));
+    // 화면에 그대로 들어가는 값: 형식이 아니면 거절 (상대 화면에 코드 끼워 넣기 방지)
+    await assertFails(db(B).doc(p + "members/" + B).set({ name: "밥", color: 'red"><b', img: "" }));
+    await assertFails(db(B).doc(p + "members/" + B).set({ name: "밥", color: "#2f6b4f", img: 'x" onerror="alert(1)' }));
+    await assertFails(db(B).doc(p + "members/" + B).set({ name: "밥", color: "#2f6b4f", img: "https://evil.example/a.jpg" }));
+    await assertSucceeds(db(B).doc(p + "members/" + B).set({ name: "밥", color: "#2f6b4f", img: U("profiles/b") }));
   });
   test("한마디는 본인 이름으로만 쓰고 본인 것만 지운다", async () => {
     await assertSucceeds(db(B).collection(p + "says").add({ uid: B, text: "보고 싶다", ts: 2 }));
@@ -380,9 +386,9 @@ describe("문답은 멤버 두 명만", () => {
     await assertFails(db(A).doc(p + "chats/d1/messages/m1").delete());
   });
   test("우표는 정해진 이름으로 한 번만 붙이고 바꿀 수 없다", async () => {
-    const ok = { day: 2, uid: B, img: "https://x/y", ts: 1 };
+    const ok = { day: 2, uid: B, img: U("y"), ts: 1 };
     await assertSucceeds(db(B).doc(p + "stamps/d2_" + B).set(ok));
-    await assertFails(db(B).doc(p + "stamps/d2_" + B).set({ ...ok, img: "https://x/z" }));
+    await assertFails(db(B).doc(p + "stamps/d2_" + B).set({ ...ok, img: U("z") }));
     await assertFails(db(B).doc(p + "stamps/d2_" + B).delete());
     await assertFails(db(B).doc(p + "stamps/d3_" + A).set({ ...ok, day: 3 }));
     await assertFails(db(B).doc(p + "stamps/d3_" + B).set({ ...ok, day: 3, uid: A }));
@@ -390,16 +396,22 @@ describe("문답은 멤버 두 명만", () => {
     await assertFails(db(B).doc(p + "stamps/d31_" + B).set({ ...ok, day: 31 }));
   });
   test("헤더는 h1~h4 네 칸뿐이다", async () => {
-    const h = { aid: "https://x/h", y: 50, by: B, ts: 1 };
+    const h = { aid: U("h"), y: 50, by: B, ts: 1 };
     for (const k of ["h2", "h3", "h4"]) await assertSucceeds(db(B).doc(p + "headers/" + k).set(h));
     await assertFails(db(B).doc(p + "headers/h5").set(h));
     await assertFails(db(B).doc(p + "headers/extra").set(h));
+    await assertFails(db(B).doc(p + "headers/h2").set({ ...h, aid: 'x" onerror="1' }));
+    await assertFails(db(B).doc(p + "headers/h2").set({ ...h, y: '50%;"><b' }));
+    await assertFails(db(B).doc(p + "stamps/d6_" + B).set({ day: 6, uid: B, img: "javascript:alert(1)", ts: 1 }));
     await assertFails(db(B).collection(p + "headers").add(h));
     await assertSucceeds(db(B).doc(p + "headers/h1").delete());
   });
   test("문답 설정은 색·종이·효과만 바꿀 수 있다 (제목·질문은 공통)", async () => {
     const r = db(B).doc("rooms/" + RID);
     await assertSucceeds(r.update({ palette: { bg: "#111111", main: "#eeeeee" }, paper: "navy", fx: "bigsnow" }));
+    await assertFails(r.update({ palette: { bg: 'red;"><img', main: "#eeeeee" } }));
+    await assertFails(r.update({ palette: { bg: "#111111", main: "#eeeeee", x: "#000000" } }));
+    await assertFails(r.update({ paper: 'cream"><b' }));
     await assertFails(r.update({ fx: "rain" }));
     await assertSucceeds(r.update({ fx: "powder" }));
     await assertFails(r.update({ fxc: "navy" }));
@@ -437,9 +449,9 @@ describe("문답은 멤버 두 명만", () => {
       await assertFails(d.doc(p + "says/s1").delete());
       await assertFails(d.collection(p + "chats/d30/messages").add({ uid: A, text: "늦은 채팅", ts: 9 }));
       await assertFails(d.doc(p + "members/" + A).set({ name: "앨리스", color: "#000000", img: "" }));
-      await assertFails(d.doc(p + "headers/h2").set({ aid: "https://x/h", y: 50, by: A, ts: 1 }));
+      await assertFails(d.doc(p + "headers/h2").set({ aid: U("h"), y: 50, by: A, ts: 1 }));
       await assertFails(d.doc(p + "headers/h1").delete());
-      await assertFails(d.doc(p + "stamps/d5_" + A).set({ day: 5, uid: A, img: "https://x/y", ts: 1 }));
+      await assertFails(d.doc(p + "stamps/d5_" + A).set({ day: 5, uid: A, img: U("y"), ts: 1 }));
       await assertFails(d.doc("rooms/" + RID).update({ fx: "storm" }));
     });
   });

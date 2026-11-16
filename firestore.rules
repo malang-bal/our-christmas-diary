@@ -110,11 +110,17 @@ service cloud.firestore {
     }
 
     function validName(n) { return n is string && n.size() >= 1 && n.size() <= 12; }
+    // 화면에 그대로 들어가는 값은 형식을 못 박는다 (짝꿍이 콘솔로 이상한 값을 넣어 상대 화면을 망가뜨리지 못하게)
+    function isHex(c) { return c is string && c.matches('^#[0-9a-fA-F]{6}$'); }
+    function isImgUrl(u) { return u is string && u.size() <= 600 && u.matches('^https://firebasestorage[.]googleapis[.]com/[A-Za-z0-9._~%/?&=+-]*$'); }
 
     function validRoom(d) {
       // 제목·부제·질문은 모든 문답이 함께 쓰는 값이라 사이트 코드에만 있고, 문답 문서에는 저장하지 않는다
       return d.palette is map
-        && d.paper is string && d.paper.size() <= 20
+        && d.palette.keys().hasOnly(['bg', 'main'])
+        && isHex(d.palette.bg) && isHex(d.palette.main)
+        && d.paper in ['cream', 'sand', 'peach', 'rose', 'mint', 'sage', 'sky', 'lilac', 'white', 'warmgray', 'coolgray', 'ash',
+                       'mocha', 'wine', 'forest', 'navy', 'terra', 'teal', 'ink', 'charcoal', 'slate']
         && d.fx in ['snow', 'powder', 'bigsnow', 'flake', 'storm', 'blizzard']
         && d.pairCode is string && d.pairCode.size() <= 12
         && d.pairExp is number;
@@ -174,8 +180,8 @@ service cloud.firestore {
         allow create, update: if canWrite(rid) && mid == uid()
           && request.resource.data.keys().hasOnly(['name', 'color', 'img'])
           && validName(request.resource.data.name)
-          && request.resource.data.color is string && request.resource.data.color.size() <= 9
-          && request.resource.data.img is string && request.resource.data.img.size() <= 600;
+          && isHex(request.resource.data.color)
+          && (request.resource.data.img == '' || isImgUrl(request.resource.data.img));
         allow delete: if false;
       }
 
@@ -213,7 +219,7 @@ service cloud.firestore {
           && request.resource.data.day is int
           && request.resource.data.day >= 1 && request.resource.data.day <= 30
           && sid == 'd' + string(request.resource.data.day) + '_' + uid()
-          && request.resource.data.img is string && request.resource.data.img.size() <= 600
+          && isImgUrl(request.resource.data.img)
           && request.resource.data.ts is number;
         allow update, delete: if false;
       }
@@ -224,7 +230,8 @@ service cloud.firestore {
         allow create, update: if canWrite(rid)
           && hid.matches('^h[1-4]$')
           && request.resource.data.keys().hasOnly(['aid', 'y', 'by', 'ts'])
-          && request.resource.data.aid is string && request.resource.data.aid.size() <= 600
+          && isImgUrl(request.resource.data.aid)
+          && request.resource.data.y is number && request.resource.data.y >= 0 && request.resource.data.y <= 100
           && request.resource.data.by == uid()
           && request.resource.data.ts is number;
         allow delete: if canWrite(rid);

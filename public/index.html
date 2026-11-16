@@ -1101,7 +1101,7 @@ html.gmodal{overflow:hidden}@media (hover:hover) and (pointer:fine){html{scrollb
 </script>
 <script>
 /* 새 버전 알림: 올라간 index.html이 바뀌면 상단에 새로고침 안내를 띄워요 */
-const BUILD_ID="1794831191011";
+const BUILD_ID="1794833009859";
 (function(){
   if(!/^https?:/.test(location.protocol))return;
   let shown=false;
@@ -1253,7 +1253,7 @@ function homeSays(){const a=$("#hs1"),b=$("#hs2");if(!a||!b)return;const p=partn
 function gReceipt(){const T=Q.length,n=today;if(n<1||n>T)return"";const p=partner(),ok=id=>!!answers[id]?.[n],both=ok(me)&&!!p&&ok(p),sp=stampsOf(n)[0];
   const st=(id,role)=>'<div class="grc"><small>'+role+' · '+(id?esc(realName(id)):"상대")+'</small><b'+(id&&ok(id)?"":' class="no"')+'>'+(!id?"참여 전":ok(id)?(arush[id]&&arush[id][n]?"✓ 긴급 송부":"✓ 답변 완료"):"작성 전")+'</b></div>';
   return '<div class="grcpt"><div class="grh"><b>접수증</b><span>No. '+String(n).padStart(4,"0")+' · DAY '+n+'</span></div><div class="grr">'+st(p,"발송인")+st(me,"수취인")+'</div>'+
-    '<div class="grst">'+(sp?'<img src="'+sp.img+'" alt="오늘의 우표">':'우표<br>한 장')+'</div>'+
+    '<div class="grst">'+(sp?'<img src="'+esc(sp.img)+'" alt="오늘의 우표">':'우표<br>한 장')+'</div>'+
     '<div class="grq"><small>내용 · 오늘의 질문</small><b>'+esc(Q[n-1])+'</b></div>'+
     '<div class="grf"><div class="grc"><small>접수일</small><b>'+gDate(n)+'</b></div><span class="gok'+(both?"":" wait")+'">'+(both?"접수 확인":"접수 대기")+'</span><button class="btn pri ggo" id="ggo" type="button">보러가기'+GAR+'</button></div></div>'}
 function gStub(n,live){const y8=gDate(n).slice(0,10).replace(/\./g,"");
@@ -1264,7 +1264,7 @@ function viewCal(){
   let h=gReceipt()+'<div class="gsl"><b>우표 시트 · '+Q.length+'일</b><span>소인 '+Math.max(0,Math.min(today-1,Q.length))+'개 찍힘</span></div><div class="gsh"><div class="grid">';
   for(let n=1;n<=Q.length;n++){const open=n<=today,t=n===today,sp=stampPick(n);
     const mine=answers[me]?.[n]?"✓":"";
-    h+='<button class="day '+(t?"today":open?(gDone(n)?"done":""):"lock")+'" data-n="'+n+'" aria-label="'+n+'일째'+(t?" · 오늘":open?"":" · 잠김")+'">'+(sp&&open?'<i class="gth"><i class="bgb" style="background-image:url('+sp.img+')"></i><i class="bgo"></i></i>':"")+'<span class="dt">'+n+"<small>"+(t?"오늘":open?"열림 "+mine:n+"일째")+"</small></span></button>"}
+    h+='<button class="day '+(t?"today":open?(gDone(n)?"done":""):"lock")+'" data-n="'+n+'" aria-label="'+n+'일째'+(t?" · 오늘":open?"":" · 잠김")+'">'+(sp&&open?'<i class="gth"><i class="bgb" style="background-image:url('+esc(sp.img)+')"></i><i class="bgo"></i></i>':"")+'<span class="dt">'+n+"<small>"+(t?"오늘":open?"열림 "+mine:n+"일째")+"</small></span></button>"}
   $("#view").innerHTML=h+"</div></div>";{const g=$("#ggo");if(g)g.onclick=()=>{sel=today;render();window.scrollTo(0,0)}}
   document.querySelectorAll(".day").forEach(b=>b.onclick=()=>{const n=+b.dataset.n;if(n<=today){const y=window.scrollY;sel=n;render();document.body.style.minHeight=(y+window.innerHeight)+"px";window.scrollTo(0,y)}});
 }
@@ -1357,7 +1357,7 @@ function msgHtml(m,live){if(m.dice)return'<div class="dice">― '+esc(realName(m
   const mk=m.emote?{c:""}:gMk(m.text),body=m.emote?'<img class="emo" src="'+emoSrc(m.emote)+'" alt="">':'<span class="mb">'+esc(mk.t)+'</span>';
   return '<div class="m '+(m.uid===me?"me":"you")+(mk.c?" "+mk.c:"")+'" style="'+bg(m.uid)+'"><i>'+esc(nameOf(m.uid))+" · "+(live?'<span data-ago="'+m.ts+'">'+t+"</span>":t)+"</i>"+body+"</div>"}
 function renderBanner(){clearInterval(bt);const b=$("#banner");if(!headers.length){b.innerHTML="";return}
-  b.innerHTML='<div class="ban">'+headers.map((h,i)=>'<img class="'+(i===0?"on":"")+'" src="'+blob(h.aid)+'" style="object-position:50% '+(h.y??50)+'%" alt="">').join("")+"</div>";bi=0;
+  b.innerHTML='<div class="ban">'+headers.map((h,i)=>'<img class="'+(i===0?"on":"")+'" src="'+esc(blob(h.aid))+'" style="object-position:50% '+(+h.y||50)+'%" alt="">').join("")+"</div>";bi=0;
   /* 7단계: 첫 그림은 다 그려진 뒤 0.24초 페이드 (반쯤 그려진 그림이 튀지 않게) */
   {const f=b.querySelector(".ban img.on");if(f&&!f.complete&&!gRM()){f.style.opacity="0";const sh=()=>{f.style.transition="opacity .24s ease-out";f.style.opacity="";setTimeout(()=>{f.style.transition=""},320)};(f.decode?f.decode():Promise.reject()).then(sh,sh)}}
   /* 2단계: 홈 표지에서만, 8초마다, 화면에 보일 때만 바꿔요. 다음 그림은 decode()로 다 그린 뒤 교차해 빈 칸이 끼지 않게 */
@@ -1372,7 +1372,7 @@ let editing=null;
 const PLANE='<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4z"/></svg>';
 const realName=id=>members[id]?.name||"익명";
 const fmt=ts=>new Date(ts).toLocaleString("ko-KR",{month:"numeric",day:"numeric",hour:"2-digit",minute:"2-digit"});
-function avH(id){const m=members[id]||{};return m.img?'<img class="av" src="'+m.img+'" alt="">':'<span class="av" style="background:'+(m.color||"#c2492f")+'">'+esc((m.name||"?").slice(0,1))+'</span>'}
+function avH(id){const m=members[id]||{};return m.img?'<img class="av" src="'+esc(m.img)+'" alt="">':'<span class="av" style="background:'+esc(m.color||"#c2492f")+'">'+esc((m.name||"?").slice(0,1))+'</span>'}
 const hasAlpha=c=>{try{const t=document.createElement("canvas"),w=t.width=Math.min(c.width,96),h=t.height=Math.max(1,Math.round(c.height*w/c.width)),g=t.getContext("2d");g.drawImage(c,0,0,w,h);const d=g.getImageData(0,0,w,h).data;for(let i=3;i<d.length;i+=4)if(d[i]<250)return true}catch(e){}return false};
 function sqImg(f,sz){return new Promise((res,rej)=>{const u=URL.createObjectURL(f),i=new Image();i.onload=()=>{const c=document.createElement("canvas");c.width=c.height=sz;const m=Math.min(i.naturalWidth,i.naturalHeight);c.getContext("2d").drawImage(i,(i.naturalWidth-m)/2,(i.naturalHeight-m)/2,m,m,0,0,sz,sz);URL.revokeObjectURL(u);res(hasAlpha(c)?c.toDataURL("image/png"):c.toDataURL("image/jpeg",.85))};i.onerror=()=>rej();i.src=u})}
 function pickSay(id,force){const arr=says.filter(x=>x.uid===id);if(!arr.length){tk[id]=null;return null}
@@ -1397,7 +1397,7 @@ function gRel(ts){const d=Math.max(0,(Date.now()-ts)/1000);if(d<60)return"방금
 function gSayHead(){const p=partner(),mn=says.filter(x=>x.uid===me).length,pn=p?says.filter(x=>x.uid===p).length:0;
   return '<b>한마디<span class="gcnt">· '+mn+'개 작성</span></b><span>'+(p?'상대는 '+pn+'개의 한마디를 작성했어요':'')+'</span>'}
 function renderSayList(){{const gh=$("#gh");if(gh&&tab==="say")gh.innerHTML=gSayHead()}{const ca=$("#view.psay .card>.row>.av");if(ca){const t=document.createElement("i");t.innerHTML=avH(me);if(t.firstChild.outerHTML!==ca.outerHTML)ca.replaceWith(t.firstChild)}}const el=$("#sayList");if(!el)return;const arr=says.filter(x=>x.uid===me).sort((a,b)=>b.ts-a.ts);const F0=gFlipFirst(el,".say[data-sid]","sid");
-  el.innerHTML=arr.length?arr.map(x=>'<div class="say" data-sid="'+esc(x.id)+'">'+avH(x.uid)+'<div class="sb"><div class="shd"><b class="sn" style="--ac:'+(members[x.uid]?.color||"#c2492f")+'">'+esc(realName(x.uid))+'</b><time class="st" title="'+esc(fmt(x.ts))+'" datetime="'+new Date(x.ts).toISOString()+'">· '+gRel(x.ts)+'</time>'+
+  el.innerHTML=arr.length?arr.map(x=>'<div class="say" data-sid="'+esc(x.id)+'">'+avH(x.uid)+'<div class="sb"><div class="shd"><b class="sn" style="--ac:'+esc(members[x.uid]?.color||"#c2492f")+'">'+esc(realName(x.uid))+'</b><time class="st" title="'+esc(fmt(x.ts))+'" datetime="'+new Date(x.ts).toISOString()+'">· '+gRel(x.ts)+'</time>'+
     (x.uid===me&&!CLOSED?'<span class="smw"><button type="button" class="smore" aria-label="더보기" aria-expanded="false">⋯</button><span class="smenu" hidden><button type="button" class="xs" data-sd="'+x.id+'">삭제</button></span></span>':"")+'</div><div class="stext">'+esc(x.text)+'</div></div></div>').join(""):'<p class="note" style="text-align:center">아직 한마디가 없어요</p>';gFlipPlay(el,".say[data-sid]","sid",F0,200);
   el.querySelectorAll(".smore").forEach(b=>b.onclick=e=>{e.stopPropagation();const m=b.nextElementSibling,op=m.hidden;el.querySelectorAll(".smenu").forEach(x=>{x.hidden=true;x.previousElementSibling.setAttribute("aria-expanded","false")});m.hidden=!op;b.setAttribute("aria-expanded",op)});
   if(!el._smc){el._smc=1;document.addEventListener("click",e=>{if(!e.target.closest||!e.target.closest(".smw"))document.querySelectorAll("#sayList .smenu").forEach(x=>x.hidden=true)})}
@@ -1405,9 +1405,9 @@ function renderSayList(){{const gh=$("#gh");if(gh&&tab==="say")gh.innerHTML=gSay
     try{await db.doc(P("says/"+b.dataset.sd)).delete();says=says.filter(x=>x.id!==b.dataset.sd);renderSayList();renderTalk()}catch(e){alert("삭제 실패")}})}
 function settingsTop(){const m=members[me]||{},col=m.color||"#c2492f";
   const sec=(k,title,view,edit)=>'<div class="card"><div class="row" style="justify-content:space-between;align-items:center"><b>'+title+'</b>'+(CLOSED?"":(editing===k?'<span class="row" style="gap:6px;flex-wrap:nowrap"><button class="btn" data-cancel="'+k+'">취소</button><button class="btn pri" data-edit="'+k+'">완료</button></span>':'<button class="btn" data-edit="'+k+'">편집</button>'))+'</div>'+(editing===k&&!CLOSED?edit:view)+'</div>';
-  const imgs=(k,arr,ed)=>'<div class="thumbs '+k+'">'+(arr.map(x=>{const del=ed?'<button data-del="'+k+'/'+x.id+'" data-aid="'+(x.aid||"")+'" title="삭제">×</button>':"";
-    if(k==="headers"){const y=x.y??50;return '<span class="hs"><div class="hp"'+(ed?' data-hadj="'+x.id+'" title="눌러서 위치·크기 조정"':"")+'><img src="'+blob(x.aid)+'" style="object-position:50% '+y+'%" alt=""></div>'+del+'</span>'}
-    return '<span><img src="'+(x.data||blob(x.aid))+'" alt="">'+del+'</span>'}).join("")||'<span class="note">아직 없어요</span>')+'</div>';
+  const imgs=(k,arr,ed)=>'<div class="thumbs '+k+'">'+(arr.map(x=>{const del=ed?'<button data-del="'+k+'/'+x.id+'" data-aid="'+esc(x.aid||"")+'" title="삭제">×</button>':"";
+    if(k==="headers"){const y=+x.y||50;return '<span class="hs"><div class="hp"'+(ed?' data-hadj="'+x.id+'" title="눌러서 위치·크기 조정"':"")+'><img src="'+esc(blob(x.aid))+'" style="object-position:50% '+y+'%" alt=""></div>'+del+'</span>'}
+    return '<span><img src="'+esc(x.data||blob(x.aid))+'" alt="">'+del+'</span>'}).join("")||'<span class="note">아직 없어요</span>')+'</div>';
   const imgSec=(k,title,acc,arr,hint)=>sec(k,title+' <span class="note">'+arr.length+'개</span>',imgs(k,arr,false),'<p class="note" style="margin:6px 0 0">'+hint+'</p>'+imgs(k,arr,true)+'<p></p><input type="file" id="up-'+k+'" accept="'+acc+'"'+(k==="headers"?"":" multiple")+'>'+(k==="headers"?'<div id="hd-ed"></div>':"")+'<div class="note" id="us-'+k+'"></div>');
   return sec("profile","내 프로필",
     '<div class="row" style="align-items:center;margin-top:8px">'+avH(me)+'<div><span style="display:inline-block;width:12px;height:12px;border-radius:50%;vertical-align:middle;background:'+col+'"></span> <b>'+esc(m.name||"이름 없음")+'</b><div class="note">참여자: '+Object.values(members).map(x=>esc(x.name)).join(", ")+'</div></div></div>',
@@ -1415,7 +1415,7 @@ function settingsTop(){const m=members[me]||{},col=m.color||"#c2492f";
   sec("headers",'헤더 이미지 <span class="note">'+headers.length+' / '+HMAX+'</span>',hThumbs(false),'<p class="note" style="margin:6px 0 0">실제 헤더는 가로로 길게(약 5:1) 올라가요.</p><div id="hd-ed"></div>'+hThumbs(true)+''+(headers.length<HMAX?'<div class="hbtns"><label class="btn pri hfile">파일 선택<input type="file" id="up-headers" accept="image/*" hidden></label></div>':'<p class="note">헤더는 '+HMAX+'개까지예요. 바꾸려면 하나를 먼저 빼 주세요.</p>')+'<div class="note" id="us-headers"></div>')}
 /* ===== 헤더: 문답마다 최대 4개 (h1~h4 칸) · 가로 960px JPEG로 Cloud Storage에 저장 ===== */
 const HMAX=4,HW=960,HH=195;let hEd=null;
-function hThumbs(ed){return '<div class="thumbs headers">'+(headers.map(x=>'<span class="hs"><div class="hp"><img src="'+blob(x.aid)+'" style="object-position:50% '+(x.y??50)+'%" alt=""></div>'+(ed?'<button data-hout="'+x.id+'" title="헤더에서 빼기" aria-label="헤더에서 빼기">×</button>':"")+'</span>').join("")||'<span class="note">아직 없어요</span>')+'</div>'}
+function hThumbs(ed){return '<div class="thumbs headers">'+(headers.map(x=>'<span class="hs"><div class="hp"><img src="'+esc(blob(x.aid))+'" style="object-position:50% '+(+x.y||50)+'%" alt=""></div>'+(ed?'<button data-hout="'+x.id+'" title="헤더에서 빼기" aria-label="헤더에서 빼기">×</button>':"")+'</span>').join("")||'<span class="note">아직 없어요</span>')+'</div>'}
 function hPaint(im){return(cv,st)=>{const g=cv.getContext("2d"),sc=gCoverClamp(im,HW,HH,st),dw=im.naturalWidth*sc,dh=im.naturalHeight*sc;g.clearRect(0,0,HW,HH);g.fillStyle="#fff";g.fillRect(0,0,HW,HH);g.drawImage(im,(HW-dw)/2+st.ox,(HH-dh)/2+st.oy,dw,dh)}}
 function hSay(t){const u=$("#us-headers");if(u)u.textContent=t||""}
 /* Storage 올리기·지우기 (파일은 덮어쓰지 않고 항상 새 이름으로) */
@@ -1502,7 +1502,7 @@ function pawPlace(box,pm){var W=box.clientWidth,H=box.clientHeight,pw=pm.offsetW
   if(!best||o<best.o)best={x:x,y:y,g:v[2],o:o};return o===0});
  pm.style.left=best.x.toFixed(1)+"px";pm.style.top=best.y.toFixed(1)+"px";pm.style.transform="rotate("+(best.g*360).toFixed(1)+"deg)"}
 function stampArea(n,live){const a=stampsOf(n),mine=a.some(x=>x.uid===me);
-  return '<div class="stamps">'+a.map((x,i)=>'<img class="stp" style="transform:rotate('+(i%2?3:-3)+'deg)" src="'+x.img+'" alt="">').join("")+'</div>'+(!live&&gPawDay(n)?'<i class="gpaw" data-c="'+pmCands(n+":hp",24)+'"></i>':"")+(live?"":'<i class="pmk" style="'+gPmStyle(n)+';background:rgba(0,0,0,.12);-webkit-mask:url('+PMK_URI+') center/contain no-repeat;mask:url('+PMK_URI+') center/contain no-repeat"></i>')}
+  return '<div class="stamps">'+a.map((x,i)=>'<img class="stp" style="transform:rotate('+(i%2?3:-3)+'deg)" src="'+esc(x.img)+'" alt="">').join("")+'</div>'+(!live&&gPawDay(n)?'<i class="gpaw" data-c="'+pmCands(n+":hp",24)+'"></i>':"")+(live?"":'<i class="pmk" style="'+gPmStyle(n)+';background:rgba(0,0,0,.12);-webkit-mask:url('+PMK_URI+') center/contain no-repeat;mask:url('+PMK_URI+') center/contain no-repeat"></i>')}
 const EXPIC='<svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="13" rx="2"/><circle cx="8.5" cy="8" r="1.5"/><path d="M3 14l5-4 4 3 3-2.5 6 4.5"/><path d="M12 18.5v3.5m0 0-2-2m2 2 2-2"/></svg>';
 const stampBtn=(n,live)=>live?(!stampsOf(n).length&&!stEd.open?'<button class="btn stbtn" id="stb" aria-label="우표 붙이기" title="우표 붙이기"></button><input type="file" id="sfp" accept="image/*" hidden>':""):"";
 function stEditor(n,live){if(!live||!stEd.open||!stEd.img)return"";return '<div class="stedit" id="sted"></div>'}
@@ -1704,7 +1704,7 @@ async function buildBackup(ret){
       const st=stampsOf(n)[0],y8=gDate(n).slice(0,10).replace(/\./g,"");
       const ans=order.slice().reverse().map((id,i)=>'<div class="ans'+(i?" you":" me")+'"><b>'+esc(realName(id))+'</b>'+(answers[id]?.[n]?esc(answers[id][n]):'<em>작성하지 않았어요</em>')+'</div>').join("");
       const bub=chat.length?chat.map(m=>m.dice?'<div class="dice">― '+esc(realName(m.uid))+' 님이 주사위를 굴렸어요 · <b style="color:'+diceCol(m.v,m.dice)+'">'+m.v+'</b> ―</div>':'<div class="m '+(m.uid===me?"r":"l")+'" style="background:'+gMixHex(C.paper,(members[m.uid]?.color||C.main).slice(0,7),.3)+'"><i>'+esc(realName(m.uid))+' · '+gHM(m.ts)+'</i>'+(m.emote?(String(m.emote).startsWith("data:")?'<img class="emo" src="'+m.emote+'" alt="">':"🖼 이모티콘"):(k=>'<span class="'+k.c+'">'+esc(k.t)+'</span>')(gMk(m.text)))+'</div>').join(""):'<div class="none">그날은 대화가 없었어요</div>';
-      days+='<article class="tk day"><div class="body">'+(st?'<div class="stamps"><img src="'+st.img+'" alt="우표"></div>':"")+(n!==today?'<i class="pmk" style="'+gPmStyle(n)+'"></i>':"")+(gPawDay(n)?'<i class="paw" data-c="'+pmCands(n+":hp",24)+'"></i>':"")+
+      days+='<article class="tk day"><div class="body">'+(st?'<div class="stamps"><img src="'+esc(st.img)+'" alt="우표"></div>':"")+(n!==today?'<i class="pmk" style="'+gPmStyle(n)+'"></i>':"")+(gPawDay(n)?'<i class="paw" data-c="'+pmCands(n+":hp",24)+'"></i>':"")+
         '<div class="adm">ADMIT TWO · No. '+String(n).padStart(4,"0")+'</div><div class="dn">DAY '+n+'</div><div class="dt"></div><h2>'+esc(Q[n-1])+'</h2>'+ans+'</div>'+
         '<div class="stub">'+gBar(y8)+'<span class="bn">'+y8+'</span></div></article>'+
         '<details class="chat"><summary><span class="cs">'+gYMD(n)+'에 확인된 '+chat.length+'번의 음성기록</span></summary><div class="bubs">'+bub+'</div></details>'}
@@ -1748,7 +1748,7 @@ function pk(a){return a[Math.floor(Math.random()*a.length)]}
 function talk(){D.order.forEach(function(id,i){var el=document.getElementById("s"+(i+1)),a=D.says[id];if(!el)return;el.innerHTML=D.av[id]+'<span class="tx">'+(a&&a.length?pk(a):"아직 한마디가 없어요")+'</span>'})}
 document.querySelectorAll(".seg.s1,.seg.s2").forEach(function(e){e.onclick=talk});talk();
 var im=document.querySelectorAll(".ban img");if(im.length>1){var k=0;setInterval(function(){im[k].classList.remove("on");k=(k+1)%im.length;im[k].classList.add("on")},4000)}`;
-    const cover='<div class="tk"><div class="cov">'+(hd.length?'<div class="ban">'+hd.map((h,i)=>'<img class="'+(i?"":"on")+'" src="'+h.u+'" style="object-position:50% '+h.y+'%" alt="">').join("")+'</div>':"")+'<div class="adm">ADMIT TWO · No. '+String(T).padStart(4,"0")+'</div><h1>'+esc(cfg.title||"")+'</h1>'+(cfg.sub?'<div class="sub">'+esc(cfg.sub)+'</div>':'<div class="sub">'+esc(names)+'</div>')+(e8?gBar(e8)+'<span class="bn">'+e8+'</span>':"")+'</div>'+
+    const cover='<div class="tk"><div class="cov">'+(hd.length?'<div class="ban">'+hd.map((h,i)=>'<img class="'+(i?"":"on")+'" src="'+h.u+'" style="object-position:50% '+(+h.y||50)+'%" alt="">').join("")+'</div>':"")+'<div class="adm">ADMIT TWO · No. '+String(T).padStart(4,"0")+'</div><h1>'+esc(cfg.title||"")+'</h1>'+(cfg.sub?'<div class="sub">'+esc(cfg.sub)+'</div>':'<div class="sub">'+esc(names)+'</div>')+(e8?gBar(e8)+'<span class="bn">'+e8+'</span>':"")+'</div>'+
       order.map((id,i)=>'<div class="seg s'+(i+1)+'" id="s'+(i+1)+'" title="눌러서 다른 한마디 보기"></div>').join("")+'<div class="seg end">'+esc(names)+' · 함께한 '+last+'일의 기록</div></div>';
     let html=`<!DOCTYPE html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${esc(cfg.title)} · ${esc(names)}</title><link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet"><style>${css}</style></head><body><main>${cover}<nav>${tabs}</nav><div class="pn on" id="p0">${days||'<p class="none" style="color:'+C.on+'">아직 열린 날이 없어요</p>'}</div>${sayPanels}<footer>${esc(names)} · ${esc(cfg.title||"")} · 함께한 ${last}일의 기록<br>마찰@4_nb_, 「크리스마스를 기다리는 30문답」 · 질문의 저작권은 원작자에게 있습니다.</footer></main><script id="d" type="application/json">${json}<\/script><script>${SCRIPT+";"+pawPlace.toString()+";document.querySelectorAll('.body .paw').forEach(function(p){pawPlace(p.parentNode,p)})"}<\/script></body></html>`;
     {const us=new Set([...stamps.map(x=>x.img),...Object.values(members).map(m=>m.img)].filter(u=>/^https?:/.test(String(u||""))));let miss=0;
