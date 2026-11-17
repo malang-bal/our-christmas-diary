@@ -359,7 +359,7 @@ body:has(#roomApp:not([hidden])) #fb-out{display:none}
 .ibox .ggift.pop svg{animation:gPop .5s cubic-bezier(.34,1.56,.64,1)}
 .ibox .ggift .gdot{position:absolute;top:3px;right:2px;width:8px;height:8px;border-radius:50%;background:var(--main);box-shadow:0 0 0 2px var(--paper,#fff);transition:transform .25s cubic-bezier(.215,.61,.355,1),opacity .2s}
 .ibox .ggift.done .gdot{transform:scale(0);opacity:0}
-.ibox:focus-within .ggift{opacity:0;transform:translateY(-50%) scale(.5);pointer-events:none}
+.ibox.gtyping .ggift{opacity:0;transform:translateY(-50%) scale(.5);pointer-events:none}
 .ibox.hasg textarea{transition:padding-right .22s ease}
 .ibox .gtip{position:absolute;right:0;bottom:calc(100% + 10px);z-index:3;padding:6px 11px;border-radius:10px;background:var(--txt,#2b211e);color:#fff;font-size:12px;font-weight:700;line-height:1.3;white-space:nowrap;pointer-events:none;transform-origin:calc(100% - 22px) 100%;animation:gTipIn .4s cubic-bezier(.34,1.56,.64,1) both,gTipBob 2.8s ease-in-out .6s infinite}
 .ibox .gtip.l2{transform-origin:calc(100% - 54px) 100%}
@@ -1131,7 +1131,7 @@ html.gmodal{overflow:hidden}@media (hover:hover) and (pointer:fine){html{scrollb
 </script>
 <script>
 /* 새 버전 알림: 올라간 index.html이 바뀌면 상단에 새로고침 안내를 띄워요 */
-const BUILD_ID="1794885108180";
+const BUILD_ID="1794885372382";
 (function(){
   if(!/^https?:/.test(location.protocol))return;
   let shown=false;
@@ -1428,6 +1428,9 @@ function gGiftSync(n,ms){if(n!==today)return;const b=$("#ggift");if(!b)return;co
   const t=$("#gtip");if(t){let seen=false;try{seen=localStorage.getItem(gGiftKey(n))==="1"}catch(e){}if(op||seen)gTipHide(t,!t.hidden&&op);else t.hidden=false}}
 function gGiftPop(b){b.classList.remove("pop");void b.offsetWidth;b.classList.add("pop")}
 function gGiftWire(n){const b=$("#ggift");if(!b)return;const card=b.closest(".gchat");
+  /* 글 쓰는 입력칸에 커서가 있을 때만 아이콘을 숨겨요 (버튼을 누를 때 버튼이 포커스를 받아도 숨지 않게) */
+  {const ci=$("#ci"),ib=b.closest(".ibox");if(ci&&ib){ci.addEventListener("focus",()=>ib.classList.add("gtyping"));ci.addEventListener("blur",()=>ib.classList.remove("gtyping"));if(document.activeElement===ci)ib.classList.add("gtyping")}}
+  b.addEventListener("mousedown",e=>e.preventDefault());
   if(card)["pointerdown","focusin"].forEach(ev=>card.addEventListener(ev,()=>{const t=$("#gtip");if(t&&!t.hidden){try{localStorage.setItem(gGiftKey(n),"1")}catch(_){}gTipHide(t,1)}},{passive:true}));
   b.onclick=async()=>{if(gGift.opened){gGiftPop(b);gToastMsg("오늘 선물은 이미 열었어요 · 내일 또 도착해요");return}
     if(b.dataset.busy||!GIFTS.length)return;b.dataset.busy="1";gGiftPop(b);try{navigator.vibrate&&navigator.vibrate(20)}catch(_){}
