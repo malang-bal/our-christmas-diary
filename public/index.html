@@ -1209,7 +1209,7 @@ html.gmodal{overflow:hidden}@media (hover:hover) and (pointer:fine){html{scrollb
 </script>
 <script>
 /* 새 버전 알림: 올라간 index.html이 바뀌면 상단에 새로고침 안내를 띄워요 */
-const BUILD_ID="1794918551588";
+const BUILD_ID="1794928974627";
 (function(){
   if(!/^https?:/.test(location.protocol))return;
   let shown=false;
@@ -1264,7 +1264,11 @@ function gMsgs(docs){return docs.map((x,i)=>{let d;try{d=x.data({serverTimestamp
     /* 시계 보정 표본: 이 탭에서 보낸 글의 진짜 서버 시각만 (다른 기기에서 보낸 글의 ts는 그 기기 시계라 섞으면 틀어져요) */
     if(o.st!=null&&gLocalIds.has(o.id))m._st=o.st;return m})}
 /* 화면을 다시 그려도 채팅 입력칸의 포커스·내용을 그대로 → 휴대폰 키보드가 내려가지 않아요 */
-(function(){const r0=render;render=function(){const a=document.activeElement,k=a&&a.id==="ci"?{v:a.value,s:a.selectionStart,e:a.selectionEnd}:null;const out=r0.apply(this,arguments);
+(function(){const r0=render;render=function(soft){const a=document.activeElement,k=a&&a.id==="ci"?{v:a.value,s:a.selectionStart,e:a.selectionEnd}:null;
+  /* 채팅 입력칸을 쓰는 중(키보드·클립보드 창이 열린 상태)에 같은 화면을 통째로 다시 그리면 입력칸이 새로 만들어지면서
+     키보드가 입력칸을 놓쳐 클립보드 창이 닫혀요. → 같은 화면이면 겉만 고치고, 나머지는 입력칸에서 벗어날 때 한 번에 반영해요 */
+  if(!soft&&k&&a.isConnected&&typeof lastK!=="undefined"&&lastK===tab+"|"+sel){gChatStale=true;return r0.call(this,true)}
+  const out=r0.apply(this,arguments);
   if(k){const c=document.getElementById("ci");if(c&&c!==a){c.value=k.v;try{c.focus({preventScroll:true});c.setSelectionRange(k.s,k.e)}catch(e){}}}return out}})();
 function gSendSync(){[["ci","cs"],["sx","sb"]].forEach(([i,b])=>{const c=document.getElementById(b);if(!c)return;const a=document.getElementById(i);c.classList.toggle("gidle",!(a&&a.value.trim()))})}
 function gPerf(){const g=document.querySelector("#roomApp #view .gsh .grid");if(!g)return;const cs=[...g.children].filter(x=>x.classList.contains("day"));if(!cs.length)return;
@@ -1631,7 +1635,10 @@ function refresh(){if(!db||!RID)return;const ae=document.activeElement,typing=ae
    (입력칸이 새로 만들어지면 휴대폰 키보드의 클립보드·이모지 창이 닫혀 버려요)
    그동안 미룬 갱신은 입력칸에서 벗어나면 한 번에 반영해요. */
 var gChatStale=false;
-document.addEventListener("focusout",e=>{if(!gChatStale||!e.target||e.target.id!=="ci")return;setTimeout(()=>{const a=document.activeElement;if(gChatStale&&!(a&&a.id==="ci")){gChatStale=false;refresh()}},400)});
+/* 키보드가 클립보드 편집 등으로 잠깐 입력칸을 놓았다가 다시 잡는 경우가 있어서, 넉넉히 기다린 뒤 정말 벗어났을 때만 반영해요 (화면이 가려진 동안은 미뤄요) */
+function gChatFlush(){const a=document.activeElement;if(gChatStale&&!document.hidden&&!(a&&a.id==="ci")){gChatStale=false;refresh()}}
+document.addEventListener("focusout",e=>{if(!gChatStale||!e.target||e.target.id!=="ci")return;setTimeout(gChatFlush,1500)});
+document.addEventListener("visibilitychange",()=>{if(!document.hidden&&gChatStale)setTimeout(gChatFlush,1500)});
 function dims(f){return new Promise((res,rej)=>{const u=URL.createObjectURL(f),i=new Image();i.onload=()=>{res([i.naturalWidth,i.naturalHeight]);URL.revokeObjectURL(u)};i.onerror=()=>rej("읽을 수 없는 이미지");i.src=u})}
 let editing=null;
 const PLANE='<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4z"/></svg>';
