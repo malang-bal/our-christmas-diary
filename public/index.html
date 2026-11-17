@@ -1849,24 +1849,40 @@ async function exportPng(n){
 }
 
 async function toData(u){if(!/^https?:/.test(String(u||"")))return String(u||"");try{const b=await (await fetch(u)).blob();return await new Promise((ok,no)=>{const r=new FileReader();r.onload=()=>ok(r.result);r.onerror=no;r.readAsDataURL(b)})}catch(e){return String(u)}}
+/* HTML 백업: 받은 선물(기념품) 카드. 특별한 선물은 테마색 테두리와 꼬리표로 구분해요 */
+function gBkGift(m,n){const sp=!!m.sg,nm=String(m.gift||"").slice(0,40),d=sp?String(m.gd||""):(GIFTD.get(nm)||""),big=GICO.replace(/width="14" height="14"/,'width="18" height="18"');
+  const who=sp?esc(realName(m.from))+' 님이 '+esc(realName(m.uid))+' 님에게 보낸 선물':esc(realName(m.uid))+' 님이 열었어요';
+  return '<div class="gf'+(sp?" sp":"")+'"><span class="gfi">'+big+'</span><div class="gfb">'+(sp?'<span class="gft">특별한 선물</span>':"")+'<b>'+esc(nm)+'</b>'+(d?'<p>'+esc(d)+'</p>':"")+'<small>'+(n?'DAY '+n+' · ':"")+who+'</small></div></div>'}
+function gBkGiftPanel(order,ALLG,idx){return '<div class="pn" id="p'+idx+'"><div class="sheet gfs">'+order.map(id=>{const a=ALLG.filter(x=>x.m.uid===id);return '<section class="gfsec"><h3>'+esc(realName(id))+' 님의 기념품<span>'+a.length+'개</span></h3>'+(a.length?'<div class="gfl">'+a.map(x=>gBkGift(x.m,x.n)).join("")+'</div>':'<p class="none">아직 받은 기념품이 없어요</p>')+'</section>'}).join("")+'</div></div>'}
+function gBkGiftCss(C){return `
+.chat.c1{margin-bottom:10px}.chat.nochat{min-height:52px;display:flex;align-items:center;font-size:13px;font-weight:700;color:${C.mute}}
+.gfl{display:flex;flex-direction:column;gap:8px;padding:2px 0 20px}
+.gf{display:flex;gap:12px;align-items:flex-start;padding:12px 14px;border-radius:12px;background:${C.paperd}}
+.gfi{flex:none;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:${C.paper};color:${C.mute}}
+.gfb{min-width:0;flex:1}.gfb b{display:block;font-size:15px;line-height:1.4;color:${C.text};word-break:break-word}.gfb p{margin:3px 0 0;font-size:13px;line-height:1.55;color:${C.text};opacity:.85;white-space:pre-wrap;word-break:break-word}.gfb small{display:block;margin-top:5px;font-size:12px;color:${C.mute}}
+.gf.sp{background:${gMixHex(C.paper,C.main,.1)};box-shadow:inset 0 0 0 1.5px ${C.main}}.gf.sp .gfi{background:${C.main};color:#fff}
+.gft{display:inline-block;margin-bottom:5px;padding:1px 8px;border-radius:999px;background:${C.main};color:#fff;font-size:11px;font-weight:700;letter-spacing:.02em}
+.gfs{padding:6px 24px 4px}.gfsec{padding:14px 0 18px}.gfsec+.gfsec{border-top:1.5px dashed ${C.line2}}.gfsec h3{margin:0 0 12px;font-size:15px;font-weight:700;color:${C.text};display:flex;align-items:baseline;gap:8px}.gfsec h3 span{font-size:12px;font-weight:500;color:${C.mute}}.gfsec .gfl{padding:0}`}
 async function buildBackup(ret){
   const btn=$("#bk");if(btn){btn.disabled=true;btn.textContent="만드는 중…"}
   try{
     const C=gPalNow(),p=partner(),rest=Object.keys(members).filter(k=>k!==me).sort(),ids=[me,...rest],order=[...(p?[p]:[]),me],names=order.map(realName).join(" & ");
     const hd=[];for(const h of headers){try{hd.push({u:await toData(h.aid),y:h.y??50})}catch(e){}}
     const T=Q.length,last=Math.min(today,T),e8=(endOf(cfg.start,T)||"").replace(/-/g,"");
-    let days="";
+    let days="";const ALLG=[];
     for(let n=1;n<=last;n++){
       let chat=[];try{const sn=await db.collection(P("chats/d"+n+"/messages")).orderBy("ts").get();chat=gMsgs(sn.docs)}catch(e){}
       const st=stampsOf(n)[0],y8=gDate(n).slice(0,10).replace(/\./g,"");
       const ans=order.slice().reverse().map((id,i)=>'<div class="ans'+(i?" you":" me")+'"><b>'+esc(realName(id))+'</b>'+(answers[id]?.[n]?esc(answers[id][n]):'<em>작성하지 않았어요</em>')+'</div>').join("");
-      const bub=chat.length?chat.map(m=>m.gift?gGiftLine(m,1):m.dice?'<div class="dice">― '+esc(realName(m.uid))+' 님이 주사위를 굴렸어요 · <b style="color:'+diceCol(m.v,m.dice)+'">'+m.v+'</b> ―</div>':'<div class="m '+(m.uid===me?"r":"l")+'" style="background:'+gMixHex(C.paper,(members[m.uid]?.color||C.main).slice(0,7),.3)+'"><i>'+esc(realName(m.uid))+' · '+gHM(m.ts)+'</i>'+(m.emote?(String(m.emote).startsWith("data:")?'<img class="emo" src="'+m.emote+'" alt="">':"🖼 이모티콘"):(k=>'<span class="'+k.c+'">'+esc(k.t)+'</span>')(gMk(m.text)))+'</div>').join(""):'<div class="none">그날은 대화가 없었어요</div>';
+      const bub=chat.length?chat.map(m=>m.gift?gGiftLine(m,1):m.dice?'<div class="dice">― '+esc(realName(m.uid))+' 님이 주사위를 굴렸어요 · <b style="color:'+diceCol(m.v,m.dice)+'">'+m.v+'</b> ―</div>':'<div class="m '+(m.uid===me?"r":"l")+'" style="background:'+gMixHex(C.paper,(members[m.uid]?.color||C.main).slice(0,7),.3)+'"><i>'+esc(realName(m.uid))+' · '+gHM(m.ts)+'</i>'+(m.emote?(String(m.emote).startsWith("data:")?'<img class="emo" src="'+m.emote+'" alt="">':"🖼 이모티콘"):(k=>'<span class="'+k.c+'">'+esc(k.t)+'</span>')(gMk(m.text)))+'</div>').join(""):"";const gf=chat.filter(m=>m.gift);gf.forEach(m=>ALLG.push({m,n}));
       days+='<article class="tk day"><div class="body">'+(st?'<div class="stamps"><img src="'+esc(st.img)+'" alt="우표"></div>':"")+(n!==today?'<i class="pmk" style="'+gPmStyle(n)+'"></i>':"")+(gPawDay(n)?'<i class="paw" data-c="'+pmCands(n+":hp",24)+'"></i>':"")+
         '<div class="adm">ADMIT TWO · No. '+String(n).padStart(4,"0")+'</div><div class="dn">DAY '+n+'</div><div class="dt"></div><h2>'+esc(Q[n-1])+'</h2>'+ans+'</div>'+
         '<div class="stub">'+gBar(y8)+'<span class="bn">'+y8+'</span></div></article>'+
-        '<details class="chat"><summary><span class="cs">'+gYMD(n)+'에 확인된 '+chat.length+'번의 음성기록</span></summary><div class="bubs">'+bub+'</div></details>'}
+        (chat.length?'<details class="chat c1"><summary><span class="cs">'+gYMD(n)+'에 확인된 '+chat.length+'번의 대화</span></summary><div class="bubs">'+bub+'</div></details>':'<div class="chat c1 nochat">그날은 대화가 없었어요.</div>')+
+        (gf.length?'<details class="chat"><summary><span class="cs">'+gYMD(n)+'에 확인된 '+gf.length+'개의 기념품</span></summary><div class="gfl">'+gf.map(m=>gBkGift(m)).join("")+'</div></details>':'<div class="chat nochat">그날은 기념품이 없었어요.</div>')}
     const sayPanels=order.map((id,i)=>{const arr=says.filter(x=>x.uid===id).sort((a,b)=>b.ts-a.ts);return '<div class="pn" id="p'+(i+1)+'"><div class="sheet">'+(arr.length?arr.map(x=>'<div class="say">'+avH(id)+'<div class="sb"><b>'+esc(realName(id))+'</b> <span class="t">'+fmt(x.ts)+'</span><div class="stx">'+esc(x.text)+'</div></div></div>').join(""):'<p class="none">아직 한마디가 없어요</p>')+'</div></div>'}).join("");
-    const tabs='<button class="on" onclick="T(0)">전체 기록</button>'+order.map((id,i)=>'<button onclick="T('+(i+1)+')">'+esc(realName(id))+'의 한마디</button>').join("");
+    const gIdx=order.length+1,gfPanel=gBkGiftPanel(order,ALLG,gIdx);
+    const tabs='<button class="on" onclick="T(0)">전체 기록</button>'+order.map((id,i)=>'<button onclick="T('+(i+1)+')">'+esc(realName(id))+'의 한마디</button>').join("")+'<button onclick="T('+gIdx+')">선물</button>';
     const D={me,order,says:{},av:{}};order.forEach(id=>{D.says[id]=says.filter(x=>x.uid===id).map(x=>esc(x.text));D.av[id]=avH(id)});
     const json=JSON.stringify(D).replace(/</g,"\\u003c");
     const n4=c=>`radial-gradient(circle at 0 0,transparent 11px,${c} 11.5px) left top/51% 51% no-repeat,radial-gradient(circle at 100% 0,transparent 11px,${c} 11.5px) right top/51% 51% no-repeat,radial-gradient(circle at 0 100%,transparent 11px,${c} 11.5px) left bottom/51% 51% no-repeat,radial-gradient(circle at 100% 100%,transparent 11px,${c} 11.5px) right bottom/51% 51% no-repeat`;
@@ -1907,7 +1923,7 @@ document.querySelectorAll(".seg.s1,.seg.s2").forEach(function(e){e.onclick=talk}
 var im=document.querySelectorAll(".ban img");if(im.length>1){var k=0;setInterval(function(){im[k].classList.remove("on");k=(k+1)%im.length;im[k].classList.add("on")},4000)}`;
     const cover='<div class="tk"><div class="cov">'+(hd.length?'<div class="ban">'+hd.map((h,i)=>'<img class="'+(i?"":"on")+'" src="'+h.u+'" style="object-position:50% '+(+h.y||50)+'%" alt="">').join("")+'</div>':"")+'<div class="adm">ADMIT TWO · No. '+String(T).padStart(4,"0")+'</div><h1>'+esc(cfg.title||"")+'</h1>'+(cfg.sub?'<div class="sub">'+esc(cfg.sub)+'</div>':'<div class="sub">'+esc(names)+'</div>')+(e8?gBar(e8)+'<span class="bn">'+e8+'</span>':"")+'</div>'+
       order.map((id,i)=>'<div class="seg s'+(i+1)+'" id="s'+(i+1)+'" title="눌러서 다른 한마디 보기"></div>').join("")+'<div class="seg end">'+esc(names)+' · 함께한 '+last+'일의 기록</div></div>';
-    let html=`<!DOCTYPE html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${esc(cfg.title)} · ${esc(names)}</title><link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet"><style>${css}</style></head><body><main>${cover}<nav>${tabs}</nav><div class="pn on" id="p0">${days||'<p class="none" style="color:'+C.on+'">아직 열린 날이 없어요</p>'}</div>${sayPanels}<footer>${esc(names)} · ${esc(cfg.title||"")} · 함께한 ${last}일의 기록<br>마찰@4_nb_, 「크리스마스를 기다리는 30문답」 · 질문의 저작권은 원작자에게 있습니다.</footer></main><script id="d" type="application/json">${json}<\/script><script>${SCRIPT+";"+pawPlace.toString()+";document.querySelectorAll('.body .paw').forEach(function(p){pawPlace(p.parentNode,p)})"}<\/script></body></html>`;
+    let html=`<!DOCTYPE html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${esc(cfg.title)} · ${esc(names)}</title><link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet"><style>${css}${gBkGiftCss(C)}</style></head><body><main>${cover}<nav>${tabs}</nav><div class="pn on" id="p0">${days||'<p class="none" style="color:'+C.on+'">아직 열린 날이 없어요</p>'}</div>${sayPanels}${gfPanel}<footer>${esc(names)} · ${esc(cfg.title||"")} · 함께한 ${last}일의 기록<br>마찰@4_nb_, 「크리스마스를 기다리는 30문답」 · 질문의 저작권은 원작자에게 있습니다.</footer></main><script id="d" type="application/json">${json}<\/script><script>${SCRIPT+";"+pawPlace.toString()+";document.querySelectorAll('.body .paw').forEach(function(p){pawPlace(p.parentNode,p)})"}<\/script></body></html>`;
     {const us=new Set([...stamps.map(x=>x.img),...Object.values(members).map(m=>m.img)].filter(u=>/^https?:/.test(String(u||""))));let miss=0;
       for(const u of us){const d=await toData(u);if(d.startsWith("data:"))html=html.split(u).join(d);else miss++}
       if(miss)alert("이미지 "+miss+"개는 파일 안에 넣지 못했어요. 사이트가 지워지면 그 이미지는 보이지 않아요.")}
