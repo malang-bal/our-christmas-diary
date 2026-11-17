@@ -47,6 +47,18 @@ service cloud.firestore {
         && request.resource.data.deleteOn.size() <= 10;
     }
 
+    // ── 선물 목록: 관리자 페이지에서 고치고, 로그인한 사람은 읽기만 ──
+    // items = [{i:고유번호, n:이름(40자), d:설명}] — 한 문서에 통째로 (일괄 등록·수정)
+    match /meta/gifts {
+      allow get: if signedIn();
+      allow list: if false;
+      allow write: if isAdmin()
+        && request.resource.data.keys().hasOnly(['items', 'ts'])
+        && request.resource.data.items is list
+        && request.resource.data.items.size() <= 2000
+        && request.resource.data.ts is number;
+    }
+
     // ── 가입 코드: 문서 이름이 곧 코드. 코드를 아는 사람만 하나씩 확인할 수 있다 ──
     match /invites/{code} {
       // 아직 쓰지 않은 코드만 확인할 수 있다. 쓰인 코드는 쓴 사람과 관리자만 (누가 썼는지 남에게 보이지 않게)
@@ -289,14 +301,56 @@ service cloud.firestore {
         // 오늘의 선물: 하루(그날 방)에 한 사람 한 번. 문서 이름이 'gift_내uid' 로 고정이라 두 번째는 덮어쓰기라서 막힌다
         allow create: if canWrite(rid) && mid == 'gift_' + uid()
           && day.matches('^d([1-9]|[12][0-9]|30)$')
-          && request.resource.data.keys().hasOnly(['uid', 'gift', 'ts', 'st', 'af'])
+          && request.resource.data.keys().hasOnly(['uid', 'gift', 'gid', 'ts', 'st', 'af'])
           && request.resource.data.uid == uid()
           && request.resource.data.gift is string
           && request.resource.data.gift.size() >= 1 && request.resource.data.gift.size() <= 40
+          && (!('gid' in request.resource.data) || (request.resource.data.gid is string && request.resource.data.gid.size() <= 16))
+          && request.resource.data.ts is number
+          && request.resource.data.st == request.time
+          && (!('af' in request.resource.data) || request.resource.data.af is number);
+        // 특별한 선물 열기: 받는 사람만, 'sg_선물문서이름' 으로 한 번. 이름·설명·보낸 사람·날짜는 선물 문서와 같아야 한다
+        allow create: if canWrite(rid) && mid.matches('^sg_.+$')
+          && day.matches('^d([1-9]|[12][0-9]|30)$')
+          && request.resource.data.keys().hasOnly(['uid', 'sg', 'from', 'gift', 'gd', 'sd', 'ts', 'st', 'af'])
+          && request.resource.data.uid == uid()
+          && request.resource.data.sg is string
+          && mid == 'sg_' + request.resource.data.sg
+          && get(/databases/$(database)/documents/rooms/$(rid)/sgifts/$(request.resource.data.sg)).data.to == uid()
+          && request.resource.data.from == get(/databases/$(database)/documents/rooms/$(rid)/sgifts/$(request.resource.data.sg)).data.from
+          && request.resource.data.gift == get(/databases/$(database)/documents/rooms/$(rid)/sgifts/$(request.resource.data.sg)).data.n
+          && request.resource.data.gd == get(/databases/$(database)/documents/rooms/$(rid)/sgifts/$(request.resource.data.sg)).data.d
+          && request.resource.data.sd == get(/databases/$(database)/documents/rooms/$(rid)/sgifts/$(request.resource.data.sg)).data.sd
           && request.resource.data.ts is number
           && request.resource.data.st == request.time
           && (!('af' in request.resource.data) || request.resource.data.af is number);
         allow update, delete: if false;
+      }
+
+      // 특별한 선물: 내 답변에 넣어 두면 그날 짝꿍에게 가요. 한 사람 5칸('내uid_1'~'_5')뿐이라 5개를 넘을 수 없다
+      // 보낸 사람은 열리기 전까지 고치거나 뺄 수 있고, 받는 사람은 '열었음' 표시만 할 수 있다
+      match /sgifts/{sid} {
+        allow read: if isMember(rid);
+        allow create: if canWrite(rid)
+          && sid.matches('^' + uid() + '_[1-5]$')
+          && request.resource.data.keys().hasOnly(['from', 'to', 'n', 'd', 'sd', 'ts', 'op'])
+          && request.resource.data.from == uid()
+          && request.resource.data.to != uid()
+          && request.resource.data.to in get(roomPath(rid)).data.memberIds
+          && validSg(request.resource.data)
+          && request.resource.data.ts is number
+          && request.resource.data.op == false;
+        allow update: if canWrite(rid) && resource.data.op == false && (
+          (resource.data.from == uid() && changed().hasOnly(['n', 'd']) && validSg(request.resource.data))
+          || (resource.data.to == uid() && changed().hasOnly(['op', 'oa', 'od'])
+              && request.resource.data.op == true && request.resource.data.oa is number
+              && request.resource.data.od is int && request.resource.data.od >= 1 && request.resource.data.od <= 30));
+        allow delete: if canWrite(rid) && resource.data.from == uid() && resource.data.op == false;
+        function validSg(x) {
+          return x.n is string && x.n.size() >= 1 && x.n.size() <= 40
+            && x.d is string && x.d.size() <= 80
+            && x.sd is int && x.sd >= 1 && x.sd <= 30;
+        }
       }
     }
 

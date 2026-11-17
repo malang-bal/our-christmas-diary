@@ -13,6 +13,7 @@
 <script src="config.js"></script>
 <style>
 *{box-sizing:border-box}
+[hidden]{display:none!important}
 body{margin:0;background:#1c1c1d;color:#2b211e;font:15px/1.6 "Noto Sans KR",-apple-system,"Apple SD Gothic Neo",system-ui,sans-serif;letter-spacing:-.01em}
 main{max-width:720px;margin:0 auto;padding:20px 16px 60px}
 h1{color:#fff;font-size:22px;margin:4px 0 14px}
@@ -34,6 +35,22 @@ td.code{font:700 15px ui-monospace,Menlo,Consolas,monospace;letter-spacing:.08em
 .tag.u{background:#e8f0ec;color:#2a7d46}.tag.n{background:#f2ede6;color:#605856}
 .stat{display:flex;gap:16px;flex-wrap:wrap;margin:4px 0 0}.stat b{font-size:20px}
 #gate{color:#fff;text-align:center;padding:60px 0}
+/* 선물 목록 */
+code{font:600 12.5px ui-monospace,Menlo,Consolas,monospace;background:#efe8dc;border-radius:4px;padding:0 4px}
+details.bulk{margin:12px 0 4px;border:1px dashed #cec6b8;border-radius:10px;padding:8px 12px;background:#fffdf9}
+details.bulk summary{cursor:pointer;font-weight:700;font-size:14px}
+textarea{font:inherit;font-size:14px;padding:8px 10px;border:1px solid #cec6b8;border-radius:8px;background:#fff;width:100%;resize:vertical}
+.gtb{margin-top:10px;max-height:62vh;overflow:auto;border:1px solid #e3dccf;border-radius:10px;background:#fff}
+.gt{margin:0}.gt thead th{position:sticky;top:0;background:#f6f1e8;z-index:1;font-size:12.5px;color:#605856}
+.gt td{vertical-align:top;padding:6px}.gt td.no{width:34px;color:#9a918a;font-size:12px;padding-top:12px;text-align:right}
+.gt td.x{width:40px}.gt td.x button{padding:4px 9px;font-size:13px;border-color:#d9d1c5;color:#8a817a}
+.gt input,.gt textarea{max-width:none;width:100%;padding:6px 8px;font-size:14px;border-color:#e3dccf}
+.gt textarea{min-height:34px;resize:none;overflow:hidden;line-height:1.45}
+.gt .bad{border-color:#c8352b;background:#fff4f2}.gt .dup{border-color:#e0a23a;background:#fffaf0}
+.gt .cnt{display:block;font-size:11px;color:#9a918a;text-align:right;margin-top:2px}.gt .cnt.bad{color:#c8352b;background:none}
+.gt tr.new td{background:#f3faf5}.gt tr.chg td{background:#fffbea}
+.gsave{position:sticky;bottom:0;background:#fbf6ee;padding:10px 0 2px;border-top:1px solid #e3dccf;margin-top:10px}
+.tag.d{background:#fff1d6;color:#9a5b00}
 </style>
 </head>
 <body>
@@ -59,6 +76,25 @@ td.code{font:700 15px ui-monospace,Menlo,Consolas,monospace;letter-spacing:.08em
     <div class="row"><button class="pri" id="i-make">발급</button><button id="i-copy">남은 코드 모두 복사</button><button id="i-reload">새로고침</button></div>
     <div class="msg" id="i-msg"></div>
     <table><thead><tr><th>코드</th><th>상태</th><th>발급</th><th>사용</th><th></th></tr></thead><tbody id="i-list"></tbody></table>
+  </div>
+  <div class="card" id="gcard">
+    <h2>선물 목록</h2>
+    <div class="stat"><span>전체 <b id="g-all">0</b></span><span>설명 있음 <b id="g-desc">0</b></span><span class="tag d" id="g-dirty" hidden>저장 안 된 변경 있음</span></div>
+    <p class="note">채팅창의 '오늘의 선물'에서 이 목록 중 하나가 무작위로 나와요. 이름은 40자, 설명은 120자까지예요.<br>
+      이름·설명을 고치면 <b>이미 열린 선물에도</b> 바로 반영돼요. 줄을 지우면 그 선물은 더 이상 나오지 않아요(이미 연 기록은 남아요).<br>
+      문구에 넣을 수 있는 이름 태그: <code>{A}</code> 선물을 연 사람 · <code>{B}</code> 상대 · <code>{C}</code> 가입 코드를 받은 사람 · <code>{D}</code> 짝꿍 코드로 들어온 사람</p>
+    <p class="note" id="g-empty" hidden>아직 저장한 목록이 없어서, 사이트는 코드에 들어 있는 기본 선물 목록을 쓰고 있어요. 여기서 목록을 저장하면 그때부터 이 목록을 써요.</p>
+    <details class="bulk" id="g-bulk"><summary>시트에서 한꺼번에 넣기 · 고치기</summary>
+      <p class="note">스프레드시트에서 <b>A열 선물 · B열 설명</b>을 골라 복사(Ctrl/⌘+C)한 뒤 아래에 붙여 넣어요. 첫 줄이 '선물'이면 제목 줄로 보고 건너뛰어요.<br>
+        <b>목록 끝에 추가</b>: 새 줄만 덧붙여요. &nbsp;<b>전체 바꾸기</b>: 붙여 넣은 내용이 새 목록이 돼요(이름이 같은 줄은 같은 선물로 이어져서, 이미 연 선물의 설명이 새 설명으로 바뀌어요).<br>
+        지금 목록을 시트에서 고치려면 <b>시트용으로 복사</b> → 시트에 붙여 넣고 수정 → 다시 복사해서 <b>전체 바꾸기</b>.</p>
+      <textarea id="g-paste" rows="6" placeholder="따뜻한 털장갑&#9;눈 오는 날 손잡고 걸을 때 끼기 좋은 장갑"></textarea>
+      <div class="note" id="g-pv"></div>
+      <div class="row"><button id="g-add" disabled>목록 끝에 추가</button><button id="g-rep" disabled>이 내용으로 전체 바꾸기</button></div>
+    </details>
+    <div class="row"><input id="g-q" placeholder="찾기 (이름·설명)" autocomplete="off"><button id="g-new">+ 한 줄 추가</button><button id="g-copy">시트용으로 복사</button><button id="g-reload">새로고침</button></div>
+    <div class="gtb"><table class="gt"><thead><tr><th>#</th><th style="width:38%">선물 이름</th><th>설명</th><th></th></tr></thead><tbody id="g-list"></tbody></table></div>
+    <div class="row gsave"><button class="pri" id="g-save" disabled>저장</button><button id="g-undo" disabled>저장 전으로 되돌리기</button><span class="msg" id="g-msg" style="margin:0"></span></div>
   </div>
   <div class="row" style="justify-content:flex-end"><button id="out">로그아웃</button></div>
 </div>
@@ -87,7 +123,7 @@ td.code{font:700 15px ui-monospace,Menlo,Consolas,monospace;letter-spacing:.08em
       $("#in").onclick=()=>auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()).catch(e=>alert("로그인 실패: "+(e.code||e.message)));return}
     let ok=false;try{ok=(await db.doc("admins/"+u.uid).get()).exists}catch(e){}
     if(!ok){gate('<p>관리자만 들어올 수 있어요.</p><p class="note" style="color:#aaa">내 사용자 ID: <b>'+u.uid+'</b><br>Firebase 콘솔의 Firestore에 <b>admins</b> 모음을 만들고, 이 ID로 문서를 하나 만들면 관리자가 돼요.</p><button id="o2">로그아웃</button>');$("#o2").onclick=()=>auth.signOut();return}
-    $("#gate").hidden=true;$("#app").hidden=false;loadConf();loadList()});
+    $("#gate").hidden=true;$("#app").hidden=false;loadConf();loadList();gLoad()});
   $("#out").onclick=()=>auth.signOut();
 
   /* 일정 */
@@ -119,6 +155,59 @@ td.code{font:700 15px ui-monospace,Menlo,Consolas,monospace;letter-spacing:.08em
   $("#i-copy").onclick=async()=>{const t=list.filter(x=>!x.used).map(x=>x.id).join("\n");if(!t){say("#i-msg","남은 코드가 없어요");return}
     try{await navigator.clipboard.writeText(t);say("#i-msg","남은 코드 "+t.split("\n").length+"개를 복사했어요 ✓",1)}catch(e){say("#i-msg","복사하지 못했어요")}};
   $("#i-reload").onclick=loadList;
+
+  /* ===== 선물 목록: meta/gifts 한 문서에 [{i,n,d}] 로 저장 ===== */
+  const GN=40,GD=120,esc=t=>String(t??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+  let G=[],G0="[]",gIds0=new Set(),gMap0=new Map(),gq="";
+  const gid=()=>{let x;do{x="g"+Math.random().toString(36).slice(2,8)}while(G.some(y=>y.i===x));return x};
+  const gDirty=()=>JSON.stringify(G)!==G0;
+  async function gLoad(){try{const d=await db.doc("meta/gifts").get();const a=d.exists&&Array.isArray(d.data().items)?d.data().items:[];
+      G=a.map(x=>({i:String(x.i||gid()),n:String(x.n||""),d:String(x.d||"")}));G0=JSON.stringify(G);gIds0=new Set(G.map(x=>x.i));gMap0=new Map(G.map(x=>[x.i,x.n+"\u0000"+x.d]));$("#g-empty").hidden=d.exists&&a.length>0;gDraw()}
+    catch(e){say("#g-msg","선물 목록을 불러오지 못했어요: "+(e.code||e.message))}}
+  /* 스프레드시트 복사 내용(TSV) 읽기: 칸 안 줄바꿈은 "따옴표"로 감싸져 와요 */
+  function tsv(t){t=String(t).replace(/\r\n?/g,"\n");const rows=[];let row=[],cell="",q=false;
+    for(let k=0;k<t.length;k++){const c=t[k];if(q){if(c==='"'){if(t[k+1]==='"'){cell+='"';k++}else q=false}else cell+=c;continue}
+      if(c==='"'&&cell===""){q=true;continue}if(c==="\t"){row.push(cell);cell="";continue}if(c==="\n"){row.push(cell);rows.push(row);row=[];cell="";continue}cell+=c}
+    if(cell!==""||row.length){row.push(cell);rows.push(row)}
+    const out=rows.map(r=>({n:(r[0]||"").trim(),d:(r[1]||"").replace(/\s*\n\s*/g," ").trim()})).filter(x=>x.n||x.d);
+    if(out.length&&/^(선물|이름|선물\s*이름)$/.test(out[0].n))out.shift();return out}
+  function gProblems(a){const seen=new Map(),bad=[];a.forEach((x,k)=>{const key=x.n.trim();if(!key)bad.push(k+1+"번 줄 이름이 비었어요");else if(x.n.length>GN)bad.push(k+1+"번 줄 이름이 "+GN+"자를 넘어요");if(x.d.length>GD)bad.push(k+1+"번 줄 설명이 "+GD+"자를 넘어요");if(key){seen.set(key,(seen.get(key)||0)+1)}});
+    const dup=[...seen].filter(([,v])=>v>1).map(([k])=>k);return{bad,dup}}
+  function gDraw(){const q=gq.trim().toLowerCase(),{dup}=gProblems(G),D=new Set(dup);
+    $("#g-all").textContent=G.length;$("#g-desc").textContent=G.filter(x=>x.d.trim()).length;
+    const rows=G.map((x,k)=>({x,k})).filter(({x})=>!q||(x.n+" "+x.d).toLowerCase().includes(q));
+    $("#g-list").innerHTML=rows.map(({x,k})=>{const st=!gIds0.has(x.i)?"new":gMap0.get(x.i)!==x.n+"\u0000"+x.d?"chg":"";
+      return '<tr class="'+st+'" data-k="'+k+'"><td class="no">'+(k+1)+'</td><td><input data-f="n" value="'+esc(x.n)+'" class="'+(!x.n.trim()||x.n.length>GN?"bad":D.has(x.n.trim())?"dup":"")+'" placeholder="선물 이름"><span class="cnt'+(x.n.length>GN?" bad":"")+'">'+x.n.length+'/'+GN+(D.has(x.n.trim())?" · 같은 이름 있음":"")+'</span></td><td><textarea data-f="d" rows="1" class="'+(x.d.length>GD?"bad":"")+'" placeholder="설명 (없어도 돼요)">'+esc(x.d)+'</textarea><span class="cnt'+(x.d.length>GD?" bad":"")+'">'+x.d.length+'/'+GD+'</span></td><td class="x"><button data-rm title="이 줄 지우기" aria-label="'+(k+1)+'번 줄 지우기">×</button></td></tr>'}).join("")||'<tr><td colspan="4" class="note">'+(q?"찾는 선물이 없어요":"아직 선물이 없어요 · 위에서 시트 내용을 붙여 넣거나 한 줄씩 추가해요")+'</td></tr>';
+    document.querySelectorAll("#g-list textarea").forEach(fit);gState()}
+  const fit=t=>{t.style.height="auto";t.style.height=t.scrollHeight+"px"};
+  function gState(){const dr=gDirty();$("#g-dirty").hidden=!dr;$("#g-save").disabled=!dr;$("#g-undo").disabled=!dr}
+  $("#g-list").addEventListener("input",e=>{const tr=e.target.closest("tr[data-k]");if(!tr)return;const x=G[+tr.dataset.k],f=e.target.dataset.f;if(!x||!f)return;x[f]=e.target.value;
+    if(f==="d")fit(e.target);const L=f==="n"?GN:GD,c=e.target.nextElementSibling;e.target.classList.toggle("bad",x[f].length>L||(f==="n"&&!x.n.trim()));if(c){c.textContent=x[f].length+"/"+L;c.classList.toggle("bad",x[f].length>L)}
+    tr.className=!gIds0.has(x.i)?"new":gMap0.get(x.i)!==x.n+"\u0000"+x.d?"chg":"";$("#g-desc").textContent=G.filter(y=>y.d.trim()).length;gState()});
+  $("#g-list").addEventListener("change",e=>{if(e.target.dataset.f==="n")gDraw()});
+  $("#g-list").addEventListener("click",e=>{const b=e.target.closest("[data-rm]");if(!b)return;const k=+b.closest("tr").dataset.k,x=G[k];if(x.n.trim()&&!confirm("'"+x.n+"' 줄을 지울까요? (저장해야 반영돼요)"))return;G.splice(k,1);gDraw()});
+  $("#g-q").oninput=e=>{gq=e.target.value;gDraw()};
+  $("#g-new").onclick=()=>{gq="";$("#g-q").value="";G.push({i:gid(),n:"",d:""});gDraw();const t=$("#g-list tr:last-child input");if(t){t.scrollIntoView({block:"center"});t.focus()}};
+  $("#g-paste").oninput=()=>{const a=tsv($("#g-paste").value),{bad,dup}=gProblems(a);
+    $("#g-pv").innerHTML=a.length?("<b>"+a.length+"줄</b>을 읽었어요"+(a.filter(x=>x.d).length?" (설명 있는 줄 "+a.filter(x=>x.d).length+"개)":"")+(bad.length?' · <span class="err">'+esc(bad.slice(0,3).join(", "))+(bad.length>3?" 외 "+(bad.length-3)+"건":"")+'</span>':"")+(dup.length?' · <span style="color:#9a5b00">같은 이름 '+dup.length+'개</span>':"")):"";
+    $("#g-add").disabled=$("#g-rep").disabled=!a.length};
+  $("#g-add").onclick=()=>{const a=tsv($("#g-paste").value);if(!a.length)return;a.forEach(x=>G.push({i:gid(),n:x.n,d:x.d}));$("#g-paste").value="";$("#g-pv").textContent="";$("#g-add").disabled=$("#g-rep").disabled=true;gDraw();say("#g-msg",a.length+"줄을 추가했어요 · 저장을 눌러야 사이트에 반영돼요",1)};
+  $("#g-rep").onclick=()=>{const a=tsv($("#g-paste").value);if(!a.length)return;const by=new Map();G.forEach(x=>{const k=x.n.trim();if(k&&!by.has(k))by.set(k,x.i)});
+    const used=new Set(),nx=a.map(x=>{let i=by.get(x.n.trim());if(i&&used.has(i))i=null;if(i)used.add(i);return{i:i||gid(),n:x.n,d:x.d}}),kept=nx.filter(x=>gIds0.has(x.i)).length,gone=G.filter(x=>!used.has(x.i)).length;
+    if(!confirm("붙여 넣은 "+a.length+"줄로 전체 목록을 바꿀까요?\n· 이름이 같아 이어지는 선물 "+kept+"개\n· 새 선물 "+(nx.length-kept)+"개\n· 목록에서 빠지는 선물 "+gone+"개\n(저장해야 사이트에 반영돼요)"))return;
+    G=nx;$("#g-paste").value="";$("#g-pv").textContent="";$("#g-add").disabled=$("#g-rep").disabled=true;gDraw();say("#g-msg","목록을 바꿨어요 · 저장을 눌러야 사이트에 반영돼요",1)};
+  $("#g-copy").onclick=async()=>{const t="선물\t설명\n"+G.map(x=>x.n.replace(/[\t\n]/g," ")+"\t"+x.d.replace(/[\t\n]/g," ")).join("\n");
+    try{await navigator.clipboard.writeText(t);say("#g-msg",G.length+"줄을 복사했어요 · 시트의 A1 칸에 붙여 넣어요",1)}catch(e){say("#g-msg","복사하지 못했어요")}};
+  $("#g-undo").onclick=()=>{if(!confirm("저장하지 않은 변경을 모두 버릴까요?"))return;G=JSON.parse(G0);gDraw();say("#g-msg","저장된 상태로 되돌렸어요",1)};
+  $("#g-reload").onclick=()=>{if(gDirty()&&!confirm("저장하지 않은 변경이 있어요. 버리고 새로 불러올까요?"))return;gLoad()};
+  $("#g-save").onclick=async()=>{G.forEach(x=>{x.n=x.n.trim();x.d=x.d.trim()});const{bad,dup}=gProblems(G);
+    if(bad.length){gDraw();say("#g-msg","저장 전에 고쳐 주세요: "+bad.slice(0,3).join(", ")+(bad.length>3?" 외 "+(bad.length-3)+"건":""));return}
+    if(dup.length&&!confirm("이름이 같은 선물이 "+dup.length+"개 있어요 ("+dup.slice(0,3).join(", ")+(dup.length>3?" …":"")+"). 그래도 저장할까요?"))return;
+    if(!G.length&&!confirm("목록을 비우면 사이트는 코드에 들어 있는 기본 목록을 써요. 비운 채로 저장할까요?"))return;
+    const b=$("#g-save");b.disabled=true;b.textContent="저장 중…";
+    try{await db.doc("meta/gifts").set({items:G.map(x=>({i:x.i,n:x.n,d:x.d})),ts:Date.now()});G0=JSON.stringify(G);gIds0=new Set(G.map(x=>x.i));gMap0=new Map(G.map(x=>[x.i,x.n+"\u0000"+x.d]));$("#g-empty").hidden=G.length>0;gDraw();say("#g-msg","저장했어요 ✓ 사이트에 바로 반영돼요",1)}
+    catch(e){say("#g-msg","저장하지 못했어요: "+(e.code||e.message))}b.textContent="저장";gState()};
+  window.addEventListener("beforeunload",e=>{if(gDirty()){e.preventDefault();e.returnValue=""}});
 })();
 </script>
 </body>

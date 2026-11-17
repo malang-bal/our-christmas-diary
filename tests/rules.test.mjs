@@ -436,6 +436,55 @@ describe("문답은 멤버 두 명만", () => {
     // 바깥 사람 → 거절
     await assertFails(db(C).doc(p + "chats/d3/messages/gift_" + C).set(ok(C)));
   });
+  test("오늘의 선물: 선물 목록 고유번호(gid)를 함께 남길 수 있다 (16자까지)", async () => {
+    const ok = { uid: B, gift: "따뜻한 털장갑", gid: "g01", ts: 1, st: FV.serverTimestamp() };
+    await assertSucceeds(db(B).doc(p + "chats/d5/messages/gift_" + B).set(ok));
+    await assertFails(db(A).doc(p + "chats/d5/messages/gift_" + A).set({ ...ok, uid: A, gid: "x".repeat(17) }));
+    await assertFails(db(A).doc(p + "chats/d5/messages/gift_" + A).set({ ...ok, uid: A, gid: 3 }));
+  });
+  test("특별한 선물: 한 사람 5칸, 상대에게만, 열리기 전까지 보낸 사람만 고치고 뺀다", async () => {
+    const sg = (u, k, o = {}) => db(u).doc(p + "sgifts/" + u + "_" + k).set({ from: u, to: u === A ? B : A, n: "붕어빵", d: "따끈해", sd: 9, ts: 1, op: false, ...o });
+    await assertSucceeds(sg(A, 1));
+    await assertSucceeds(sg(A, 5));
+    // 6번째 칸·남의 칸·나에게·바깥 사람에게·형식 위반 → 거절
+    await assertFails(sg(A, 6));
+    await assertFails(db(A).doc(p + "sgifts/" + B + "_1").set({ from: A, to: B, n: "x", d: "", sd: 9, ts: 1, op: false }));
+    await assertFails(db(A).doc(p + "sgifts/" + A + "_2").set({ from: B, to: A, n: "x", d: "", sd: 9, ts: 1, op: false }));
+    await assertFails(sg(A, 2, { to: A }));
+    await assertFails(sg(A, 2, { to: C }));
+    await assertFails(sg(A, 2, { n: "가".repeat(41) }));
+    await assertFails(sg(A, 2, { d: "가".repeat(81) }));
+    await assertFails(sg(A, 2, { sd: 31 }));
+    await assertFails(sg(A, 2, { op: true }));
+    await assertFails(sg(A, 2, { extra: 1 }));
+    await assertFails(sg(C, 1, { to: A }));
+    // 이미 있는 칸에 다시 만들기(덮어쓰기)로 받는 사람·날짜 바꾸기 → 거절
+    await assertFails(sg(A, 1, { sd: 3 }));
+    // 보낸 사람: 이름·설명만 고친다, 받는 사람은 못 고친다
+    const r = p + "sgifts/" + A + "_1";
+    await assertSucceeds(db(A).doc(r).update({ n: "붕어빵 세 개", d: "식기 전에" }));
+    await assertFails(db(A).doc(r).update({ sd: 2 }));
+    await assertFails(db(B).doc(r).update({ n: "바꿔치기" }));
+    // 둘 다 읽을 수 있고, 바깥 사람은 못 읽는다
+    await assertSucceeds(db(B).doc(r).get());
+    await assertFails(db(C).doc(r).get());
+    // 받는 사람이 열기: 선물과 같은 내용의 'sg_' 줄 + 열었음 표시를 한 번에
+    const open = (u, o = {}) => { const d = db(u), b = d.batch();
+      b.set(d.doc(p + "chats/d9/messages/sg_" + A + "_1"), { uid: u, sg: A + "_1", from: A, gift: "붕어빵 세 개", gd: "식기 전에", sd: 9, ts: 1, st: FV.serverTimestamp(), ...o });
+      b.update(d.doc(r), { op: true, oa: 1, od: 9 }); return b.commit(); };
+    await assertFails(open(A, { uid: A }));                // 보낸 사람이 대신 열기
+    await assertFails(open(B, { gift: "다른 선물" }));      // 내용 바꾸기
+    await assertFails(open(B, { from: B }));                // 보낸 사람 바꾸기
+    await assertSucceeds(open(B));
+    // 연 뒤에는 아무도 고치거나 뺄 수 없다
+    await assertFails(db(A).doc(r).update({ n: "늦은 수정" }));
+    await assertFails(db(A).doc(r).delete());
+    await assertFails(db(B).doc(r).update({ op: false }));
+    // 열지 않은 선물은 보낸 사람만 뺄 수 있고, 빼면 그 칸을 다시 쓸 수 있다
+    await assertFails(db(B).doc(p + "sgifts/" + A + "_5").delete());
+    await assertSucceeds(db(A).doc(p + "sgifts/" + A + "_5").delete());
+    await assertSucceeds(sg(A, 5, { n: "다시 넣은 선물" }));
+  });
   test("우표는 정해진 이름으로 한 번만 붙이고 바꿀 수 없다", async () => {
     const ok = { day: 2, uid: B, img: U("y"), ts: 1 };
     await assertSucceeds(db(B).doc(p + "stamps/d2_" + B).set(ok));
@@ -505,6 +554,19 @@ describe("문답은 멤버 두 명만", () => {
       await assertFails(d.doc(p + "stamps/d5_" + A).set({ day: 5, uid: A, img: U("y"), ts: 1 }));
       await assertFails(d.doc("rooms/" + RID).update({ fx: "storm" }));
     });
+  });
+});
+
+describe("선물 목록 (관리자)", () => {
+  const items = [{ i: "g01", n: "따뜻한 털장갑", d: "두툼해요" }, { i: "g02", n: "핫초코 한 잔", d: "" }];
+  test("관리자만 쓰고, 로그인한 사람은 읽기만 한다", async () => {
+    await assertSucceeds(db(ADMIN).doc("meta/gifts").set({ items, ts: 1 }));
+    await assertSucceeds(db(A).doc("meta/gifts").get());
+    await assertFails(db(null).doc("meta/gifts").get());
+    await assertFails(db(A).doc("meta/gifts").set({ items, ts: 2 }));
+    await assertFails(db(A).collection("meta").get());
+    await assertFails(db(ADMIN).doc("meta/gifts").set({ items, ts: 3, extra: 1 }));
+    await assertFails(db(ADMIN).doc("meta/gifts").set({ items: "목록 아님", ts: 3 }));
   });
 });
 
