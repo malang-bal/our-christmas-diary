@@ -51,6 +51,10 @@ textarea{font:inherit;font-size:14px;padding:8px 10px;border:1px solid #cec6b8;b
 .gt tr.new td{background:#f3faf5}.gt tr.chg td{background:#fffbea}
 .gsave{position:sticky;bottom:0;background:#fbf6ee;padding:10px 0 2px;border-top:1px solid #e3dccf;margin-top:10px}
 .tag.d{background:#fff1d6;color:#9a5b00}
+.gt th.ck,.gt td.ck{width:30px;text-align:center;padding-top:12px}.gt th.ck{padding-top:8px}
+.gt input[type=checkbox]{width:16px;height:16px;padding:0;accent-color:#c8352b;cursor:pointer}
+.gt tr.sel td{background:#fdeceb}
+button.danger{color:#b3261e;border-color:#e3b8b3;background:#fff}button.danger:disabled{color:#bbb;border-color:#e3dccf}
 </style>
 </head>
 <body>
@@ -94,8 +98,8 @@ textarea{font:inherit;font-size:14px;padding:8px 10px;border:1px solid #cec6b8;b
       <div class="note" id="g-pv"></div>
       <div class="row"><button id="g-add" disabled>목록 끝에 추가</button><button id="g-rep" disabled>이 내용으로 전체 바꾸기</button></div>
     </details>
-    <div class="row"><input id="g-q" placeholder="찾기 (이름·설명)" autocomplete="off"><button id="g-new">+ 한 줄 추가</button><button id="g-copy">시트용으로 복사</button><button id="g-reload">새로고침</button></div>
-    <div class="gtb"><table class="gt"><thead><tr><th>#</th><th style="width:38%">선물 이름</th><th>설명</th><th></th></tr></thead><tbody id="g-list"></tbody></table></div>
+    <div class="row"><input id="g-q" placeholder="찾기 (이름·설명)" autocomplete="off"><button id="g-delsel" class="danger" disabled>고른 줄 지우기</button><button id="g-delall" class="danger">전체 지우기</button><button id="g-new">+ 한 줄 추가</button><button id="g-copy">시트용으로 복사</button><button id="g-reload">새로고침</button></div>
+    <div class="gtb"><table class="gt"><thead><tr><th class="ck"><input type="checkbox" id="g-all-ck" aria-label="보이는 줄 모두 고르기"></th><th>#</th><th style="width:38%">선물 이름</th><th>설명</th><th></th></tr></thead><tbody id="g-list"></tbody></table></div>
     <div class="row gsave"><button class="pri" id="g-save" disabled>저장</button><button id="g-undo" disabled>저장 전으로 되돌리기</button><span class="msg" id="g-msg" style="margin:0"></span></div>
   </div>
   <div class="row" style="justify-content:flex-end"><button id="out">로그아웃</button></div>
@@ -160,7 +164,10 @@ textarea{font:inherit;font-size:14px;padding:8px 10px;border:1px solid #cec6b8;b
 
   /* ===== 선물 목록: meta/gifts 한 문서에 [{i,n,d}] 로 저장 ===== */
   const GN=40,GD=120,esc=t=>String(t??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
-  let G=[],G0="[]",gIds0=new Set(),gMap0=new Map(),gq="";
+  let G=[],G0="[]",gIds0=new Set(),gMap0=new Map(),gq="",gSel=new Set(),gVis=[];
+  /* 여러 줄 고르기: 머리 칸 체크는 지금 보이는(찾기 결과) 줄 전체 */
+  function gSelState(vis){if(vis)gVis=vis;[...gSel].forEach(i=>{if(!G.some(x=>x.i===i))gSel.delete(i)});const a=$("#g-all-ck"),n=gVis.filter(i=>gSel.has(i)).length;
+    if(a){a.checked=gVis.length>0&&n===gVis.length;a.indeterminate=n>0&&n<gVis.length}const b=$("#g-delsel");if(b){b.disabled=!gSel.size;b.textContent=gSel.size?"고른 "+gSel.size+"줄 지우기":"고른 줄 지우기"}$("#g-delall").disabled=!G.length}
   const gid=()=>{let x;do{x="g"+Math.random().toString(36).slice(2,8)}while(G.some(y=>y.i===x));return x};
   const gDirty=()=>JSON.stringify(G)!==G0;
   async function gLoad(){try{const d=await db.doc("meta/gifts").get();const a=d.exists&&Array.isArray(d.data().items)?d.data().items:[];
@@ -179,14 +186,18 @@ textarea{font:inherit;font-size:14px;padding:8px 10px;border:1px solid #cec6b8;b
     $("#g-all").textContent=G.length;$("#g-desc").textContent=G.filter(x=>x.d.trim()).length;
     const rows=G.map((x,k)=>({x,k})).filter(({x})=>!q||(x.n+" "+x.d).toLowerCase().includes(q));
     $("#g-list").innerHTML=rows.map(({x,k})=>{const st=!gIds0.has(x.i)?"new":gMap0.get(x.i)!==x.n+"\u0000"+x.d?"chg":"";
-      return '<tr class="'+st+'" data-k="'+k+'"><td class="no">'+(k+1)+'</td><td><input data-f="n" value="'+esc(x.n)+'" class="'+(!x.n.trim()||x.n.length>GN?"bad":D.has(x.n.trim())?"dup":"")+'" placeholder="선물 이름"><span class="cnt'+(x.n.length>GN?" bad":"")+'">'+x.n.length+'/'+GN+(D.has(x.n.trim())?" · 같은 이름 있음":"")+'</span></td><td><textarea data-f="d" rows="1" class="'+(x.d.length>GD?"bad":"")+'" placeholder="설명 (없어도 돼요)">'+esc(x.d)+'</textarea><span class="cnt'+(x.d.length>GD?" bad":"")+'">'+x.d.length+'/'+GD+'</span></td><td class="x"><button data-rm title="이 줄 지우기" aria-label="'+(k+1)+'번 줄 지우기">×</button></td></tr>'}).join("")||'<tr><td colspan="4" class="note">'+(q?"찾는 선물이 없어요":"아직 선물이 없어요 · 위에서 시트 내용을 붙여 넣거나 한 줄씩 추가해요")+'</td></tr>';
-    document.querySelectorAll("#g-list textarea").forEach(fit);gState()}
+      return '<tr class="'+st+(gSel.has(x.i)?" sel":"")+'" data-k="'+k+'"><td class="ck"><input type="checkbox" data-ck'+(gSel.has(x.i)?" checked":"")+' aria-label="'+(k+1)+'번 줄 고르기"></td><td class="no">'+(k+1)+'</td><td><input data-f="n" value="'+esc(x.n)+'" class="'+(!x.n.trim()||x.n.length>GN?"bad":D.has(x.n.trim())?"dup":"")+'" placeholder="선물 이름"><span class="cnt'+(x.n.length>GN?" bad":"")+'">'+x.n.length+'/'+GN+(D.has(x.n.trim())?" · 같은 이름 있음":"")+'</span></td><td><textarea data-f="d" rows="1" class="'+(x.d.length>GD?"bad":"")+'" placeholder="설명 (없어도 돼요)">'+esc(x.d)+'</textarea><span class="cnt'+(x.d.length>GD?" bad":"")+'">'+x.d.length+'/'+GD+'</span></td><td class="x"><button data-rm title="이 줄 지우기" aria-label="'+(k+1)+'번 줄 지우기">×</button></td></tr>'}).join("")||'<tr><td colspan="5" class="note">'+(q?"찾는 선물이 없어요":"아직 선물이 없어요 · 위에서 시트 내용을 붙여 넣거나 한 줄씩 추가해요")+'</td></tr>';
+    document.querySelectorAll("#g-list textarea").forEach(fit);gSelState(rows.map(r=>r.x.i));gState()}
   const fit=t=>{t.style.height="auto";t.style.height=t.scrollHeight+"px"};
   function gState(){const dr=gDirty();$("#g-dirty").hidden=!dr;$("#g-save").disabled=!dr;$("#g-undo").disabled=!dr}
   $("#g-list").addEventListener("input",e=>{const tr=e.target.closest("tr[data-k]");if(!tr)return;const x=G[+tr.dataset.k],f=e.target.dataset.f;if(!x||!f)return;x[f]=e.target.value;
     if(f==="d")fit(e.target);const L=f==="n"?GN:GD,c=e.target.nextElementSibling;e.target.classList.toggle("bad",x[f].length>L||(f==="n"&&!x.n.trim()));if(c){c.textContent=x[f].length+"/"+L;c.classList.toggle("bad",x[f].length>L)}
     tr.className=!gIds0.has(x.i)?"new":gMap0.get(x.i)!==x.n+"\u0000"+x.d?"chg":"";$("#g-desc").textContent=G.filter(y=>y.d.trim()).length;gState()});
   $("#g-list").addEventListener("change",e=>{if(e.target.dataset.f==="n")gDraw()});
+  $("#g-list").addEventListener("change",e=>{if(!e.target.matches("[data-ck]"))return;const tr=e.target.closest("tr[data-k]"),x=G[+tr.dataset.k];if(!x)return;if(e.target.checked)gSel.add(x.i);else gSel.delete(x.i);tr.classList.toggle("sel",e.target.checked);gSelState()});
+  $("#g-all-ck").onchange=e=>{gVis.forEach(i=>e.target.checked?gSel.add(i):gSel.delete(i));gDraw()};
+  $("#g-delsel").onclick=()=>{const n=gSel.size;if(!n)return;if(!confirm("고른 "+n+"줄을 지울까요? (저장해야 사이트에 반영돼요)"))return;G=G.filter(x=>!gSel.has(x.i));gSel.clear();gDraw();say("#g-msg",n+"줄을 지웠어요 · 저장을 눌러야 반영돼요 (되돌리려면 '저장 전으로 되돌리기')",1)};
+  $("#g-delall").onclick=()=>{if(!G.length)return;if(!confirm("선물 "+G.length+"개를 모두 지울까요?\n저장해야 사이트에 반영되고, 저장 전에는 '저장 전으로 되돌리기'로 되살릴 수 있어요."))return;const n=G.length;G=[];gSel.clear();gq="";$("#g-q").value="";gDraw();say("#g-msg",n+"개를 모두 지웠어요 · 새 목록을 넣고 저장하거나, 비운 채로 저장하면 기본 목록을 써요",1)};
   $("#g-list").addEventListener("click",e=>{const b=e.target.closest("[data-rm]");if(!b)return;const k=+b.closest("tr").dataset.k,x=G[k];if(x.n.trim()&&!confirm("'"+x.n+"' 줄을 지울까요? (저장해야 반영돼요)"))return;G.splice(k,1);gDraw()});
   $("#g-q").oninput=e=>{gq=e.target.value;gDraw()};
   $("#g-new").onclick=()=>{gq="";$("#g-q").value="";G.push({i:gid(),n:"",d:""});gDraw();const t=$("#g-list tr:last-child input");if(t){t.scrollIntoView({block:"center"});t.focus()}};
