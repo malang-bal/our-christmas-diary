@@ -1209,7 +1209,7 @@ html.gmodal{overflow:hidden}@media (hover:hover) and (pointer:fine){html{scrollb
 </script>
 <script>
 /* 새 버전 알림: 올라간 index.html이 바뀌면 상단에 새로고침 안내를 띄워요 */
-const BUILD_ID="1794915187659";
+const BUILD_ID="1794918551588";
 (function(){
   if(!/^https?:/.test(location.protocol))return;
   let shown=false;
@@ -1476,7 +1476,8 @@ function viewWrite(){
     if(rushN&&next[rushN]&&!mine[rushN])nr[rushN]=Date.now();
     try{await db.doc(P("answers/"+me)).set({a:next,r:nr});answers[me]=next;arush[me]=nr;draft={};wEdit=false;render();$("#sst").textContent="저장됨 ✓";{const b=$("#sv");if(b){b.textContent="저장됨 ✓";setTimeout(()=>{if(b.isConnected)b.textContent="저장"},1200)}}}catch(e){$("#sst").textContent="저장 실패 — 권한을 확인해 주세요"}};
 }
-function sgCan(){return !!partner()&&!CLOSED&&today>=1&&today<=Q.length}
+/* 시작 전에도 저장한 답변에 미리 넣을 수 있어요 (마지막 날 뒤로는 보낼 날이 없어요) */
+function sgCan(){return !!partner()&&!CLOSED&&today<Q.length}
 function sgFor(n){return SGS.find(x=>x.from===me&&x.sd===n)}
 /* 저장한 답변 오른쪽 아래 선물 칸: 비어 있으면 회색, 넣으면 테마색 */
 function sgCardBtn(n){const g=sgFor(n);return '<div class="gwg"><button type="button" class="gwgb'+(g?" on":"")+'" data-n="'+n+'" aria-label="'+(g?"DAY "+n+" 답변에 넣은 선물 · "+esc(g.n):"DAY "+n+" 답변에 선물 넣기")+'" title="'+(g?esc(g.n):"선물 넣기")+'">'+GICO.replace(/width="14" height="14"/,'width="18" height="18"')+'</button></div>'}
