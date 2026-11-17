@@ -436,7 +436,8 @@ body:has(#roomApp:not([hidden])) #fb-out{display:none}
 .ibox .gtip::after{content:"";position:absolute;right:17px;bottom:-4px;width:9px;height:9px;background:inherit;transform:rotate(45deg);border-radius:0 0 2px 0}
 .ibox .gtip.l2::after{right:49px}
 .ibox .gtip.out{animation:gTipOut .24s ease-in forwards}
-.dice.ggl{word-break:keep-all;overflow-wrap:anywhere;max-width:100%;line-height:1.55}.dice.ggl .ggn{white-space:nowrap}.dice.ggl .ggd{display:none}.dice.ggl.two .gga{display:block}.dice.ggl.two .ggd{display:inline}.dice.ggl.two .ggs,.dice.ggl.two .ggt{display:none}.dice.ggl.two .ggb{display:block;margin-top:2px;font-size:15px;line-height:1.45}
+.dice.ggl{word-break:keep-all;overflow-wrap:anywhere;max-width:100%;line-height:1.55}.dice.ggl .ggn{white-space:nowrap}.dice.ggl .ggd{display:none}.dice.ggl.two .gga{display:block}.dice.ggl.two .ggd{display:inline}.dice.ggl.two .ggs,.dice.ggl.two .ggt{display:none}/* 두 줄일 때도 한 줄과 같은 글씨 크기 */
+.dice.ggl.two .ggb{display:block;margin-top:2px;font-size:inherit;line-height:1.5}
 .dice.ggl .ggi{display:inline-flex;vertical-align:-2px;margin-right:4px;color:var(--main)}
 .dice.ggl b{color:var(--main)}
 .dice.ggl.new{animation:gGlIn .55s cubic-bezier(.215,.61,.355,1) both}
@@ -1202,7 +1203,7 @@ html.gmodal{overflow:hidden}@media (hover:hover) and (pointer:fine){html{scrollb
 </script>
 <script>
 /* 새 버전 알림: 올라간 index.html이 바뀌면 상단에 새로고침 안내를 띄워요 */
-const BUILD_ID="1794902586630";
+const BUILD_ID="1794902781245";
 (function(){
   if(!/^https?:/.test(location.protocol))return;
   let shown=false;
