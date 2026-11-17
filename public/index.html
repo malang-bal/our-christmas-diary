@@ -356,27 +356,27 @@ body:has(#roomApp:not([hidden])) #fb-out{display:none}
 .dice.ggl .ggx{display:inline-block;margin-left:6px;padding:0 7px;border:1px solid var(--line,#d8cfc2);border-radius:999px;font-size:11px;line-height:18px;color:var(--mute2,#605856);vertical-align:1px}
 .dice.ggl.two .ggx{margin-top:4px}
 @media (hover:hover) and (pointer:fine){.dice.ggl.hasd:hover{background:color-mix(in srgb,var(--main) 7%,transparent)}.dice.ggl .ggx{display:none}}
-.gsh{position:fixed;inset:0;z-index:80;display:flex;flex-direction:column;justify-content:flex-end;font-family:inherit}
-.gsh-ov{position:absolute;inset:0;background:rgba(15,25,20,.45);opacity:0;transition:opacity .28s ease}
-.gsh-p{position:relative;width:100%;max-width:520px;margin:0 auto;box-sizing:border-box;background:var(--paper,#fbf6ee);color:var(--txt,#2b211e);border-radius:20px 20px 0 0;padding:10px 22px calc(22px + env(safe-area-inset-bottom));display:flex;flex-direction:column;align-items:center;gap:12px;box-shadow:0 -10px 30px rgba(0,0,0,.25);transform:translateY(100%);transition:transform .34s cubic-bezier(.215,.61,.355,1)}
-.gsh.on .gsh-ov{opacity:1}.gsh.on .gsh-p{transform:none}
-.gsh.off .gsh-p{transition-duration:.24s;transition-timing-function:ease-in}
-.gsh-grip{width:40px;height:5px;border-radius:999px;background:var(--line,#d8cfc2)}
-.gsh-h{display:flex;align-items:center;gap:12px;align-self:stretch;margin-top:6px}
-.gsh-ic{flex:none;width:52px;height:52px;border-radius:14px;background:color-mix(in srgb,var(--main) 13%,var(--paper,#fff));color:var(--main);display:flex;align-items:center;justify-content:center}
-.gsh.on .gsh-ic svg{animation:gPop .55s cubic-bezier(.34,1.56,.64,1) .12s both}
-.gsh-tt{display:flex;flex-direction:column;gap:2px;min-width:0}
-.gsh-tt small{font-size:12px;color:var(--mute2,var(--mute,#605856))}
-.gsh-tt b{font-size:21px;font-weight:900;color:var(--main);letter-spacing:-.02em;word-break:keep-all;overflow-wrap:anywhere;line-height:1.3}
-.gsh-d{margin:0;align-self:stretch;padding:14px;border-radius:12px;background:color-mix(in srgb,var(--txt,#2b211e) 6%,transparent);font-size:14px;line-height:1.6;word-break:keep-all;overflow-wrap:anywhere}
-.gsh-ok{align-self:stretch;min-height:48px;border-radius:12px;border:0;background:var(--main);color:#fff;font:inherit;font-size:15px;font-weight:700;cursor:pointer}
+.ggsh{position:fixed;inset:0;z-index:80;display:flex;flex-direction:column;justify-content:flex-end;font-family:inherit}
+.ggsh-ov{position:absolute;inset:0;background:rgba(15,25,20,.45);opacity:0;transition:opacity .28s ease}
+.ggsh-p{position:relative;width:100%;max-width:520px;margin:0 auto;box-sizing:border-box;background:var(--paper,#fbf6ee);color:var(--txt,#2b211e);border-radius:20px 20px 0 0;padding:10px 22px calc(22px + env(safe-area-inset-bottom));display:flex;flex-direction:column;align-items:center;gap:12px;box-shadow:0 -10px 30px rgba(0,0,0,.25);transform:translateY(100%);transition:transform .34s cubic-bezier(.215,.61,.355,1)}
+.ggsh.on .ggsh-ov{opacity:1}.ggsh.on .ggsh-p{transform:none}
+.ggsh.off .ggsh-p{transition-duration:.24s;transition-timing-function:ease-in}
+.ggsh-grip{width:40px;height:5px;border-radius:999px;background:var(--line,#d8cfc2)}
+.ggsh-h{display:flex;align-items:center;gap:12px;align-self:stretch;margin-top:6px}
+.ggsh-ic{flex:none;width:52px;height:52px;border-radius:14px;background:color-mix(in srgb,var(--main) 13%,var(--paper,#fff));color:var(--main);display:flex;align-items:center;justify-content:center}
+.ggsh.on .ggsh-ic svg{animation:gPop .55s cubic-bezier(.34,1.56,.64,1) .12s both}
+.ggsh-tt{display:flex;flex-direction:column;gap:2px;min-width:0}
+.ggsh-tt small{font-size:12px;color:var(--mute2,var(--mute,#605856))}
+.ggsh-tt b{font-size:21px;font-weight:900;color:var(--main);letter-spacing:-.02em;word-break:keep-all;overflow-wrap:anywhere;line-height:1.3}
+.ggsh-d{margin:0;align-self:stretch;padding:14px;border-radius:12px;background:color-mix(in srgb,var(--txt,#2b211e) 6%,transparent);font-size:14px;line-height:1.6;word-break:keep-all;overflow-wrap:anywhere}
+.ggsh-ok{align-self:stretch;min-height:48px;border-radius:12px;border:0;background:var(--main);color:#fff;font:inherit;font-size:15px;font-weight:700;cursor:pointer}
 #gtipd{position:fixed;z-index:70;max-width:260px;padding:10px 13px;border-radius:10px;background:#2b211e;color:#fff;font-size:13px;line-height:1.55;word-break:keep-all;overflow-wrap:anywhere;box-shadow:0 8px 20px rgba(0,0,0,.25);pointer-events:none;opacity:0;transform:translateY(4px);transition:opacity .16s ease,transform .16s ease}
 #gtipd.below{transform:translateY(-4px)}
 #gtipd.on{opacity:1;transform:none}
 #gtipd b{display:block;margin-bottom:2px;color:#ffd9d2}
 #gtipd::after{content:"";position:absolute;left:var(--ax,50%);bottom:-5px;width:10px;height:10px;margin-left:-5px;background:#2b211e;transform:rotate(45deg)}
 #gtipd.below::after{bottom:auto;top:-5px}
-@media (prefers-reduced-motion:reduce){.gsh-ov,.gsh-p,#gtipd{transition:none!important}.gsh.on .gsh-ic svg{animation:none!important}}
+@media (prefers-reduced-motion:reduce){.ggsh-ov,.ggsh-p,#gtipd{transition:none!important}.ggsh.on .ggsh-ic svg{animation:none!important}}
 /* 오늘의 선물 (C안) */
 .ibox .ggift{position:absolute;right:6px;top:50%;transform:translateY(-50%);width:32px;height:32px;border:0;background:none;padding:0;display:flex;align-items:center;justify-content:center;color:var(--main);cursor:pointer;transition:opacity .2s ease,transform .24s cubic-bezier(.215,.61,.355,1),color .35s ease;animation:gGiftIn .32s cubic-bezier(.215,.61,.355,1) backwards}
 .ibox .ggift.l2{right:38px}
@@ -1159,7 +1159,7 @@ html.gmodal{overflow:hidden}@media (hover:hover) and (pointer:fine){html{scrollb
 </script>
 <script>
 /* 새 버전 알림: 올라간 index.html이 바뀌면 상단에 새로고침 안내를 띄워요 */
-const BUILD_ID="1794887425800";
+const BUILD_ID="1794887625918";
 (function(){
   if(!/^https?:/.test(location.protocol))return;
   let shown=false;
@@ -1455,14 +1455,14 @@ function gGiftLine(m,plain){const nm=esc(realName(m.uid)),g0=String(m.gift).slic
   if(plain)return '<div class="dice"'+(d?' title="'+esc(d)+'"':"")+'>― '+nm+' 님이 선물을 열었어요 · <b>'+g+'</b> ―</div>';
   const nw=Date.now()-(m.ts||0)<6000;return '<div class="dice ggl'+(nw?" new":"")+(d?' hasd" role="button" tabindex="0" aria-label="'+nm+' 님의 선물 '+g+' 설명 보기" data-g="'+g+'" data-who="'+nm+'"':'"')+'><span class="gga"><span class="ggi">'+GICO+'</span>― '+nm+' 님이 선물을 <span class="ggn">열었어요<span class="ggd"> ―</span><span class="ggs"> ·</span></span> </span><b class="ggb">'+g+'</b><span class="ggt"> ―</span>'+(d?'<span class="ggx" aria-hidden="true">설명</span>':"")+'</div>'}
 /* 선물 설명: 휴대폰은 결과 줄을 누르면 아래 시트(F안), 마우스가 있는 PC는 올리면 말풍선(H안) · 누르면 시트도 열려요 */
-function gGiftSheet(who,g,n){const d=GIFTD.get(g)||"";let w=document.getElementById("gsh");if(w)w.remove();
-  w=document.createElement("div");w.id="gsh";w.className="gsh";const ra=document.getElementById("roomApp"),cs=ra?getComputedStyle(ra):null;
+function gGiftSheet(who,g,n){const d=GIFTD.get(g)||"";let w=document.getElementById("ggsh");if(w)w.remove();
+  w=document.createElement("div");w.id="ggsh";w.className="ggsh";const ra=document.getElementById("roomApp"),cs=ra?getComputedStyle(ra):null;
   if(cs)["--paper","--paperd","--txt","--main","--mute","--mute2","--line"].forEach(k=>{const v=cs.getPropertyValue(k);if(v)w.style.setProperty(k,v)});
-  w.innerHTML='<div class="gsh-ov"></div><div class="gsh-p" role="dialog" aria-modal="true" aria-labelledby="gsh-t"><span class="gsh-grip" aria-hidden="true"></span><div class="gsh-h"><div class="gsh-ic">'+GICO.replace(/width="14" height="14"/,'width="28" height="28"')+'</div><div class="gsh-tt"><small>'+(n?"DAY "+n+" · ":"")+esc(who)+' 님의 선물</small><b id="gsh-t">'+esc(g)+'</b></div></div>'+(d?'<p class="gsh-d">'+esc(d)+'</p>':"")+'<button type="button" class="gsh-ok">확인</button></div>';
-  document.body.appendChild(w);requestAnimationFrame(()=>w.classList.add("on"));const ok=w.querySelector(".gsh-ok");try{ok.focus({preventScroll:true})}catch(e){}
+  w.innerHTML='<div class="ggsh-ov"></div><div class="ggsh-p" role="dialog" aria-modal="true" aria-labelledby="ggsh-t"><span class="ggsh-grip" aria-hidden="true"></span><div class="ggsh-h"><div class="ggsh-ic">'+GICO.replace(/width="14" height="14"/,'width="28" height="28"')+'</div><div class="ggsh-tt"><small>'+(n?"DAY "+n+" · ":"")+esc(who)+' 님의 선물</small><b id="ggsh-t">'+esc(g)+'</b></div></div>'+(d?'<p class="ggsh-d">'+esc(d)+'</p>':"")+'<button type="button" class="ggsh-ok">확인</button></div>';
+  document.body.appendChild(w);requestAnimationFrame(()=>w.classList.add("on"));const ok=w.querySelector(".ggsh-ok");try{ok.focus({preventScroll:true})}catch(e){}
   const close=()=>{if(!w.isConnected||w.classList.contains("off"))return;w.classList.add("off");w.classList.remove("on");document.removeEventListener("keydown",esc1);setTimeout(()=>w.remove(),gRM()?0:300)};
-  const esc1=e=>{if(e.key==="Escape")close()};document.addEventListener("keydown",esc1);ok.onclick=close;w.querySelector(".gsh-ov").onclick=close;
-  {const p=w.querySelector(".gsh-p");let y0=null;p.addEventListener("touchstart",e=>{y0=e.touches[0].clientY},{passive:true});p.addEventListener("touchmove",e=>{if(y0===null)return;const dy=e.touches[0].clientY-y0;if(dy>0)p.style.transform="translateY("+dy+"px)"},{passive:true});
+  const esc1=e=>{if(e.key==="Escape")close()};document.addEventListener("keydown",esc1);ok.onclick=close;w.querySelector(".ggsh-ov").onclick=close;
+  {const p=w.querySelector(".ggsh-p");let y0=null;p.addEventListener("touchstart",e=>{y0=e.touches[0].clientY},{passive:true});p.addEventListener("touchmove",e=>{if(y0===null)return;const dy=e.touches[0].clientY-y0;if(dy>0)p.style.transform="translateY("+dy+"px)"},{passive:true});
    p.addEventListener("touchend",e=>{if(y0===null)return;const dy=e.changedTouches[0].clientY-y0;y0=null;p.style.transform="";if(dy>70)close()})}}
 function gGiftDay(el){const c=el.closest("#chat"),k=c&&c.dataset.gk;return k&&/^\d+$/.test(k)?+k:0}
 document.addEventListener("click",e=>{const el=e.target.closest&&e.target.closest(".dice.ggl.hasd");if(!el)return;gTipD(null);gGiftSheet(el.dataset.who||"",el.dataset.g||"",gGiftDay(el))});
