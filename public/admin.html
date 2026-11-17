@@ -82,7 +82,9 @@ textarea{font:inherit;font-size:14px;padding:8px 10px;border:1px solid #cec6b8;b
     <div class="stat"><span>전체 <b id="g-all">0</b></span><span>설명 있음 <b id="g-desc">0</b></span><span class="tag d" id="g-dirty" hidden>저장 안 된 변경 있음</span></div>
     <p class="note">채팅창의 '오늘의 선물'에서 이 목록 중 하나가 무작위로 나와요. 이름은 40자, 설명은 120자까지예요.<br>
       이름·설명을 고치면 <b>이미 열린 선물에도</b> 바로 반영돼요. 줄을 지우면 그 선물은 더 이상 나오지 않아요(이미 연 기록은 남아요).<br>
-      문구에 넣을 수 있는 이름 태그: <code>{A}</code> 선물을 연 사람 · <code>{B}</code> 상대 · <code>{C}</code> 가입 코드를 받은 사람 · <code>{D}</code> 짝꿍 코드로 들어온 사람</p>
+      문구에 넣을 수 있는 이름 태그: <code>{A}</code> 선물을 연 사람 · <code>{B}</code> 상대 · <code>{C}</code> 가입 코드를 받은 사람 · <code>{D}</code> 짝꿍 코드로 들어온 사람<br>
+      태그 바로 뒤에 붙인 조사는 이름 받침에 맞춰 바뀌어요: <code>{B}가</code> → 라차가 / 트리스탄이, <code>{B}를</code> → 라차를 / 트리스탄을, <code>{B}와</code> · <code>{B}는</code> · <code>{B}로</code> · <code>{B}야</code>(부르는 말)도 같아요.
+      '~이다' 꼴은 <code>{B}이야</code> · <code>{B}이에요</code> · <code>{B}이랑</code>처럼 '이'를 붙여 쓰면 받침 없는 이름에선 '이'가 빠져요.</p>
     <p class="note" id="g-empty" hidden>아직 저장한 목록이 없어서, 사이트는 코드에 들어 있는 기본 선물 목록을 쓰고 있어요. 여기서 목록을 저장하면 그때부터 이 목록을 써요.</p>
     <details class="bulk" id="g-bulk"><summary>시트에서 한꺼번에 넣기 · 고치기</summary>
       <p class="note">스프레드시트에서 <b>A열 선물 · B열 설명</b>을 골라 복사(Ctrl/⌘+C)한 뒤 아래에 붙여 넣어요. 첫 줄이 '선물'이면 제목 줄로 보고 건너뛰어요.<br>

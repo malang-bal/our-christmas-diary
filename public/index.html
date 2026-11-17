@@ -1209,7 +1209,7 @@ html.gmodal{overflow:hidden}@media (hover:hover) and (pointer:fine){html{scrollb
 </script>
 <script>
 /* 새 버전 알림: 올라간 index.html이 바뀌면 상단에 새로고침 안내를 띄워요 */
-const BUILD_ID="1794903941063";
+const BUILD_ID="1794915187659";
 (function(){
   if(!/^https?:/.test(location.protocol))return;
   let shown=false;
@@ -1527,9 +1527,25 @@ function gGiftSet(a){const src=Array.isArray(a)&&a.length?a:GIFTS0.map((x,i)=>ty
   GIFTS=src.filter(x=>x&&x.n).map(x=>({i:String(x.i||"").slice(0,16),n:String(x.n).slice(0,40),d:String(x.d||"").slice(0,120)}));
   GIFTN=GIFTS.map(x=>x.n);GIFTD=new Map(GIFTS.filter(x=>x.d).map(x=>[x.n,x.d]));GIFTI=new Map(GIFTS.filter(x=>x.i).map(x=>[x.i,x]))}
 gGiftSet(null);
+/* 이름 태그 {A}~{D} 바로 뒤에 붙인 조사를 이름 받침에 맞춰 바꿔요.
+   예) {B}가 좋아하는 물건 → 라차가 / 트리스탄이 좋아하는 물건
+   부르는 말은 {B}야(아), '~이다' 꼴은 {B}이야·{B}이에요·{B}이랑·{B}이라고처럼 '이'를 붙여 쓰면 받침 없는 이름에선 '이'가 빠져요 */
+function gJongOf(s){s=String(s||"").replace(/[\s.,!?~…)\]」』"'’”]+$/,"");const ch=s.slice(-1);if(!ch)return{has:false,rl:false};const c=ch.charCodeAt(0);
+  if(c>=0xAC00&&c<=0xD7A3){const j=(c-0xAC00)%28;return{has:j>0,rl:j===8}}
+  if(/[0-9]/.test(ch))return{has:"013678".includes(ch),rl:"178".includes(ch)};
+  if(/[a-z]/i.test(ch)){const l=ch.toLowerCase();return{has:"lmn".includes(l)||/ng$/i.test(s),rl:l==="l"}}
+  return{has:false,rl:false}}
+function gJosaFill(t,names){return String(t||"").replace(/\{([ABCD])\}(이에요|예요|이었|였|으로|로|[라란랑나든며면]|이|가|은|는|을|를|과|와|아|야)?/g,(all,k,p,off,str)=>{
+    if(!(k in names))return all;const nm=String(names[k]);if(!p)return nm;const{has,rl}=gJongOf(nm);let q;
+    switch(p){case"이에요":case"예요":q=has?"이에요":"예요";break;case"이었":case"였":q=has?"이었":"였";break;
+      case"으로":case"로":q=has&&!rl?"으로":"로";break;case"은":case"는":q=has?"은":"는";break;case"을":case"를":q=has?"을":"를";break;
+      case"과":case"와":q=has?"과":"와";break;case"아":case"야":q=has?"아":"야";break;case"가":q=has?"이":"가";break;
+      case"이":q=/[가-힣]/.test(str.charAt(off+all.length))?(has?"이":""):(has?"이":"가");break;
+      default:q=(has?"이":"")+p}
+    return nm+q})}
 /* 선물 문구 태그: {A} 연 사람 · {B} 상대 · {C} 가입 코드를 받은 사람 · {D} 짝꿍 코드로 들어온 사람 */
 function gTag(t,m){t=String(t||"");if(!/\{[ABCD]\}/.test(t))return t;const ids=(cfg&&cfg.memberIds)||Object.keys(members),a=(m&&m.uid)||me,b=ids.find(k=>k!==a),c=cfg&&cfg.owner,d=ids.find(k=>k!==c);
-  const nm=(id,f)=>id?realName(id):f;return t.replace(/\{A\}/g,nm(a,"나")).replace(/\{B\}/g,nm(b,"짝꿍")).replace(/\{C\}/g,nm(c,"초대받은 사람")).replace(/\{D\}/g,nm(d,"짝꿍"))}
+  const nm=(id,f)=>id?realName(id):f;return gJosaFill(t,{A:nm(a,"나"),B:nm(b,"짝꿍"),C:nm(c,"초대받은 사람"),D:nm(d,"짝꿍")})}
 /* 연 선물의 이름·설명: 목록에서 고친 내용(오타 수정 등)이 이미 연 선물에도 반영돼요 */
 function gGName(m){const it=m&&!m.sg&&m.gid&&GIFTI.get(m.gid);return gTag(it?it.n:String((m&&m.gift)||"").slice(0,40),m)}
 function gGDesc(m){if(m&&m.sg)return gTag(String(m.gd||""),m);const it=m&&m.gid&&GIFTI.get(m.gid);return gTag(it?it.d:(GIFTD.get(String((m&&m.gift)||""))||""),m)}
