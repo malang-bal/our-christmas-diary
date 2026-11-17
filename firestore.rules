@@ -286,6 +286,16 @@ service cloud.firestore {
               && request.resource.data.v is int
               && request.resource.data.v >= 1 && request.resource.data.v <= request.resource.data.dice)
           );
+        // 오늘의 선물: 하루(그날 방)에 한 사람 한 번. 문서 이름이 'gift_내uid' 로 고정이라 두 번째는 덮어쓰기라서 막힌다
+        allow create: if canWrite(rid) && mid == 'gift_' + uid()
+          && day.matches('^d([1-9]|[12][0-9]|30)$')
+          && request.resource.data.keys().hasOnly(['uid', 'gift', 'ts', 'st', 'af'])
+          && request.resource.data.uid == uid()
+          && request.resource.data.gift is string
+          && request.resource.data.gift.size() >= 1 && request.resource.data.gift.size() <= 40
+          && request.resource.data.ts is number
+          && request.resource.data.st == request.time
+          && (!('af' in request.resource.data) || request.resource.data.af is number);
         allow update, delete: if false;
       }
     }

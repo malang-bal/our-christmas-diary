@@ -419,6 +419,23 @@ describe("문답은 멤버 두 명만", () => {
     // 바깥 사람은 순번 문서도 못 만든다
     await assertFails(db(C).doc(p + "rate/" + C).set({ t: FV.serverTimestamp(), n: 1 }));
   });
+  test("오늘의 선물: 그날 한 사람 한 번, 정해진 이름·형식만", async () => {
+    const g = (u, id, o) => db(u).doc(p + "chats/d3/messages/" + id).set(o);
+    const ok = (u) => ({ uid: u, gift: "따뜻한 털장갑", ts: 1, st: FV.serverTimestamp() });
+    await assertSucceeds(g(B, "gift_" + B, ok(B)));
+    // 같은 날 두 번째 → 거절 (덮어쓰기), 다른 날은 가능
+    await assertFails(g(B, "gift_" + B, { ...ok(B), gift: "다시 뽑기" }));
+    await assertSucceeds(db(B).doc(p + "chats/d4/messages/gift_" + B).set(ok(B)));
+    // 남의 이름·사칭·형식 위반 → 거절
+    await assertFails(g(B, "gift_" + A, ok(A)));
+    await assertFails(g(B, "gift_" + B + "x", ok(B)));
+    await assertFails(db(A).doc(p + "chats/d3/messages/gift_" + A).set({ ...ok(A), gift: "가".repeat(41) }));
+    await assertFails(db(A).doc(p + "chats/d3/messages/gift_" + A).set({ ...ok(A), extra: 1 }));
+    await assertFails(db(A).doc(p + "chats/d3/messages/gift_" + A).set({ uid: A, gift: "선물", ts: 1, st: TS.fromMillis(Date.now()) }));
+    await assertSucceeds(db(A).doc(p + "chats/d3/messages/gift_" + A).set(ok(A)));
+    // 바깥 사람 → 거절
+    await assertFails(db(C).doc(p + "chats/d3/messages/gift_" + C).set(ok(C)));
+  });
   test("우표는 정해진 이름으로 한 번만 붙이고 바꿀 수 없다", async () => {
     const ok = { day: 2, uid: B, img: U("y"), ts: 1 };
     await assertSucceeds(db(B).doc(p + "stamps/d2_" + B).set(ok));
