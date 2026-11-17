@@ -567,6 +567,12 @@ body:has(#roomApp:not([hidden])) #fb-out{display:none}
 /* ===== 종이 프리셋 연동 ===== */
 #roomApp{--paper:var(--gpaper,#fbf6ee);--paperd:var(--gpaperd,#f2ede6);--perf:var(--gperf,#b9ad9a);--line2:var(--gline2,#cec6b8);--mute2:var(--gmute,#605856);--ansl:var(--gans,#c9bfae);--cutl:var(--gcut,#cfc4b2)}
 #roomApp .dcard .ans.you{border-top-color:var(--ansl)}
+/* 하루 보기 답변 간격: 구분선 위아래를 같은 간격(22px)으로, 이름표와 답변 사이 6px, 마지막 답변 아래도 여유 있게 */
+#roomApp .dcard .ans{margin-top:0;padding-top:22px}
+#roomApp .dcard .ans.me{margin-top:12px}
+#roomApp .dcard .ans.me b{padding-top:0}
+#roomApp .dcard .ans.you{margin-top:22px;padding-bottom:24px}
+#roomApp .dcard .ans b{margin-bottom:6px}
 #roomApp #view.pmore .card{border-bottom-color:var(--cutl)}
 #roomApp .gcut::before{border-top-color:var(--cutl)}
 #roomApp .gcta{color:var(--gmainink,var(--main))}
@@ -1203,7 +1209,7 @@ html.gmodal{overflow:hidden}@media (hover:hover) and (pointer:fine){html{scrollb
 </script>
 <script>
 /* 새 버전 알림: 올라간 index.html이 바뀌면 상단에 새로고침 안내를 띄워요 */
-const BUILD_ID="1794902781245";
+const BUILD_ID="1794903941063";
 (function(){
   if(!/^https?:/.test(location.protocol))return;
   let shown=false;
