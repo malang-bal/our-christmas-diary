@@ -349,6 +349,7 @@ body:has(#roomApp:not([hidden])) #fb-out{display:none}
 #roomApp,#roomApp:has(#view.pset){padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))!important}
 /* 홈: 상대 스텁 어둡게 · 내 스텁 밝게 · 오늘 문답 칸 다시 어둡게 */
 #roomApp #hs1{--c:var(--paperd)}
+#roomApp .gsay{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}#gtoast{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom));transform:translate(-50%,8px);z-index:60;max-width:calc(100vw - 32px);padding:9px 16px;border-radius:999px;background:rgba(28,28,29,.92);color:#fff;font-size:13px;opacity:0;pointer-events:none;transition:opacity .18s,transform .18s}#gtoast.on{opacity:1;transform:translate(-50%,0)}
 #roomApp #hs2{--c:var(--paper)}
 #roomApp .ghome .gend{--c:var(--paperd)}
 #roomApp .gcta,#roomApp .gcta.off{background:transparent;color:var(--main);height:48px;font-size:19px}
@@ -1102,7 +1103,7 @@ html.gmodal{overflow:hidden}@media (hover:hover) and (pointer:fine){html{scrollb
 </script>
 <script>
 /* 새 버전 알림: 올라간 index.html이 바뀌면 상단에 새로고침 안내를 띄워요 */
-const BUILD_ID="1794843451486";
+const BUILD_ID="1794880457194";
 (function(){
   if(!/^https?:/.test(location.protocol))return;
   let shown=false;
@@ -1252,14 +1253,29 @@ function viewHome(){const T=Q.length;
   $("#view").innerHTML='<div class="ghome"><div class="gseg gsay" id="hs1" role="button" tabindex="0" hidden></div><div class="gseg gsay" id="hs2" role="button" tabindex="0" hidden></div><div class="gseg gend">'+cta+'</div></div>';
   const o=$("#gopen");if(o)o.onclick=()=>gTear(o,()=>{tab="cal";sel=today>=1&&today<=T?today:null;stopChat();render();window.scrollTo(0,0)});
   homeSays()}
-function homeSays(){const a=$("#hs1"),b=$("#hs2");if(!a||!b)return;const p=partner();
+/* 홈 한마디 순서 (이 기기에서만): "p" = 상대 먼저(기본), "me" = 나 먼저 */
+function gSayOrd(){try{return localStorage.getItem("o30.sayo")==="me"?"me":"p"}catch(e){return"p"}}
+function gSayOrdSet(v){try{localStorage.setItem("o30.sayo",v)}catch(e){}}
+function gSayOrdApply(anim){const a=$("#hs1"),b=$("#hs2");if(!a||!b||!a.parentNode)return;const meFirst=gSayOrd()==="me";
+  if(meFirst===(b.nextElementSibling===a))return;const r0=anim&&!gRM()?[a.getBoundingClientRect().top,b.getBoundingClientRect().top]:null;
+  if(meFirst)a.parentNode.insertBefore(b,a);else a.parentNode.insertBefore(a,b);
+  if(r0&&a.animate){[[a,r0[0]],[b,r0[1]]].forEach(([el,y])=>{const dy=y-el.getBoundingClientRect().top;if(dy)el.animate([{transform:"translateY("+dy+"px)"},{transform:"none"}],{duration:260,easing:"cubic-bezier(.215,.61,.355,1)"})})}}
+function gToastMsg(t){let el=document.getElementById("gtoast");if(!el){el=document.createElement("div");el.id="gtoast";el.setAttribute("role","status");document.body.appendChild(el)}
+  el.textContent=t;el.classList.add("on");clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove("on"),1800)}
+/* 꾹 누르기(0.5초): 손가락이 움직이면 취소. 꾹 누른 뒤의 탭·쓸어올리기는 무시해요 */
+function gLongPress(el,fn){let t=0,x0=0,y0=0;const stop=()=>{clearTimeout(t);t=0};
+  el.onpointerdown=e=>{if(e.button>0)return;x0=e.clientX;y0=e.clientY;stop();t=setTimeout(()=>{t=0;el._lp=Date.now();try{navigator.vibrate&&navigator.vibrate(15)}catch(_){}fn()},500)};
+  el.onpointermove=e=>{if(t&&Math.hypot(e.clientX-x0,e.clientY-y0)>8)stop()};el.onpointerup=stop;el.onpointercancel=stop;el.onpointerleave=stop;
+  el.oncontextmenu=e=>e.preventDefault()}
+function homeSays(){const a=$("#hs1"),b=$("#hs2");if(!a||!b)return;const p=partner();gSayOrdApply(false);
   const row=(id,el)=>{if(!id||!members[id]){el.hidden=true;return}const x=pickSay(id);el.hidden=false;const pv0=el.querySelector(".gst");const pvt=pv0?pv0.textContent:null;
     el.innerHTML=avH(id)+'<span class="gst'+(x?"":" none")+'">'+(x?esc(x.text):id===me?"아직 남긴 한마디가 없어요 · 한마디 남기기":"아직 한마디가 없어요")+'</span>';
     {const g=el.querySelector(".gst");if(g&&pvt!==null&&pvt!==g.textContent&&g.animate&&!gRM())g.animate([{opacity:0},{opacity:1}],{duration:240,easing:"ease-out"})}
-    el.onclick=()=>{if(x){renderTalk(true);try{sfx("t",Math.floor(Math.random()*4),.315)}catch(e){}}else if(id===me){gTabGo("say")}};
+    gLongPress(el,()=>{if(!p||a.hidden||b.hidden)return;gSayOrdSet(gSayOrd()==="me"?"p":"me");gSayOrdApply(true);gToastMsg("한마디 순서를 바꿨어요 · 이 기기에서만");const sg=$("#gsao");if(sg)gSayOrdSegSync(sg)});
+    el.onclick=()=>{if(el._lp&&Date.now()-el._lp<900)return;if(x){renderTalk(true);try{sfx("t",Math.floor(Math.random()*4),.315)}catch(e){}}else if(id===me){gTabGo("say")}};
     el.onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();el.onclick()}};
     let sy=null,sx=0;el.ontouchstart=e=>{const t=e.touches[0];sy=t.clientY;sx=t.clientX};
-    el.ontouchend=e=>{if(sy===null)return;const t=e.changedTouches[0],dy=t.clientY-sy,dx=Math.abs(t.clientX-sx);sy=null;if(x&&dy<-40&&-dy>dx*1.5){renderTalk(true);gSwipeSnd()}}};
+    el.ontouchend=e=>{if(sy===null)return;if(el._lp&&Date.now()-el._lp<900){sy=null;return}const t=e.changedTouches[0],dy=t.clientY-sy,dx=Math.abs(t.clientX-sx);sy=null;if(x&&dy<-40&&-dy>dx*1.5){renderTalk(true);gSwipeSnd()}}};
   row(p,a);row(me,b)}
 function gReceipt(){const T=Q.length,n=today;if(n<1||n>T)return"";const p=partner(),ok=id=>!!answers[id]?.[n],both=ok(me)&&!!p&&ok(p),sp=stampsOf(n)[0];
   const st=(id,role)=>'<div class="grc"><small>'+role+' · '+(id?esc(realName(id)):"상대")+'</small><b'+(id&&ok(id)?"":' class="no"')+'>'+(!id?"참여 전":ok(id)?(arush[id]&&arush[id][n]?"✓ 긴급 송부":"✓ 답변 완료"):"작성 전")+'</b></div>';
@@ -1355,8 +1371,8 @@ function viewWrite(){
 }
 function viewMore(){
   if(!gMemOk){$("#view").innerHTML='<div class="card"><span class="note">불러오는 중…</span></div>';return}
-  $("#view").innerHTML=pairCard()+settingsTop()+roomSetCard()+notifCard()+'<div class="card"><div class="gfxm"><b>배경 움직임</b>'+gFxSeg("gfxm-r")+'</div><p class="note gfxmn">이 기기에서만 적용돼요. 조용히는 입자 수와 속도를 줄여요.</p></div><div class="card"><div class="row" style="justify-content:space-between;align-items:center"><b>계정</b><button class="btn" id="glo" type="button">로그아웃</button></div><p class="note" style="margin:8px 0 0">'+kDay(CONF.start)+' 시작 · '+(closeMs()?kDate(closeMs()-1)+' 문답 종료 · ':"")+(CONF.deleteOn?kDay(CONF.deleteOn)+' 사이트와 기록 전체 삭제':"")+'</p></div><div class="gcut" aria-hidden="true"></div><button class="btn pri gbkb" id="bk" type="button">HTML 백업</button>';
-  wireSettings();wireNotif();wirePair();gFxSegWire("gfxm-r");$("#bk").onclick=()=>buildBackup();{const g=$("#glo");if(g)g.onclick=()=>{if(confirm("로그아웃할까요?"))window.gSignOut()}}
+  $("#view").innerHTML=pairCard()+settingsTop()+roomSetCard()+notifCard()+'<div class="card"><div class="gfxm"><b>홈 한마디 순서</b>'+gSayOrdSeg("gsao")+'</div><p class="note gfxmn">이 기기에서만 적용돼요. 홈에서 한마디를 꾹 눌러도 위아래를 바꿀 수 있어요.</p></div><div class="card"><div class="gfxm"><b>배경 움직임</b>'+gFxSeg("gfxm-r")+'</div><p class="note gfxmn">이 기기에서만 적용돼요. 조용히는 입자 수와 속도를 줄여요.</p></div><div class="card"><div class="row" style="justify-content:space-between;align-items:center"><b>계정</b><button class="btn" id="glo" type="button">로그아웃</button></div><p class="note" style="margin:8px 0 0">'+kDay(CONF.start)+' 시작 · '+(closeMs()?kDate(closeMs()-1)+' 문답 종료 · ':"")+(CONF.deleteOn?kDay(CONF.deleteOn)+' 사이트와 기록 전체 삭제':"")+'</p></div><div class="gcut" aria-hidden="true"></div><button class="btn pri gbkb" id="bk" type="button">HTML 백업</button>';
+  wireSettings();wireNotif();wirePair();gFxSegWire("gfxm-r");gSayOrdSegWire("gsao");$("#bk").onclick=()=>buildBackup();{const g=$("#glo");if(g)g.onclick=()=>{if(confirm("로그아웃할까요?"))window.gSignOut()}}
 }
 const bg=id=>{const c=members[id]?.color;return c?"background:"+c+"4d":""};
 const blob=id=>String(id||"");const emoSrc=blob;
@@ -2566,6 +2582,9 @@ function gFxHoldFor(ms){gHoldUntil=Math.max(gHoldUntil,performance.now()+ms)}
 function gFxHeld(){return!!window.gFxHold||gFxMode()==="off"||gFocusHold||performance.now()<gHoldUntil||!!document.querySelector(".hlov,.gpop,#mtrash")}
 document.addEventListener("focusin",e=>{const t=e.target;gFocusHold=gCoarse()&&!!t&&(t.tagName==="TEXTAREA"||(t.tagName==="INPUT"&&!/^(checkbox|radio|color|file|range|button|submit)$/.test(t.type)))});
 document.addEventListener("focusout",()=>{gFocusHold=false});
+function gSayOrdSeg(id){const v=gSayOrd();return '<span class="gseg3" id="'+id+'" role="radiogroup" aria-label="홈 한마디 순서">'+[["p","상대 먼저"],["me","나 먼저"]].map(([k,l])=>'<button type="button" role="radio" data-sao="'+k+'" aria-checked="'+(k===v)+'"'+(k===v?' class="on"':"")+'>'+l+'</button>').join("")+'</span>'}
+function gSayOrdSegSync(sg){const v=gSayOrd();sg.querySelectorAll("[data-sao]").forEach(x=>{const on=x.dataset.sao===v;x.classList.toggle("on",on);x.setAttribute("aria-checked",String(on))})}
+function gSayOrdSegWire(id){const sg=document.getElementById(id);if(!sg)return;sg.querySelectorAll("[data-sao]").forEach(b=>b.onclick=()=>{gSayOrdSet(b.dataset.sao);gSayOrdSegSync(sg)})}
 function gFxSeg(id){const v=gFxMode();return '<span class="gseg3" id="'+id+'" role="radiogroup" aria-label="배경 움직임">'+[["on","켜기"],["calm","조용히"],["off","끄기"]].map(([k,l])=>'<button type="button" role="radio" data-fxm="'+k+'" aria-checked="'+(k===v)+'"'+(k===v?' class="on"':"")+'>'+l+'</button>').join("")+'</span>'}
 function gFxSegWire(id){const s=document.getElementById(id);if(!s)return;s.querySelectorAll("[data-fxm]").forEach(b=>b.onclick=()=>{try{localStorage.setItem("o30.fxm",b.dataset.fxm)}catch(e){}
   s.querySelectorAll("[data-fxm]").forEach(x=>{const on=x===b;x.classList.toggle("on",on);x.setAttribute("aria-checked",String(on))});try{window.gFxRefresh&&window.gFxRefresh()}catch(e){}})}
