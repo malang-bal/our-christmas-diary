@@ -366,6 +366,7 @@ body:has(#roomApp:not([hidden])) #fb-out{display:none}
 .ibox .gtip::after{content:"";position:absolute;right:17px;bottom:-4px;width:9px;height:9px;background:inherit;transform:rotate(45deg);border-radius:0 0 2px 0}
 .ibox .gtip.l2::after{right:49px}
 .ibox .gtip.out{animation:gTipOut .24s ease-in forwards}
+.dice.ggl{word-break:keep-all;overflow-wrap:anywhere;max-width:100%;line-height:1.55}.dice.ggl .ggn{white-space:nowrap}.dice.ggl .ggd{display:none}.dice.ggl.two .gga{display:block}.dice.ggl.two .ggd{display:inline}.dice.ggl.two .ggs,.dice.ggl.two .ggt{display:none}.dice.ggl.two .ggb{display:block;margin-top:2px;font-size:15px;line-height:1.45}
 .dice.ggl .ggi{display:inline-flex;vertical-align:-2px;margin-right:4px;color:var(--main)}
 .dice.ggl b{color:var(--main)}
 .dice.ggl.new{animation:gGlIn .55s cubic-bezier(.215,.61,.355,1) both}
@@ -1131,7 +1132,7 @@ html.gmodal{overflow:hidden}@media (hover:hover) and (pointer:fine){html{scrollb
 </script>
 <script>
 /* 새 버전 알림: 올라간 index.html이 바뀌면 상단에 새로고침 안내를 띄워요 */
-const BUILD_ID="1794885459914";
+const BUILD_ID="1794886040493";
 (function(){
   if(!/^https?:/.test(location.protocol))return;
   let shown=false;
@@ -1419,10 +1420,13 @@ const GICO='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="
 let gGift={n:0,opened:false};
 function gGiftLine(m,plain){const nm=esc(realName(m.uid)),g=esc(String(m.gift).slice(0,40));
   if(plain)return '<div class="dice">― '+nm+' 님이 선물을 열었어요 · <b>'+g+'</b> ―</div>';
-  const nw=Date.now()-(m.ts||0)<6000;return '<div class="dice ggl'+(nw?" new":"")+'"><span class="ggi">'+GICO+'</span>― '+nm+' 님이 선물을 열었어요 · <b>'+g+'</b> ―</div>'}
+  const nw=Date.now()-(m.ts||0)<6000;return '<div class="dice ggl'+(nw?" new":"")+'"><span class="gga"><span class="ggi">'+GICO+'</span>― '+nm+' 님이 선물을 <span class="ggn">열었어요<span class="ggd"> ―</span><span class="ggs"> ·</span></span> </span><b class="ggb">'+g+'</b><span class="ggt"> ―</span></div>'}
+/* 한 줄에 들어가면 한 줄, 넘치면 두 줄(윗줄: 누가 열었는지, 아랫줄: 선물 이름) */
+function gGiftFit(root){(root||document).querySelectorAll(".dice.ggl").forEach(el=>{el.classList.remove("two");if(!el.offsetParent)return;const lh=parseFloat(getComputedStyle(el).lineHeight)||20;if(el.getBoundingClientRect().height>lh*1.4)el.classList.add("two")})}
+{let t=0;addEventListener("resize",()=>{clearTimeout(t);t=setTimeout(()=>gGiftFit(document.getElementById("chat")),120)})}
 function gGiftKey(n){return "o30.gtip."+RID+"."+n+"."+me}
 function gTipHide(t,anim){if(!t||t.hidden)return;if(anim&&!gRM()&&!t.classList.contains("out")){t.classList.add("out");setTimeout(()=>{t.hidden=true;t.classList.remove("out")},240)}else if(!anim){t.hidden=true}}
-function gGiftSync(n,ms){if(n!==today)return;const b=$("#ggift");if(!b)return;const op=ms.some(m=>m.gift&&m.uid===me);gGift={n,opened:op};
+function gGiftSync(n,ms){gGiftFit(document.getElementById("chat"));if(n!==today)return;const b=$("#ggift");if(!b)return;const op=ms.some(m=>m.gift&&m.uid===me);gGift={n,opened:op};
   if(b.hidden){b.hidden=false;const ib=b.closest(".ibox");if(ib)ib.classList.add("hasg")}
   b.classList.toggle("done",op);b.setAttribute("aria-label",op?"오늘 선물은 이미 열었어요":"오늘의 선물 열기");
   const t=$("#gtip");if(t){let seen=false;try{seen=localStorage.getItem(gGiftKey(n))==="1"}catch(e){}if(op||seen)gTipHide(t,!t.hidden&&op);else t.hidden=false}}
@@ -1717,7 +1721,8 @@ async function exportPng(n){
     const bcY=SEAM+56,bcH=104;L.bn=bcY+bcH+40;const T1=bcY+bcH+40+48;
     // 채팅
     const CH=T1+40,cp=44;let cy=CH+cp+26+30;const items=[],MAXI=8;
-    for(const m of chat){const mine=m.uid===me;if(m.gift){items.push({m,gift:1,h:44});continue}if(m.dice){items.push({m,dice:1,h:44});continue}
+    for(const m of chat){const mine=m.uid===me;if(m.gift){const a="― "+realName(m.uid)+" 님이 선물을 열었어요",b=String(m.gift).slice(0,40);mg.font="400 24px "+F;const one=mg.measureText(a+" · ").width;mg.font="700 24px "+F;const full=one+mg.measureText(b+" ―").width;
+        if(full<=TW-2*cp){items.push({m,gift:1,h:44});continue}const gl=wrap("700 28px "+F,b,TW-2*cp-40,3,"0px");items.push({m,gift:2,gl,h:30+14+gl.length*38+6});continue}if(m.dice){items.push({m,dice:1,h:44});continue}
       let im=null,lines=[],w=0,h=0;const lab=realName(m.uid)+" · "+gHM(m.ts);
       if(m.emote&&String(m.emote).startsWith("data:")){im=await loadImg(m.emote);w=184;h=20+28+150+18}
       else{const mk=m.emote?{c:"",t:"🖼 이모티콘"}:gMk(m.text),wf=(mk.c==="gbold"?"800":"500")+" 29px "+F;lines=wrap(wf,mk.t,660,6,"-0.3px");mg.font=wf;mg.letterSpacing="-0.3px";const tw=Math.max(...lines.map(l=>mg.measureText(l).width));mg.letterSpacing="0px";mg.font="500 20px "+F;w=Math.max(tw,mg.measureText(lab).width)+52;h=18+26+lines.length*42+16}
@@ -1767,6 +1772,8 @@ async function exportPng(n){
     g.fillStyle=C.mute;g.font="700 26px "+F;g.fillText(n===today?"오늘의 대화":"그날의 대화",TX0+cp,CH+cp+26);
     if(!items.length){g.fillStyle=C.mute;g.font="400 28px "+F;g.textAlign="center";g.fillText("그날은 대화가 없었어요",W/2,CH+cp+26+30+44);g.textAlign="left"}
     for(const it of shown){
+      if(it.gift===2){g.textAlign="center";g.font="400 24px "+F;g.fillStyle=C.mute;g.fillText("― "+realName(it.m.uid)+" 님이 선물을 열었어요 ―",W/2,it.y+30);
+        g.font="700 28px "+F;g.fillStyle=C.main;it.gl.forEach((l,i)=>g.fillText(l,W/2,it.y+30+14+30+i*38));g.textAlign="left";continue}
       if(it.gift){g.font="400 24px "+F;const a="― "+realName(it.m.uid)+" 님이 선물을 열었어요 · ",b=String(it.m.gift).slice(0,40),c=" ―",wa=g.measureText(a).width;g.font="700 24px "+F;const wb=g.measureText(b).width;g.font="400 24px "+F;const wc=g.measureText(c).width;let sx=W/2-(wa+wb+wc)/2;
         g.fillStyle=C.mute;g.fillText(a,sx,it.y+30);g.fillStyle=C.main;g.font="700 24px "+F;g.fillText(b,sx+wa,it.y+30);g.font="400 24px "+F;g.fillStyle=C.mute;g.fillText(c,sx+wa+wb,it.y+30);continue}
       if(it.dice){g.font="400 24px "+F;const a="― "+realName(it.m.uid)+" 님이 주사위를 굴렸어요 · ",b=String(it.m.v),c=" ―",wa=g.measureText(a).width;g.font="700 24px "+F;const wb=g.measureText(b).width;g.font="400 24px "+F;const wc=g.measureText(c).width;let sx=W/2-(wa+wb+wc)/2;
