@@ -511,6 +511,8 @@ body:has(#roomApp:not([hidden])) #fb-out{display:none}
 #roomApp{--paperd:#f2ede6}
 /* 홈 스텁: 색 경계를 점선 한가운데에 맞춰요 (점선이 경계를 덮어요) */
 #roomApp .gseg::before{top:-1px;z-index:2}
+/* 홈 티켓 절취선: 브라우저 점선 대신 직접 그린 무늬(6px 선 · 4px 빈칸) — 음악 칸의 진행선이 이 무늬에 꼭 맞게 겹쳐요 */
+#roomApp .ghome .gseg::before{border-top:0;height:2px;background:repeating-linear-gradient(90deg,var(--perf) 0 6px,transparent 6px 10px)}
 #roomApp .ghome .gseg+.gseg{margin-top:0}
 #roomApp .gcta:hover{text-decoration:none}
 #roomApp .ghome .gend:has(.gcta:hover){filter:brightness(1.05)}
@@ -1139,6 +1141,124 @@ html.gmodal{overflow:hidden}@media (hover:hover) and (pointer:fine){html{scrollb
 #roomApp #view.psay .cbar{gap:10px;margin-top:4px}
 #roomApp #view.psay .card>.row>.av{width:40px;height:40px;font-size:15px;line-height:40px;margin-top:0}
 .hpvt{position:absolute;left:0;right:0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:#fff;opacity:.85;pointer-events:none;letter-spacing:.02em}.hpv{width:100%;max-width:520px;display:flex;flex-direction:column;gap:8px}.hpvl{display:flex;flex-wrap:wrap;justify-content:center;gap:4px 14px;font-size:11.5px;opacity:.7}.hpvl span{display:inline-flex;align-items:center;gap:6px}.hpvl i{width:16px;height:0;border-top:2px dashed currentColor}.hpvl i.pc{border-top-style:solid}.hpvq{font-size:12px;text-align:center;color:var(--main)}.hpvq.bad{color:#c0563a}.hpvr{display:flex;justify-content:space-between;align-items:flex-start}.hpvr>div{display:flex;flex-direction:column;gap:4px}.hpvr b{font-size:11px;font-weight:600;opacity:.6}.hpvr canvas{width:100%!important;max-width:none!important;height:auto!important;border-radius:8px;display:block}
+/* ===== 배경음악 (BGM) — 색은 종이색·메인색·헤더 글자색을 따라가요 =====
+   간격은 4의 배수, 누르는 곳은 40px 이상, 본문 글자 12px 이상
+   A안 확정 (2026-11-19): 홈에서는 티켓의 절취선 한 칸, 누르면 바텀시트(앨범 뒤에서 레코드판이 밀려 나와요).
+   YouTube 화면은 보이지 않게 두고(재생은 계속), 앨범 자리에는 지금 곡 썸네일을 써요. */
+#gyt{width:200px;height:200px}#gyt iframe{display:block;width:200px;height:200px;border:0}
+#gyt.gyt-off{position:fixed;left:0;top:0;opacity:0;pointer-events:none;z-index:-1}
+.bm-eq{display:inline-flex;align-items:flex-end;gap:2px;height:16px;flex:none}
+.bm-eq i{display:block;width:3px;height:16px;border-radius:1px;background:currentColor;transform-origin:50% 100%;transform:scaleY(.3);animation:bmeqa 1.1s ease-in-out infinite;animation-play-state:paused}
+.bm-eq i:nth-child(2){animation-duration:.9s;animation-delay:-.3s}.bm-eq i:nth-child(3){animation-duration:1.3s;animation-delay:-.6s}.bm-eq i:nth-child(4){animation-duration:1s;animation-delay:-.15s}.bm-eq i:nth-child(5){animation-duration:1.2s;animation-delay:-.45s}
+.bm-eq{transition:opacity .24s}#gbgmc:not(.on) .bm-eq,#gbgmb:not(.on) .bm-eq,#gbsh:not(.on) .bm-eq{opacity:.55}
+#gbgmc.on .bm-eq i,#gbgmb.on .bm-eq i,#gbsh.on .bm-eq i{animation-play-state:running}
+/* 레코드판 (홈 칸·바텀시트 공통): 한쪽에 빛이 맺히고 라벨에 줄무늬가 있어서 도는 게 보여요 */
+.bm-vin{position:relative;border-radius:50%;background:repeating-radial-gradient(circle at 50% 50%,#1c1c1d 0 2px,#2a2a2c 2px 4px);display:flex;align-items:center;justify-content:center;animation:gbspin 6s linear infinite;animation-play-state:paused;box-shadow:0 4px 12px rgba(0,0,0,.25)}
+.bm-vin::after{content:"";position:absolute;inset:0;border-radius:50%;pointer-events:none;background:conic-gradient(from 20deg,transparent 0deg,rgba(255,255,255,.17) 26deg,rgba(255,255,255,.05) 50deg,transparent 78deg,transparent 200deg,rgba(255,255,255,.09) 222deg,transparent 250deg)}
+.bm-vin i{position:relative;width:35%;height:35%;border-radius:50%;background:radial-gradient(circle,var(--gpaper,#fbf6ee) 0 11%,var(--gmainink,var(--main,#c8352b)) 13%)}
+.bm-vin i::before{content:"";position:absolute;left:30%;right:30%;top:16%;height:7%;min-height:2px;border-radius:2px;background:rgba(255,255,255,.5)}
+#gbgmc.on .bm-vin,#gbsh.on .bm-vin{animation-play-state:running}
+.bm-cvi{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .3s}.bm-cvi.ok{opacity:1}
+/* ---- 홈: 티켓의 절취선 한 칸 (.gseg 모양을 그대로 써요) ---- */
+#gbgmc{--c:var(--paper);display:flex;align-items:center;gap:4px;padding:12px 6px 12px 16px;min-height:68px;color:var(--txt);box-sizing:border-box}
+#gbgmc[hidden]{display:none}
+/* 위쪽 절취선이 재생 위치만큼 한 칸씩 메인색으로 켜져요 (빈칸에는 칠하지 않아요) */
+#gbgmc .bm-pg{position:absolute;left:12px;right:12px;top:-1px;height:2px;pointer-events:none;z-index:3}
+#gbgmc .bm-pg b{display:block;height:2px;background:repeating-linear-gradient(90deg,var(--gmainink,var(--main,#c8352b)) 0 6px,transparent 6px 10px);clip-path:inset(0 100% 0 0)}
+#gbgmc .bm-open{flex:1;min-width:0;min-height:48px;display:flex;align-items:center;gap:12px;border:0;background:none;padding:0;font:inherit;color:inherit;text-align:left;cursor:pointer;border-radius:8px;-webkit-tap-highlight-color:transparent}
+#gbgmc .bm-sl{position:relative;width:62px;height:44px;flex:none}
+#gbgmc .bm-cv{position:absolute;left:0;top:0;z-index:1;width:44px;height:44px;border-radius:4px;overflow:hidden;background:#2a2a2c;color:rgba(255,255,255,.55);display:flex;align-items:center;justify-content:center;box-shadow:2px 2px 0 color-mix(in srgb,var(--txt,#2b211e) 16%,transparent)}
+#gbgmc .bm-dw{position:absolute;left:4px;top:2px;transition:transform .6s cubic-bezier(.22,.8,.3,1)}
+#gbgmc.on .bm-dw{transform:translateX(16px)}
+#gbgmc .bm-vin{width:40px;height:40px;box-shadow:none}
+#gbgmc .bm-tx{flex:1;display:flex;flex-direction:column;gap:2px;min-width:0}
+#gbgmc .bm-t{font-size:15px;line-height:1.35;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#gbgmc .bm-k{font-size:12px;line-height:1.4;color:var(--mute2,#605856);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#gbgmc .bm-k:empty{display:none}
+#gbgmc .bm-eq{color:var(--gmainink,var(--main,#c8352b));height:14px;margin:0 4px}#gbgmc .bm-eq i{height:14px}
+#gbgmc .bm-pp{width:44px;height:44px;border:0;border-radius:50%;background:none;color:inherit;display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;flex:none}
+#gbgmc .bm-pp svg{width:20px;height:20px}
+#gbgmc[data-st=loading] .bm-t,#gbgmb[data-st=loading] .bm-pt,#gbsh[data-st=loading] .bs-t{animation:bmld 1.4s ease-in-out infinite}@keyframes bmld{50%{opacity:.5}}
+#gbgmc[data-st=blocked] .bm-t,#gbgmc[data-st=blocked] .bm-pp,#gbsh[data-st=blocked] .bs-pp{color:var(--gmainink,var(--main,#c8352b))}
+@media (hover:hover){#gbgmc .bm-pp:hover,#gbsh button:not(:disabled):hover{background:color-mix(in srgb,var(--gtx,#2b211e) 7%,transparent)}#gbsh .bs-pp:hover{background:var(--gtx,#2b211e)}}
+#gbgmc button,#gbgmb button,#gbsh button{transition:background-color .16s,transform .08s,opacity .16s}
+#gbgmc .bm-pp:active,#gbgmb .bm-pp:active,#gbsh button:not(:disabled):active{transform:scale(.9)}#gbgmc .bm-open:active{transform:scale(.985)}
+#gbgmc button:focus-visible,#gbgmb button:focus-visible,#gbsh button:focus-visible,#gbsh .bs-tr:focus-visible{outline:2px solid currentColor;outline-offset:1px}
+/* ---- 바텀시트 ---- */
+#gbsh{position:fixed;inset:0;z-index:90;color:var(--gtx,#2b211e);letter-spacing:-.01em}
+#gbsh[hidden]{display:none}
+#gbsh .bs-bd{position:absolute;inset:0;background:rgba(0,0,0,.5)}
+#gbsh .bs-pn{position:absolute;left:0;right:0;bottom:0;max-width:560px;margin:0 auto;box-sizing:border-box;background:var(--gpaper,#fbf6ee);border-radius:20px 20px 0 0;padding:0 20px calc(20px + env(safe-area-inset-bottom,0px));box-shadow:0 -10px 30px rgba(0,0,0,.25);max-height:calc(100% - 24px);overflow:auto}
+#gbsh .bs-gr{height:20px;display:flex;align-items:center;justify-content:center;touch-action:none;cursor:grab;margin:0 -20px}
+#gbsh .bs-gr::before{content:"";width:40px;height:4px;border-radius:2px;background:var(--gperf,#b9ad9a)}
+#gbsh .bs-h{display:flex;align-items:center;gap:8px;min-height:40px;font-size:12px;font-weight:700;color:var(--gmute,#605856)}
+#gbsh .bs-h .bm-eq{color:var(--gmainink,var(--main,#c8352b));height:12px}#gbsh .bs-h .bm-eq i{height:12px}
+#gbsh .bs-k{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#gbsh .bs-n{font-variant-numeric:tabular-nums;flex:none;margin-left:-4px}#gbsh .bs-n:not(:empty)::before{content:"· "}
+#gbsh button{width:44px;height:44px;border:0;border-radius:50%;background:none;color:inherit;display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;flex:none}
+#gbsh button:disabled{opacity:.3;cursor:default}
+#gbsh .bs-x{margin-left:auto;margin-right:-10px;color:var(--gmute,#605856)}
+#gbsh .bs-st{position:relative;width:276px;max-width:100%;height:176px;margin:4px auto 18px}
+#gbsh .bs-cv{position:absolute;left:0;top:0;z-index:1;width:176px;height:176px;border-radius:6px;overflow:hidden;background:#2a2a2c;color:rgba(255,255,255,.5);display:flex;align-items:center;justify-content:center;box-shadow:0 14px 28px rgba(0,0,0,.28)}
+#gbsh .bs-dw{position:absolute;left:124px;top:12px}
+#gbsh .bm-vin{width:152px;height:152px}
+#gbsh .bs-t{display:block;font-size:19px;line-height:1.35;font-weight:700;word-break:keep-all;overflow-wrap:anywhere;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+#gbsh .bs-pl{display:block;font-size:13px;line-height:1.4;color:var(--gmute,#605856);margin-top:2px}#gbsh .bs-pl:empty{display:none}
+#gbsh .bs-tr{height:24px;position:relative;margin-top:12px;cursor:pointer;touch-action:none}
+#gbsh .bs-tr::before{content:"";position:absolute;left:0;right:0;top:10.5px;height:3px;border-radius:2px;background:var(--gperf,#d9cfbf)}
+#gbsh .bs-tr i{position:absolute;left:0;top:10.5px;height:3px;border-radius:2px;width:0;background:var(--gtx,#2b211e)}
+#gbsh .bs-tr b{position:absolute;left:0;top:6px;width:12px;height:12px;margin-left:-6px;border-radius:50%;background:var(--gpaper,#fbf6ee);border:2px solid var(--gtx,#2b211e);box-sizing:border-box}
+#gbsh .bs-tr.run i{transition:width .5s linear}#gbsh .bs-tr.run b{transition:left .5s linear,transform .12s}#gbsh .bs-tr.jump i,#gbsh .bs-tr.jump b{transition:none}#gbsh .bs-tr:active b{transform:scale(1.2)}
+#gbsh .bs-tm{display:flex;justify-content:space-between;font-size:12px;color:var(--gmute,#605856);font-variant-numeric:tabular-nums}
+#gbsh .bs-ctl{display:flex;align-items:center;justify-content:center;gap:28px;margin-top:6px}
+#gbsh .bs-pp{width:60px;height:60px;background:var(--gtx,#2b211e);color:var(--gpaper,#fbf6ee)}#gbsh .bs-pp svg{width:26px;height:26px}
+#gbsh[data-st=blocked] .bs-pp{background:var(--gmainink,var(--main,#c8352b));color:#fff}
+/* 열 때: 시트가 올라오고 → 앨범이 자리 잡고 → 앨범 뒤에서 레코드판이 돌며 밀려 나와요. 닫을 때는 레코드판이 먼저 들어가요 */
+#gbsh.in .bs-bd{animation:bsBdIn .24s ease-out both}
+#gbsh.in .bs-pn{animation:bsUp .36s cubic-bezier(.22,.9,.3,1) both}
+#gbsh.in .bs-cv{animation:bsCv .36s cubic-bezier(.22,.9,.3,1) .08s both}
+#gbsh.in .bs-dw{animation:bsLpOut .75s cubic-bezier(.2,.85,.25,1) .3s both}
+#gbsh.in .bs-bt{animation:bsTx .3s ease-out .42s both}
+#gbsh.out .bs-dw{animation:bsLpIn .22s cubic-bezier(.5,0,.75,0) both}
+#gbsh.out .bs-pn{animation:bsDown .3s cubic-bezier(.5,0,.75,0) .16s both}
+#gbsh.out .bs-bd{animation:bsBdOut .3s ease-in .14s both}
+@keyframes bsBdIn{from{opacity:0}}@keyframes bsBdOut{to{opacity:0}}
+@keyframes bsUp{from{transform:translateY(100%)}}@keyframes bsDown{to{transform:translateY(100%)}}
+@keyframes bsCv{from{transform:translateY(14px) scale(.96);opacity:0}}
+@keyframes bsLpOut{0%{transform:translateX(-112px) rotate(-120deg);opacity:0}25%{opacity:1}100%{transform:none;opacity:1}}
+@keyframes bsLpIn{to{transform:translateX(-112px) rotate(-90deg)}}
+@keyframes bsTx{from{opacity:0;transform:translateY(6px)}}
+@media (prefers-reduced-motion:reduce){
+  #gbsh.in .bs-pn,#gbsh.in .bs-cv,#gbsh.in .bs-dw,#gbsh.in .bs-bt,#gbsh.out .bs-dw{animation:bsBdIn .2s ease-out both}
+  #gbsh.out .bs-pn{animation:bsBdOut .2s ease-in both}
+  .bm-vin{animation-duration:24s}#gbgmc .bm-dw{transition:none}}
+/* 상단 고정 줄: 화면 전환 효과와 상관없이 늘 그 자리에 (view-transition 이름을 따로 주고 움직임 없음) */
+#gbgmb{position:fixed;top:0;left:0;right:0;margin:0 auto;max-width:640px;height:calc(48px + env(safe-area-inset-top,0px));padding:env(safe-area-inset-top,0px) 12px 0;box-sizing:border-box;display:flex;align-items:center;z-index:50;pointer-events:none;color:var(--homec,#fff);view-transition-name:gbgm}
+#gbgmb[hidden]{display:none}
+#gbgmb{transition:background-color .16s}#gbgmb.sc{background:var(--bgc,#0f3b2a)}
+::view-transition-group(gbgm),::view-transition-new(gbgm){animation:none}::view-transition-old(gbgm){display:none}
+#gbgmb .bm-pill{pointer-events:auto;flex:1;min-width:0;height:36px;border-radius:18px;border:1px solid color-mix(in srgb,currentColor 38%,transparent);display:flex;align-items:center;gap:10px;padding:0 3px 0 14px;font-size:13px;line-height:1;box-sizing:border-box}
+#gbgmb .bm-pt{flex:1;display:block;min-width:0;height:100%;border:0;background:none;color:inherit;font:inherit;padding:0;overflow:hidden;cursor:pointer;text-align:left}
+#gbgmb .bm-pt:disabled{cursor:default}
+#gbgmb .bm-pp{width:30px;height:30px;flex:none;border:0;border-radius:50%;background:none;color:inherit;display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0}
+#gbgmb .bm-pp::after{content:"";position:absolute;width:44px;height:44px}
+#gbgmb .bm-pp{position:relative}
+#gbgmb .bm-eq{height:14px}#gbgmb .bm-eq i{height:14px;width:2.5px}
+#gbgmb .bm-mq{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;line-height:34px}
+#gbgmb .bm-pt.run{-webkit-mask-image:linear-gradient(90deg,transparent,#000 10px,#000 calc(100% - 14px),transparent);mask-image:linear-gradient(90deg,transparent,#000 10px,#000 calc(100% - 14px),transparent)}
+#gbgmb .bm-pt.run .bm-mq{display:inline-flex;overflow:visible;text-overflow:clip;animation:bmmq var(--mqd,10s) linear infinite;padding-left:10px}
+#gbgmb .bm-pt.run .bm-mq>span{padding-right:36px;flex:none}
+@keyframes bmmq{0%,8%{transform:translateX(0)}100%{transform:translateX(var(--mqx,0))}}
+/* 고정 줄이 있을 때: 문답 목록은 그만큼 내리고, 내 답변의 저장 줄(상단 고정)은 고정 줄 바로 아래에 붙어요 */
+html.gbgm-m #mainApp{padding-top:calc(var(--gbgm-mp,16px) + 40px)}
+html.gbgm-on .savebar{top:calc(48px + env(safe-area-inset-top,0px))}
+/* 하루 보기(오늘 문답)는 맨 위에 이전·제목·다음 줄이 있어서, 고정 줄 높이만큼 내려요 */
+html.gbgm-on #roomApp[data-sel="1"]{padding-top:calc(44px + env(safe-area-inset-top,0px))}
+html.gbgm-on{scroll-padding-top:calc(56px + env(safe-area-inset-top,0px))}
+.bm-gmf{transition:color .16s}.bm-gmf.ok{color:#2f6b4f}.bm-gmf.bad{color:#c8352b}.bm-gmf:empty{display:none}
+.bm-vol{display:flex;align-items:center;gap:12px;margin-top:12px}.bm-vol b{font-size:14px}.bm-vol input{flex:1;accent-color:var(--main,#c8352b)}.bm-vol span{min-width:26px;text-align:right;font-variant-numeric:tabular-nums;color:var(--mute2,#605856)}.bm-vol.off{opacity:.45}
+@keyframes gbspin{to{transform:rotate(360deg)}}
+@keyframes bmeqa{0%,100%{transform:scaleY(.3)}50%{transform:scaleY(1)}}
 </style>
 </head>
 <body>
@@ -1210,7 +1330,7 @@ html.gmodal{overflow:hidden}@media (hover:hover) and (pointer:fine){html{scrollb
 </script>
 <script>
 /* 새 버전 알림: 올라간 index.html이 바뀌면 상단에 새로고침 안내를 띄워요 */
-const BUILD_ID="1795008241710";
+const BUILD_ID="1795203039837";
 (function(){
   if(!/^https?:/.test(location.protocol))return;
   let shown=false;
@@ -1305,7 +1425,7 @@ function render(soft){try{gClosedBar()}catch(e){}document.body.dataset.tab=tab;i
   if(!cfg){$("#sub").textContent="불러오는 중…";return}if(gTodayNext&&gTodayNext===RID){gTodayNext=null;if(today>=1&&today<=Q.length){tab="cal";sel=today}}try{gBootReady("roomApp",String(RID))}catch(e){}if(gRoomWaitId===RID&&members[me]){gRoomReveal(RID);return}
   const total=Q.length;
   $("#sub").textContent=today<1?"시작까지 "+(1-today)+"일 남았어요":today>total?total+"일을 모두 마쳤어요 🎉":today+"일째 · "+members[me]?.name+(partner()?" & "+nameOf(partner()):" (상대를 기다리는 중)");
-  gChrome();$("#tabs").innerHTML=[["home","홈"],["cal","캘린더"],["write","내 답변"],["say","한마디"],["more","설정"]].map(([k,l])=>'<button class="'+(tab===k?"on":"")+'" data-t="'+k+'"'+(tab===k?' aria-current="page"':"")+'><span class="tl">'+l+"</span>"+(k==="cal"&&calDot?'<i class="rdot"></i>':"")+"</button>").join("");
+  gChrome();try{window.gBgmSync&&gBgmSync()}catch(e){}$("#tabs").innerHTML=[["home","홈"],["cal","캘린더"],["write","내 답변"],["say","한마디"],["more","설정"]].map(([k,l])=>'<button class="'+(tab===k?"on":"")+'" data-t="'+k+'"'+(tab===k?' aria-current="page"':"")+'><span class="tl">'+l+"</span>"+(k==="cal"&&calDot?'<i class="rdot"></i>':"")+"</button>").join("");
   document.querySelectorAll("#tabs button").forEach(b=>b.onclick=()=>gTabGo(b.dataset.t));gTabInd();
   if(soft)return;
   const vw=$("#view"),vk=tab+"|"+sel,van=vk!==lastK;lastK=vk;if(van)document.body.style.minHeight="";
@@ -1363,7 +1483,7 @@ function viewHome(){const T=Q.length;
   const cta=today<1?'<div class="gcta off">시작까지 '+(1-today)+'일 남았어요</div>':'<button class="gcta" id="gopen" type="button">'+(today>T?"지난 문답 모아보기":"오늘 문답 확인하기")+GAR+'</button>';
   $("#view").innerHTML='<div class="ghome"><div class="gseg gsay" id="hs1" role="button" tabindex="0" hidden></div><div class="gseg gsay" id="hs2" role="button" tabindex="0" hidden></div><div class="gseg gend">'+cta+'</div></div>';
   const o=$("#gopen");if(o)o.onclick=()=>gTear(o,()=>{tab="cal";sel=today>=1&&today<=T?today:null;stopChat();render();window.scrollTo(0,0)});
-  homeSays()}
+  homeSays();try{window.gBgmMount&&gBgmMount()}catch(e){}}
 /* 홈 한마디 순서 (이 기기에서만): "p" = 상대 먼저(기본), "me" = 나 먼저 */
 function gSayOrd(){try{return localStorage.getItem("o30.sayo")==="me"?"me":"p"}catch(e){return"p"}}
 function gSayOrdSet(v){try{localStorage.setItem("o30.sayo",v)}catch(e){}}
@@ -1506,8 +1626,8 @@ function sgSendUI(n){const p=partner();if(!p||!n)return;const pn=realName(p),g=s
       try{await db.doc(P("sgifts/"+g.id)).delete();closeModal();gToastMsg("선물을 뺐어요 · 남은 선물 "+Math.min(SG_MAX,left+1)+" / "+SG_MAX)}catch(e){r.disabled=false;r.textContent="선물 빼기";gToastMsg("빼지 못했어요 · 연결을 확인해 주세요")}}})}
 function viewMore(){
   if(!gMemOk){$("#view").innerHTML='<div class="card"><span class="note">불러오는 중…</span></div>';return}
-  $("#view").innerHTML=pairCard()+settingsTop()+roomSetCard()+notifCard()+'<div class="card"><div class="gfxm"><b>홈 한마디 순서</b>'+gSayOrdSeg("gsao")+'</div><p class="note gfxmn">이 기기에서만 적용돼요. 홈에서 한마디를 꾹 눌러도 위아래를 바꿀 수 있어요.</p></div><div class="card"><div class="gfxm"><b>배경 움직임</b>'+gFxSeg("gfxm-r")+'</div><p class="note gfxmn">이 기기에서만 적용돼요. 조용히는 입자 수와 속도를 줄여요.</p></div><div class="card"><div class="row" style="justify-content:space-between;align-items:center"><b>계정</b><button class="btn" id="glo" type="button">로그아웃</button></div><p class="note" style="margin:8px 0 0">'+kDay(CONF.start)+' 시작 · '+(closeMs()?kDate(closeMs()-1)+' 문답 종료 · ':"")+(CONF.deleteOn?kDay(CONF.deleteOn)+' 사이트와 기록 전체 삭제':"")+'</p></div><div class="gcut" aria-hidden="true"></div><button class="btn pri gbkb" id="bk" type="button">HTML 백업</button>';
-  wireSettings();wireNotif();wirePair();gFxSegWire("gfxm-r");gSayOrdSegWire("gsao");$("#bk").onclick=()=>buildBackup();{const g=$("#glo");if(g)g.onclick=()=>{if(confirm("로그아웃할까요?"))window.gSignOut()}}
+  $("#view").innerHTML=pairCard()+settingsTop()+roomSetCard()+(window.gBgmCard?gBgmCard():"")+notifCard()+'<div class="card"><div class="gfxm"><b>홈 한마디 순서</b>'+gSayOrdSeg("gsao")+'</div><p class="note gfxmn">이 기기에서만 적용돼요. 홈에서 한마디를 꾹 눌러도 위아래를 바꿀 수 있어요.</p></div><div class="card"><div class="gfxm"><b>배경 움직임</b>'+gFxSeg("gfxm-r")+'</div><p class="note gfxmn">이 기기에서만 적용돼요. 조용히는 입자 수와 속도를 줄여요.</p></div><div class="card"><div class="row" style="justify-content:space-between;align-items:center"><b>계정</b><button class="btn" id="glo" type="button">로그아웃</button></div><p class="note" style="margin:8px 0 0">'+kDay(CONF.start)+' 시작 · '+(closeMs()?kDate(closeMs()-1)+' 문답 종료 · ':"")+(CONF.deleteOn?kDay(CONF.deleteOn)+' 사이트와 기록 전체 삭제':"")+'</p></div><div class="gcut" aria-hidden="true"></div><button class="btn pri gbkb" id="bk" type="button">HTML 백업</button>';
+  wireSettings();wireNotif();wirePair();window.gBgmWire&&gBgmWire();gFxSegWire("gfxm-r");gSayOrdSegWire("gsao");$("#bk").onclick=()=>buildBackup();{const g=$("#glo");if(g)g.onclick=()=>{if(confirm("로그아웃할까요?"))window.gSignOut()}}
 }
 const bg=id=>{const c=members[id]?.color;return c?"background:"+c+"4d":""};
 const blob=id=>String(id||"");const emoSrc=blob;
@@ -1747,7 +1867,7 @@ function gPop(o){return new Promise(res=>{const w=document.createElement("div");
   w.onclick=e=>{if(e.target===w)done(null)};w.querySelectorAll("[data-i]").forEach(b=>b.onclick=()=>done(o.btns[+b.dataset.i].v));
   document.body.appendChild(w);const f=w.querySelector(".btn.pri")||w.querySelector(".btn");if(f)f.focus()})}
 function wireSettings(){wireAcct();wireRoomSet();
-  document.querySelectorAll("[data-edit]").forEach(b=>b.onclick=()=>{if(editing==="room"&&b.dataset.edit==="room"&&window.rsSave){window.rsSave();return}if(editing==="profile"&&b.dataset.edit==="profile"&&window.profSave){window.profSave();return}pend={};editing=editing===b.dataset.edit?null:b.dataset.edit;render()});
+  document.querySelectorAll("[data-edit]").forEach(b=>b.onclick=()=>{if(editing==="room"&&b.dataset.edit==="room"&&window.rsSave){window.rsSave();return}if(editing==="bgm"&&b.dataset.edit==="bgm"&&window.bgSave){window.bgSave();return}if(editing==="profile"&&b.dataset.edit==="profile"&&window.profSave){window.profSave();return}pend={};editing=editing===b.dataset.edit?null:b.dataset.edit;render()});
   /* 취소: 고친 내용은 버리고 저장된 상태로 (색·종이 미리보기도 되돌림) */
   document.querySelectorAll("[data-cancel]").forEach(b=>b.onclick=()=>{pend={};rsPal=null;ppSel=null;window.rsSave=null;window.profSave=null;editing=null;render()});
   if($("#pn")){
@@ -2749,7 +2869,7 @@ window.setFx=setF;
 })();
 
 /* ===== 부팅 · 코드 입력 · 시작 화면 ===== */
-const shell=m=>{$("#mainApp").innerHTML=m+$("#roomApp .gcredit").outerHTML;$("#mainApp").hidden=false;$("#roomApp").hidden=true;try{gBootDone()}catch(e){}};
+const shell=m=>{$("#mainApp").innerHTML=m+$("#roomApp .gcredit").outerHTML;$("#mainApp").hidden=false;$("#roomApp").hidden=true;try{gBootDone()}catch(e){}try{window.gBgmSync&&gBgmSync()}catch(e){}};
 const TITLE="Our Christmas Diary";
 const msgBox=t=>shell('<div class="sheet ceil mhead"><h1>'+TITLE+'</h1><p class="note">'+t+'</p></div>');
 const closeMs=()=>CONF&&CONF.closeAt&&CONF.closeAt.toMillis?CONF.closeAt.toMillis():0;
@@ -2929,8 +3049,9 @@ function openRoom(rid,pv){
 function secCard(k,title,view,edit){return '<div class="card"><div class="row" style="justify-content:space-between;align-items:center"><b>'+title+'</b>'+(CLOSED?"":(editing===k?'<span class="row" style="gap:6px;flex-wrap:nowrap"><button class="btn" data-cancel="'+k+'">취소</button><button class="btn pri" data-edit="'+k+'">완료</button></span>':'<button class="btn" data-edit="'+k+'">편집</button>'))+'</div>'+(editing===k&&!CLOSED?edit:view)+'</div>'}
 const endOf=(st,n)=>{if(!st)return"";const [y,m,d]=st.split("-").map(Number);return ymd(new Date(y,m-1,d+n-1))};
 /* 알림 · 알림음 */
-const NQ=["반짝 개봉","포장 뜯기","오르골","종소리","팝업 1","팝업 2","팝업 3"],NC=["뽁","띠링","삐록","톡","멀티팝 1","멀티팝 2","멀티팝 3"],NDEF={q:false,c:false,snd:true,qs:0,cs:0};
+const NQ=["반짝 개봉","포장 뜯기","오르골","종소리","팝업 1","팝업 2","팝업 3"],NC=["뽁","띠링","삐록","톡","멀티팝 1","멀티팝 2","멀티팝 3"],NDEF={q:false,c:false,snd:true,qs:0,cs:0,vol:100};
 let NP=(()=>{try{return{...NDEF,...JSON.parse(localStorage.getItem("notif")||"{}")}}catch(e){return{...NDEF}}})();
+const nVol=()=>Math.max(0,Math.min(100,+NP.vol>=0?+NP.vol:100))/100;
 const nSave=()=>{try{localStorage.setItem("notif",JSON.stringify(NP))}catch(e){}};
 let AC=null,nBase={};
 const actx=()=>{try{if(!AC)AC=new(window.AudioContext||window.webkitAudioContext)();if(AC.state==="suspended")AC.resume();return AC}catch(e){return null}};
@@ -2940,7 +3061,7 @@ const SFX={q:["SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjYwLjE2LjEwMAAAAAAAAAAAAAAA//tww
 function sfx(k,j,vol){const a=actx();if(!a||!SFX[k]||!SFX[k][j])return;const id=k+j;
  if(!SFXB[id])SFXB[id]=new Promise((ok,no)=>{const bin=Uint8Array.from(atob(SFX[k][j]),c=>c.charCodeAt(0));a.decodeAudioData(bin.buffer,ok,no)}).catch(()=>{delete SFXB[id];return null});
  SFXB[id].then(buf=>{if(!buf)return;const s=a.createBufferSource(),g=a.createGain();g.gain.value=vol||.8;s.buffer=buf;s.connect(g);g.connect(a.destination);s.start()})}
-function snd(kind,i){const a=actx();if(!a||i<0)return;if(i>=4){sfx(kind,i-4,.56);return}const t=a.currentTime+.03,out=a.createGain();out.gain.value=.55;out.connect(a.destination);
+function snd(kind,i){const a=actx();if(!a||i<0)return;const nv=nVol();if(!nv)return;if(i>=4){sfx(kind,i-4,.56*nv);return}const t=a.currentTime+.03,out=a.createGain();out.gain.value=.55*nv;out.connect(a.destination);
   const tone=(f,s,d,ty,g,f2)=>{const o=a.createOscillator(),e=a.createGain();o.type=ty||"sine";o.frequency.setValueAtTime(f,t+s);if(f2)o.frequency.exponentialRampToValueAtTime(f2,t+s+d);e.gain.setValueAtTime(.0001,t+s);e.gain.exponentialRampToValueAtTime(g||.4,t+s+.01);e.gain.exponentialRampToValueAtTime(.0001,t+s+d);o.connect(e);e.connect(out);o.start(t+s);o.stop(t+s+d+.05)};
   const noise=(s,d,f1,f2,g)=>{const n=Math.floor(a.sampleRate*d),b=a.createBuffer(1,n,a.sampleRate),x=b.getChannelData(0);for(let k=0;k<n;k++)x[k]=Math.random()*2-1;const sr=a.createBufferSource();sr.buffer=b;const bp=a.createBiquadFilter();bp.type="bandpass";bp.Q.value=2;bp.frequency.setValueAtTime(f1,t+s);bp.frequency.exponentialRampToValueAtTime(f2,t+s+d);const e=a.createGain();e.gain.setValueAtTime(g,t+s);e.gain.exponentialRampToValueAtTime(.0001,t+s+d);sr.connect(bp);bp.connect(e);e.connect(out);sr.start(t+s)};
   if(kind==="q"){
@@ -2971,7 +3092,8 @@ function notifCard(){const sw=(k,v)=>'<button class="sw'+(v?" on":"")+'" data-ns
     '<div class="nrow'+(NP.c?"":" off")+'"><div><b>채팅 알림 받기</b><div class="note">바로 확인하지 못한 새 채팅이 있을 때</div></div>'+sw("c",NP.c)+'</div>'+
     '<p class="note" style="margin:4px 0 0">알림은 이 사이트가 열려 있을 때만 와요.</p><p class="note" id="nst" style="margin:4px 0 0"></p><hr class="nhr">'+
     '<div class="nrow'+(on?"":" off")+'"><div><b>알림음</b></div>'+sw("snd",on)+'</div>'+
-    '<div class="nfold'+(on?" open":"")+'"><div class="nin">'+sub("qs","문답 알림음",NQ,NP.qs)+sub("cs","채팅 알림음",NC,NP.cs)+'</div></div></div></div></div>'}
+    '<div class="nfold'+(on?" open":"")+'"><div class="nin">'+sub("qs","문답 알림음",NQ,NP.qs)+sub("cs","채팅 알림음",NC,NP.cs)+
+    '<div class="bm-vol nvol"><b>음량</b><input type="range" id="n-v" min="0" max="100" step="5" value="'+Math.round(nVol()*100)+'" aria-label="알림음 음량"><span id="n-vn">'+Math.round(nVol()*100)+'</span></div></div></div></div></div></div>'}
 function gNOpen(){try{return localStorage.getItem("o30.nopen")==="1"}catch(e){return false}}
 function wireNotif(){const c=$("#ncard");if(!c)return;{const h=c.querySelector(".nhd");if(h)h.onclick=()=>{const op=!c.querySelector(".ncol").classList.contains("open");c.querySelector(".ncol").classList.toggle("open",op);h.setAttribute("aria-expanded",op);try{localStorage.setItem("o30.nopen",op?"1":"0")}catch(e){}}}const redraw=msg=>{c.outerHTML=notifCard();wireNotif();if(msg){const s=$("#nst");if(s)s.textContent=msg}};
   c.querySelectorAll("[data-nsw]").forEach(b=>b.onclick=async()=>{const k=b.dataset.nsw;if(k==="snd"){NP.snd=!NP.snd;if(NP.snd&&NP.qs<0&&NP.cs<0){NP.qs=0;NP.cs=0;c.querySelectorAll("select[data-nk]").forEach(o=>{o.value="0"});c.querySelectorAll(".nsub").forEach(n=>n.classList.remove("mute"));c.querySelectorAll(".pl").forEach(p=>p.disabled=false)}nSave();b.classList.toggle("on",NP.snd);b.setAttribute("aria-checked",NP.snd);b.closest(".nrow").classList.toggle("off",!NP.snd);c.querySelector(".nfold").classList.toggle("open",NP.snd);return}
@@ -2980,7 +3102,10 @@ function wireNotif(){const c=$("#ncard");if(!c)return;{const h=c.querySelector("
     if(!ok){redraw("브라우저(또는 휴대폰) 설정에서 이 사이트의 알림을 허용해야 켤 수 있어요");return}
     NP[k]=true;nSave();redraw()});
   c.querySelectorAll("select[data-nk]").forEach(o=>o.onchange=()=>{const k=o.dataset.nk,i=+o.value;NP[k]=i;nSave();redraw();if(i>=0)snd(k==="qs"?"q":"c",i);else if(NP.qs<0&&NP.cs<0)setTimeout(()=>{if(NP.snd&&NP.qs<0&&NP.cs<0){const sb=$("[data-nsw=snd]");if(sb)sb.click()}},400)});
-  c.querySelectorAll(".pl").forEach(b=>b.onclick=()=>{const k=b.dataset.np;if(NP[k]>=0)snd(k==="qs"?"q":"c",NP[k])})}
+  c.querySelectorAll(".pl").forEach(b=>b.onclick=()=>{const k=b.dataset.np;if(NP[k]>=0)snd(k==="qs"?"q":"c",NP[k])});
+  /* 알림음 음량: 끄는 대로 숫자가 바뀌고, 손을 떼면 지금 고른 알림음으로 들려줘요 (이 기기에서만) */
+  const nv=$("#n-v");if(nv){nv.oninput=()=>{NP.vol=+nv.value;$("#n-vn").textContent=nv.value;try{localStorage.setItem("notif",JSON.stringify(NP))}catch(e){}};
+    nv.onchange=()=>{if(NP.qs>=0)snd("q",NP.qs);else if(NP.cs>=0)snd("c",NP.cs)}}}
 function roomSetCard(){const c=cfg||{},pal={...DEF,...(c.palette||{})},palE={...pal,...(rsPal||{})};
   const view='<p class="note" style="margin:8px 0 0"><b>'+esc(c.title||"")+'</b>'+(c.sub?' · '+esc(c.sub):"")+'<br>시작일 '+esc(c.start||"")+' · 마지막 날 '+esc(endOf(c.start,(c.q||[]).length))+' · 배경 효과 '+esc((FXI[c.fx||"snow"]||FXI.snow)[0])+'</p><div class="chips">'+Object.keys(PALN).map(k=>'<span class="chipw"><span class="chip" style="background:'+pal[k]+'"></span><small>'+PALN[k].split(" ")[0]+'</small></span>').join("")+'<span class="chipw"><span class="chip" style="background:'+(PAPERS[c.paper]||PAPERS.cream).c.paper+';box-shadow:inset 0 0 0 1px rgba(0,0,0,.15)"></span><small>종이 · '+(PAPERS[c.paper]||PAPERS.cream).n+'</small></span></div>';
   const edit='<p class="note" style="margin:8px 0 0">제목·부제·질문은 모든 문답이 함께 써요.</p><div class="note" style="margin-top:10px">컬러 팔레트</div><span id="rs-on" hidden></span>'+palInputs("rs",palE)+'<div class="note" style="margin-top:10px">종이</div><div class="ppk" id="rs-pp">'+ppPicker(PAPERS[c.paper]?c.paper:"cream")+'</div><div class="note" style="margin-top:6px">배경 움직임 효과</div>'+fxSelect("rs",c.fx||"snow")+'<p class="note" id="rs-st" style="margin:8px 0 0"></p>';
@@ -2995,6 +3120,248 @@ const homeIc='<svg class="ti" viewBox="0 0 24 24"><path d="M3 11l9-8 9 8"/><path
 (function(){const fit=()=>{const vw=document.documentElement.clientWidth;let w=Math.min(640,vw);if((vw-w)%2)w-=1;document.querySelectorAll("body>main").forEach(m=>m.style.width=w+"px")};fit();addEventListener("resize",fit);if(window.ResizeObserver)new ResizeObserver(fit).observe(document.documentElement)})();
 try{document.addEventListener("touchstart",function(){},{passive:true})}catch(e){}
 window.__boot=boot;if(window.__fbGo)window.__fbGo();
+</script>
+<script>
+/* ================= 배경음악 (BGM) — YouTube 재생목록 (2026-11-19) =================
+   · 플레이어는 하나만, body 바로 아래 #gyt 에 두고 절대 옮기지 않아요(옮기면 다시 로드돼 처음부터 재생돼요). 화면에는 보이지 않게 둬요.
+   · A안 (2026-11-19): 방 홈에서는 티켓의 절취선 한 칸(#gbgmc), 다른 탭·문답 목록에서는 상단 고정 줄(#gbgmb).
+     둘 다 누르면 같은 바텀시트(#gbsh)가 열리고, 앨범(썸네일) 뒤에서 레코드판이 밀려 나와요.
+   · 방 설정(rooms/{id}.bgm = {list,name,auto,shuf})은 두 사람 공통, 켜기/끄기·음량은 이 기기에서만(localStorage "o30.bgm").
+   · 소리 나는 자동재생은 브라우저가 첫 터치 이후에만 허락해요. 막히면 "눌러서 배경음악 켜기"로 바뀌고, 다음 터치에 시작해요.
+   · 색은 모두 종이색(--gpaper·--gtx·--gmute·--gperf)과 메인색(--gmainink), 헤더 글자색(--on)을 따라가요. */
+(function(){
+  var LSK="o30.bgm",dev={on:true,vol:60};
+  try{var d0=JSON.parse(localStorage.getItem(LSK)||"{}");if(typeof d0.on==="boolean")dev.on=d0.on;if(d0.vol>=0&&d0.vol<=100)dev.vol=+d0.vol}catch(e){}
+  if(navigator.connection&&navigator.connection.saveData&&localStorage.getItem(LSK)===null)dev.on=false;
+  function devSave(){try{localStorage.setItem(LSK,JSON.stringify(dev))}catch(e){}}
+  function parseList(v){v=String(v||"").trim();if(!v)return"";var m=v.match(/[?&]list=([A-Za-z0-9_-]{10,64})/);if(m)return m[1];if(/^[A-Za-z0-9_-]{10,64}$/.test(v))return v;return null}
+  window.gBgmParse=parseList;
+  var esc_=function(t){return String(t==null?"":t).replace(/[&<>"']/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})};
+  var RM=window.matchMedia?matchMedia("(prefers-reduced-motion: reduce)"):{matches:false};
+
+  /* ---------- 상태 ---------- */
+  var P=null,ready=false,apiP=null,cur="",want=null,st="idle",title="",idx=0,n=0,errs=0,userPaused=false,
+      volNow=0,fadeT=0,blockT=0,duckN=0,lastOn=null,lastSt="",vid="",ambVid="",ambK=0,introRun=false,evpOn=false,loopSet="",shufDone="",gest=false,progT=0;
+  function inRoom(){var ra=document.getElementById("roomApp");return !!(ra&&!ra.hidden&&typeof RID!=="undefined"&&RID&&typeof cfg!=="undefined"&&cfg)}
+  function onMain(){var m=document.getElementById("mainApp");return !!(m&&!m.hidden)}
+
+  /* ---------- 화면 조각 ---------- */
+  var IC={play:'<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15l12-7.5z"/></svg>',
+    pause:'<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg>',
+    prev:'<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M19 5v14L9 12z"/><rect x="5" y="5" width="3" height="14" rx="1"/></svg>',
+    next:'<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M5 5v14l10-7z"/><rect x="16" y="5" width="3" height="14" rx="1"/></svg>',
+    note:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>',
+    x:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>'};
+  var eq=function(k){var h="";for(var i=0;i<k;i++)h+="<i></i>";return '<span class="bm-eq" aria-hidden="true">'+h+"</span>"};
+  var vin='<span class="bm-vin" aria-hidden="true"><i></i></span>';
+  /* YouTube 플레이어: body 바로 아래, 보이지 않는 자리에 그대로 두어요(display:none이면 재생이 멈출 수 있어요) */
+  var L=document.createElement("div");L.id="gyt";L.className="gyt-off";L.setAttribute("aria-hidden","true");L.innerHTML='<div id="gytp"></div>';document.body.appendChild(L);
+  /* 홈: 티켓의 절취선 한 칸 */
+  var C=document.createElement("section");C.id="gbgmc";C.className="gseg";C.setAttribute("aria-label","배경음악");C.hidden=true;
+  C.innerHTML='<i class="bm-pg" aria-hidden="true"><b></b></i><button type="button" class="bm-open" aria-haspopup="dialog"><span class="bm-sl" aria-hidden="true"><span class="bm-dw">'+vin+'</span><span class="bm-cv">'+IC.note+'<img class="bm-cvi" alt=""></span></span>'+
+    '<span class="bm-tx"><b class="bm-t"></b><span class="bm-k"></span></span></button>'+eq(4)+'<button type="button" class="bm-pp" aria-label="재생">'+IC.play+'</button>';
+  /* 다른 탭·문답 목록: 상단 고정 줄 (누르면 바텀시트) */
+  var B=document.createElement("div");B.id="gbgmb";B.hidden=true;
+  B.innerHTML='<div class="bm-pill">'+eq(4)+'<button type="button" class="bm-pt" aria-haspopup="dialog" aria-label="배경음악 플레이어 열기"></button><button type="button" class="bm-pp" aria-label="재생">'+IC.play+'</button></div>';
+  document.body.appendChild(B);
+  /* 바텀시트 (홈 칸·상단 줄 공통) */
+  var S=document.createElement("div");S.id="gbsh";S.hidden=true;
+  S.innerHTML='<div class="bs-bd"></div><div class="bs-pn" role="dialog" aria-modal="true" aria-label="배경음악"><div class="bs-gr" aria-hidden="true"></div>'+
+    '<div class="bs-h">'+eq(4)+'<span class="bs-k"></span><span class="bs-n"></span><button type="button" class="bs-x" aria-label="닫기">'+IC.x+'</button></div>'+
+    '<div class="bs-st" aria-hidden="true"><span class="bs-dw">'+vin+'</span><span class="bs-cv">'+IC.note.replace('width="18" height="18"','width="36" height="36"')+'<img class="bm-cvi" alt=""></span></div>'+
+    '<div class="bs-bt"><b class="bs-t"></b><span class="bs-pl"></span>'+
+    '<div class="bs-tr" role="slider" aria-label="재생 위치" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" tabindex="0"><i></i><b></b></div>'+
+    '<div class="bs-tm"><span class="bs-c">0:00</span><span class="bs-d">0:00</span></div>'+
+    '<div class="bs-ctl"><button type="button" class="bs-pv" aria-label="이전 곡">'+IC.prev+'</button><button type="button" class="bs-pp" aria-label="재생">'+IC.play+'</button><button type="button" class="bs-nx" aria-label="다음 곡">'+IC.next+'</button></div></div></div>';
+  document.body.appendChild(S);
+  /* 홈 칸은 한마디 위, 티켓 안의 첫 칸으로 (홈을 다시 그리면 다시 붙여요) */
+  function mountCard(){var g=document.querySelector("#roomApp #view .ghome");if(g&&g.firstElementChild!==C)g.prepend(C)}
+  window.gBgmMount=function(){mountCard();paint()};
+  mountCard();
+  /* 썸네일: 홈 칸은 작은 것, 바텀시트는 큰 것 */
+  function cover(v0){[[C.querySelector(".bm-cvi"),"mqdefault"],[S.querySelector(".bm-cvi"),"hqdefault"]].forEach(function(x){var im=x[0],src=v0?"https://i.ytimg.com/vi/"+encodeURIComponent(v0)+"/"+x[1]+".jpg":"";
+    if(im._s===src)return;im._s=src;im.classList.remove("ok");if(!src){im.removeAttribute("src");return}im.onload=function(){if(im._s===src)im.classList.add("ok")};im.onerror=function(){im.classList.remove("ok")};im.src=src})}
+
+  /* ---------- YouTube ---------- */
+  function api(){if(apiP)return apiP;apiP=new Promise(function(res,rej){if(window.YT&&YT.Player){res();return}
+    var prev=window.onYouTubeIframeAPIReady;window.onYouTubeIframeAPIReady=function(){try{prev&&prev()}catch(e){}res()};
+    var s=document.createElement("script");s.src="https://www.youtube.com/iframe_api";s.async=true;s.onerror=function(){apiP=null;rej()};document.head.appendChild(s)});return apiP}
+  function make(list){return api().then(function(){return new Promise(function(res){
+    P=new YT.Player("gytp",{width:200,height:200,playerVars:{listType:"playlist",list:list,playsinline:1,rel:0,autoplay:0,origin:location.origin},
+      events:{onReady:function(){ready=true;vol(0);res()},onStateChange:onSt,onError:onErr}})})})}
+  function vol(v){volNow=Math.max(0,Math.min(100,v));try{P&&ready&&P.setVolume(Math.round(volNow))}catch(e){}}
+  function target(){return dev.vol*((duckN>0||evpOn)?.35:1)}
+  function fadeTo(v,ms,done){clearInterval(fadeT);var v0=volNow,t0=performance.now();if(!(ms>0)){vol(v);done&&done();return}
+    fadeT=setInterval(function(){var k=Math.min(1,(performance.now()-t0)/ms);vol(v0+(v-v0)*k);if(k>=1){clearInterval(fadeT);done&&done()}},50)}
+  function meta(){try{var d=P.getVideoData();if(d&&d.title)title=d.title;if(d&&d.video_id)vid=d.video_id;var pl=P.getPlaylist();n=pl?pl.length:0;idx=Math.max(0,P.getPlaylistIndex())+1}catch(e){}}
+  function play(){if(!P||!ready)return;userPaused=false;clearInterval(fadeT);vol(0);try{P.unMute();P.playVideo()}catch(e){}
+    clearTimeout(blockT);blockT=setTimeout(function(){if(st!=="playing"&&want){st="blocked";paint()}},2200)}
+  function onSt(e){var s=e.data;meta();
+    if(s===1){clearTimeout(blockT);st="playing";errs=0;
+      if(loopSet!==cur){loopSet=cur;try{P.setLoop(true)}catch(x){}}
+      if(want&&want.shuf&&shufDone!==cur){shufDone=cur;try{P.setShuffle(true)}catch(x){}}
+      fadeTo(target(),1500)}
+    else if(s===2){if(st!=="blocked")st="paused"}
+    else if(s===-1){if(n>1&&errs<=n&&(curId() in bad)){errs++;setTimeout(function(){try{P.nextVideo()}catch(x){}},0);return}
+      if(st==="loading"&&P&&ready){clearTimeout(blockT);blockT=setTimeout(function(){if(st==="loading"){st=want&&want.auto?"blocked":"paused";paint()}},1500)}}
+    else if(s===5){if(st==="loading")st="paused";
+      if(want&&want.shuf&&shufDone!==cur&&n>1){shufDone=cur;try{P.setShuffle(true);P.cuePlaylist({list:cur,listType:"playlist",index:Math.floor(Math.random()*n)})}catch(x){}}}
+    else if(s===0){try{P.playVideoAt(0)}catch(x){}}
+    paint()}
+  /* 재생할 수 없는 곡: YouTube 오류 번호로 이유를 나누고, 이번 접속 동안 기억해요.
+     처음 막힌 곡만 알림 대상이고, 잠깐(1.5초) 모았다가 "N개를 건너뛰었어요 · 이유"로 한 번만 알려요.
+     이미 막힌 걸 아는 곡은 다음 바퀴부터 알림 없이 바로 넘겨요 */
+  var bad={},badQ={},badQn=0,badT=0;
+  function curId(){try{var pl=P.getPlaylist(),i=P.getPlaylistIndex();if(pl&&i>=0&&pl[i])return pl[i]}catch(x){}return vid||"#"+idx}
+  function why(c){return c===100?"삭제·비공개 영상":(c===101||c===150)?"퍼가기 금지":c===153?"재생기 설정 오류":c===2?"잘못된 영상 정보":c===5?"재생기 오류":"알 수 없는 오류"}
+  function badFlush(){if(!badQn)return;var r=Object.keys(badQ).map(function(k){return badQn>1&&Object.keys(badQ).length>1?k+" "+badQ[k]:k}).join(" · ");
+    try{window.gToastMsg&&gToastMsg((badQn>1?"재생할 수 없는 곡 "+badQn+"개를 건너뛰었어요":"재생할 수 없는 곡을 건너뛰었어요")+" · "+r)}catch(x){}badQ={};badQn=0}
+  function onErr(e){errs++;meta();var c=+(e&&e.data),key=curId(),fresh=!(key in bad);
+    if(fresh){bad[key]=c;var w=why(c);badQ[w]=(badQ[w]||0)+1;badQn++;try{console.warn("[배경음악] 재생할 수 없는 곡",{code:c,why:w,video:vid,index:idx,title:title})}catch(x){}}
+    if(!n||errs>Math.max(3,n)){clearTimeout(blockT);clearTimeout(badT);badQ={};badQn=0;st="error";paint();return}
+    if(fresh){clearTimeout(badT);badT=setTimeout(badFlush,1500)}
+    setTimeout(function(){try{P.nextVideo()}catch(x){}},fresh?400:0)}
+
+  /* ---------- 방과 맞추기 ---------- */
+  function switchTo(w){var was=st==="playing";if(!w||!want||w.list!==want.list){bad={};badQ={};badQn=0;clearTimeout(badT)}want=w;title="";n=0;idx=0;errs=0;clearTimeout(blockT);
+    if(!w){cur="";if(P&&ready&&(st==="playing"||st==="loading")){fadeTo(0,750,function(){try{P.stopVideo()}catch(e){}})}else{try{P&&ready&&P.stopVideo()}catch(e){}}st="idle";paint();return}
+    var go=was||w.auto;st="loading";paint();
+    /* 플레이어가 상태를 알려 주지 않고 멈춰 있으면(불러온 채 대기) "불러오는 중"에 갇히지 않게 4초 뒤 정리해요 */
+    setTimeout(function(){if(want===w&&st==="loading"){meta();st=go?"blocked":"paused";paint()}},4000);
+    var load=function(){if(want!==w)return;cur=w.list;
+      if(!P){make(w.list).then(function(){if(want!==w)return;meta();if(go)play();else{st="paused";paint()}},function(){st="error";paint()})}
+      else if(ready){vol(0);try{if(go){P.loadPlaylist({list:w.list,listType:"playlist",index:0});clearTimeout(blockT);blockT=setTimeout(function(){if(st!=="playing"&&want===w){st="blocked";paint()}},3500)}
+        else P.cuePlaylist({list:w.list,listType:"playlist",index:0})}catch(e){}}};
+    if(was&&P&&ready)fadeTo(0,750,load);else load()}
+  function sync(){mountCard();
+    if(inRoom()){var b=cfg.bgm||{},list=dev.on&&b.list?String(b.list):"";
+      var w=list?{list:list,name:String(b.name||""),auto:b.auto!==false,shuf:!!b.shuf}:null;
+      if((w?w.list:"")!==(want?want.list:""))switchTo(w);else if(w&&want){want.name=w.name;want.auto=w.auto;want.shuf=w.shuf}}
+    else if(!dev.on&&want)switchTo(null);
+    paint();requestAnimationFrame(place)}
+  window.gBgmSync=sync;
+
+  /* ---------- 조작 ---------- */
+  function toggle(){if(!want)return;gest=true;
+    if(st==="playing"){userPaused=true;fadeTo(0,300,function(){try{P.pauseVideo()}catch(e){}});st="paused";paint();return}
+    if(st==="error"||!P){var w=want;want=null;w.auto=true;switchTo(w);return}
+    if(ready){st="loading";paint();play()}}
+  function next(){if(P&&ready){try{P.nextVideo()}catch(e){}}}
+  function prev(){if(P&&ready){try{P.getCurrentTime()>4?P.seekTo(0,true):P.previousVideo()}catch(e){}}}
+  [C,B,S].forEach(function(r){r.querySelector(".bm-pp,.bs-pp").onclick=toggle});
+  S.querySelector(".bs-nx").onclick=next;S.querySelector(".bs-pv").onclick=prev;
+  C.querySelector(".bm-open").onclick=function(){openSheet(this)};
+  B.querySelector(".bm-pt").onclick=function(){openSheet(this)};
+  /* ---------- 바텀시트 ---------- */
+  var shOpen=false,shT=0,shFrom=null,shY=0;
+  function openSheet(from){if(!want)return;clearTimeout(shT);shFrom=from||null;shOpen=true;S.hidden=false;S.classList.remove("out","in");void S.offsetWidth;S.classList.add("in");
+    shY=window.scrollY;document.documentElement.style.overflow="hidden";paint();setTimeout(function(){try{S.querySelector(".bs-pp").focus({preventScroll:true})}catch(e){}},60)}
+  function closeSheet(){if(!shOpen)return;shOpen=false;clearTimeout(shT);
+    var done=function(){S.hidden=true;S.classList.remove("in","out");S.querySelector(".bs-pn").style.transform="";document.documentElement.style.overflow="";paint();try{shFrom&&shFrom.isConnected&&shFrom.focus({preventScroll:true})}catch(e){}};
+    S.classList.remove("in");void S.offsetWidth;S.classList.add("out");shT=setTimeout(done,RM.matches?200:470)}
+  window.gBgmSheet=function(o){o?openSheet():closeSheet()};
+  S.querySelector(".bs-bd").onclick=closeSheet;S.querySelector(".bs-x").onclick=closeSheet;
+  document.addEventListener("keydown",function(e){if(shOpen&&e.key==="Escape"){e.preventDefault();closeSheet()}});
+  /* 손잡이를 끌어내리면 따라 내려오고, 충분히 내리면 닫혀요 */
+  (function(){var g=S.querySelector(".bs-gr"),pn=S.querySelector(".bs-pn"),y0=0,dy=0,on=false,ly=0,lt=0,v=0;
+    g.addEventListener("pointerdown",function(e){on=true;y0=ly=e.clientY;lt=performance.now();dy=0;v=0;S.classList.remove("in");g.setPointerCapture(e.pointerId);pn.style.transition="none"});
+    g.addEventListener("pointermove",function(e){if(!on)return;var t=performance.now();v=(e.clientY-ly)/Math.max(1,t-lt);ly=e.clientY;lt=t;dy=Math.max(0,e.clientY-y0);pn.style.transform="translateY("+dy+"px)"});
+    var end=function(){if(!on)return;on=false;pn.style.transition="transform .25s cubic-bezier(.215,.61,.355,1)";
+      if(dy>Math.min(140,pn.offsetHeight*.3)||(dy>24&&v>.8)){pn.style.transform="translateY(100%)";shOpen=false;setTimeout(function(){pn.style.transition="";pn.style.transform="";S.hidden=true;document.documentElement.style.overflow="";paint()},220)}
+      else{pn.style.transform="";setTimeout(function(){pn.style.transition=""},260)}};
+    g.addEventListener("pointerup",end);g.addEventListener("pointercancel",end)})();
+  var tr=S.querySelector(".bs-tr");
+  var seek=function(x){tr.classList.add("jump");setTimeout(function(){tr.classList.remove("jump")},120);try{var r=tr.getBoundingClientRect(),d=P.getDuration();if(d>0)P.seekTo(Math.max(0,Math.min(1,(x-r.left)/r.width))*d,true);setTimeout(prog,60)}catch(e){}};
+  tr.addEventListener("pointerdown",function(e){if(!P||!ready)return;seek(e.clientX);tr.setPointerCapture(e.pointerId);tr._d=true});
+  tr.addEventListener("pointermove",function(e){if(tr._d)seek(e.clientX)});
+  ["pointerup","pointercancel"].forEach(function(k){tr.addEventListener(k,function(){tr._d=false})});
+  tr.addEventListener("keydown",function(e){if(!P||!ready)return;var dt=e.key==="ArrowRight"?5:e.key==="ArrowLeft"?-5:0;if(dt){e.preventDefault();try{P.seekTo(Math.max(0,P.getCurrentTime()+dt),true)}catch(x){}setTimeout(prog,60)}});
+  /* 첫 터치: 자동재생이 막혀 있었다면 이 터치로 시작해요 (일시정지를 직접 누른 뒤에는 시작하지 않아요) */
+  document.addEventListener("pointerdown",function(e){gest=true;if(st==="blocked"&&want&&want.auto&&!userPaused&&!(e.target.closest&&e.target.closest(".bm-pp,.bs-pp"))){st="loading";paint();play()}},true);
+  /* 채팅 이벤트 중이거나 효과음이 날 때는 잠깐 작게 */
+  addEventListener("evp:bar",function(e){evpOn=!!(e.detail&&e.detail.active);if(st==="playing")fadeTo(target(),evpOn?400:900)});
+  function duck(ms){if(st!=="playing")return;duckN++;fadeTo(target(),200);setTimeout(function(){duckN=Math.max(0,duckN-1);if(st==="playing")fadeTo(target(),700)},ms)}
+  if(typeof window.snd==="function"){var o=window.snd;window.snd=function(){duck(1400);return o.apply(this,arguments)}}
+
+  /* ---------- 그리기 ---------- */
+  function fmt(t){t=Math.max(0,Math.floor(t||0));return Math.floor(t/60)+":"+String(t%60).padStart(2,"0")}
+  function prog(){if(!P||!ready)return;try{var c=P.getCurrentTime()||0,d=P.getDuration()||0,k=d>0?Math.min(100,c/d*100):0;
+    var pg=C.querySelector(".bm-pg b"),W=pg.clientWidth;if(W){var lit=Math.min(Math.ceil(W/10),Math.floor(k/100*Math.ceil(W/10)));pg.style.clipPath="inset(0 "+Math.max(0,W-lit*10)+"px 0 0)"}
+    tr.querySelector("i").style.width=k+"%";tr.querySelector("b").style.left=k+"%";tr.setAttribute("aria-valuenow",String(Math.round(k)));tr.setAttribute("aria-valuetext",fmt(c)+" / "+fmt(d));
+    S.querySelector(".bs-c").textContent=fmt(c);S.querySelector(".bs-d").textContent=fmt(d)}catch(e){}}
+  function label(){return st==="loading"?"재생목록을 불러오는 중이에요":st==="blocked"?"눌러서 배경음악 켜기":st==="error"?"재생목록을 열 수 없어요":title||(want&&want.name)||"배경음악"}
+  function setTx(el,t,anim){if(el.textContent===t)return;var ch=anim&&!!el.textContent;el.textContent=t;if(ch)fx(el,[{opacity:0,transform:"translateY(4px)"},{opacity:1,transform:"none"}],240)}
+  function paint(){var on=st==="playing",show=!!want;
+    var room=inRoom(),home=room&&typeof tab!=="undefined"&&tab==="home";
+    if(home)mountCard();
+    var cWas=C.hidden;C.hidden=!(show&&home&&C.isConnected);
+    if(cWas&&!C.hidden)fx(C,[{opacity:0},{opacity:1}],200);
+    if(!show&&shOpen)closeSheet();
+    [C,S].forEach(function(r){r.classList.toggle("on",on);r.dataset.st=st});
+    var nm=want&&want.name?want.name:"",cnt=n?idx+" / "+n:"",tl=label(),err=st==="error"?"설정에서 링크와 공개 범위를 확인해 주세요":"";
+    setTx(C.querySelector(".bm-t"),tl,!C.hidden);
+    C.querySelector(".bm-k").textContent=err||[nm,cnt].filter(Boolean).join(" · ");
+    C.querySelector(".bm-open").setAttribute("aria-label","배경음악 플레이어 열기 · "+tl);
+    S.querySelector(".bs-k").textContent=nm||"NOW PLAYING";S.querySelector(".bs-n").textContent=cnt;
+    setTx(S.querySelector(".bs-t"),tl,shOpen);S.querySelector(".bs-pl").textContent=err||(nm?"재생목록 · "+nm:"");
+    if(on!==lastOn){[C.querySelector(".bm-pp"),B.querySelector(".bm-pp"),S.querySelector(".bs-pp")].forEach(function(b){b.innerHTML=on?IC.pause:IC.play;b.setAttribute("aria-label",on?"일시정지":"재생");if(lastOn!==null)fx(b.firstChild,[{opacity:0,transform:"scale(.6)"},{opacity:1,transform:"none"}],160)});lastOn=on}
+    if(st==="blocked"&&lastSt!=="blocked"&&!C.hidden)fx(C.querySelector(".bm-pp"),[{boxShadow:"0 0 0 0 color-mix(in srgb,currentColor 35%,transparent)"},{boxShadow:"0 0 0 10px transparent"}],900,2);
+    lastSt=st;
+    cover(show?vid:"");
+    S.querySelector(".bs-nx").disabled=S.querySelector(".bs-pv").disabled=!(P&&ready&&n>1);
+    var bar=show&&((room&&!home)||(onMain()&&!!P&&st!=="idle"));
+    var bWas=B.hidden;B.hidden=!bar;if(bWas&&bar)fx(B.querySelector(".bm-pill"),[{opacity:0},{opacity:1}],140);
+    B.classList.toggle("on",on);B.dataset.st=st;
+    var pt=B.querySelector(".bm-pt"),ptOld=pt._t;mq(pt,tl,on&&bar);if(ptOld&&ptOld!==tl&&bar)fx(pt,[{opacity:0},{opacity:1}],240);
+    pt.setAttribute("aria-label","배경음악 플레이어 열기 · "+tl);
+    document.documentElement.classList.toggle("gbgm-m",bar&&onMain());document.documentElement.classList.toggle("gbgm-on",bar);
+    var vis=!C.hidden||shOpen;clearInterval(progT);C.classList.toggle("run",on&&vis);tr.classList.toggle("run",on&&shOpen);
+    if(on&&vis){prog();progT=setInterval(prog,500)}else if(vis&&P&&ready)prog()}
+  /* 짧은 전환: 동작 줄이기에서는 움직임은 빼고 투명도만 */
+  function fx(el,k,ms,it){if(!el||!el.animate)return;if(RM.matches)k=k.map(function(f){return{opacity:f.opacity==null?1:f.opacity}});try{el.animate(k,{duration:ms,easing:"cubic-bezier(.215,.61,.355,1)",iterations:it||1})}catch(e){}}
+  /* 상단 알약: 재생 중이고 제목이 넘칠 때만 글자가 흘러가요 (이퀄라이저·버튼은 제자리) */
+  function mq(el,t,run){if(el._t!==t){el._t=t;el._k="";el._w=0;el.innerHTML='<span class="bm-mq"><span>'+esc_(t)+'</span></span>'}el._run=run;requestAnimationFrame(function(){mqFit(el)})}
+  function mqFit(el){var m=el.querySelector(".bm-mq");if(!m||!el.clientWidth)return;var a=m.firstChild;if(!el._w){el.classList.remove("run");el._w=Math.ceil(a.getBoundingClientRect().width)}var w=el._w,run=el._run&&w>el.clientWidth+1,k=run+"|"+w+"|"+el.clientWidth;if(el._k===k)return;el._k=k;
+    el.classList.toggle("run",run);if(run){var g=36;if(m.children.length<2){var b=a.cloneNode(true);b.setAttribute("aria-hidden","true");m.appendChild(b)}
+      m.style.setProperty("--mqx",-(w+g)+"px");m.style.setProperty("--mqd",((w+g)/(RM.matches?18:34)).toFixed(2)+"s")}
+    else{while(m.children.length>1)m.lastChild.remove();m.style.removeProperty("--mqx")}}
+  addEventListener("resize",function(){var el=B.querySelector(".bm-pt");el._k="";el._w=0;mqFit(el)});
+  function place(){}
+  addEventListener("scroll",function(){B.classList.toggle("sc",window.scrollY>4)},{passive:true});
+
+  /* ---------- 설정 카드 ---------- */
+  var bgEd=null;
+  window.gBgmCard=function(){var b=(typeof cfg!=="undefined"&&cfg&&cfg.bgm)||{},E=bgEd||{list:b.list||"",name:b.name||"",auto:b.auto!==false,shuf:!!b.shuf};
+    var sw=function(k,v){return '<button type="button" class="sw'+(v?" on":"")+'" data-bgsw="'+k+'" role="switch" aria-checked="'+v+'"></button>'};
+    var view=b.list?'<p class="note" style="margin:8px 0 0">'+esc_(b.name||"이름 없는 재생목록")+' · 자동재생 '+(b.auto!==false?"켬":"끔")+(b.shuf?" · 섞어 재생":"")+'</p>':'<p class="note" style="margin:8px 0 0">아직 연결한 재생목록이 없어요. 편집에서 YouTube 재생목록 링크를 붙여 넣어 주세요.</p>';
+    var edit='<div class="note" style="margin-top:8px">YouTube 재생목록</div><input type="text" id="bg-l" inputmode="url" autocomplete="off" spellcheck="false" placeholder="재생목록 링크나 list= 뒤의 ID" value="'+esc_(E.list?"https://www.youtube.com/playlist?list="+E.list:"")+'">'+
+      '<p class="note bm-gmf" id="bg-lf" style="margin:6px 0 0"></p><p class="note" style="margin:4px 0 0">공개 또는 일부 공개 재생목록만 재생돼요. 퍼가기가 막힌 곡은 자동으로 건너뛰어요.</p>'+
+      '<div class="note" style="margin-top:12px">재생목록 이름 (선택)</div><input type="text" id="bg-n" maxlength="20" placeholder="비워 두면 표시하지 않아요" value="'+esc_(E.name)+'"><p class="note" style="margin:4px 0 0">홈 음악 카드에 곡 제목과 함께 보여요. 20자까지.</p><hr class="nhr">'+
+      '<div class="nrow"><div><b>들어오면 자동재생</b><div class="note">티켓을 뜯는 순간 1.5초에 걸쳐 소리가 커져요</div></div>'+sw("auto",E.auto)+'</div>'+
+      '<div class="nrow"><div><b>섞어 재생</b></div>'+sw("shuf",E.shuf)+'</div><p class="note" id="bg-st" style="margin:6px 0 0"></p>';
+    var devc='<div class="card" id="gbgmd"><div class="nrow'+(dev.on?"":" off")+'"><div><b>이 기기에서 배경음악</b><div class="note">이 기기에서만 적용돼요 · 데이터 절약 모드에서는 꺼진 채로 시작해요</div></div>'+
+      '<button type="button" class="sw'+(dev.on?" on":"")+'" id="bg-on" role="switch" aria-checked="'+dev.on+'" aria-label="이 기기에서 배경음악"></button></div>'+
+      '<div class="nfold'+(dev.on?" open":"")+'"><div class="nin"><div class="bm-vol"><b>음량</b><input type="range" id="bg-v" min="0" max="100" step="5" value="'+dev.vol+'" aria-label="배경음악 음량"><span id="bg-vn">'+dev.vol+'</span></div>'+
+      '<p class="note" style="margin:8px 0 4px">효과음이 날 때나 채팅 이벤트 중에는 잠깐 작아져요</p></div></div></div>';
+      '<div class="bm-vol'+(dev.on?"":" off")+'"><b>음량</b><input type="range" id="bg-v" min="0" max="100" step="5" value="'+dev.vol+'" aria-label="배경음악 음량"'+(dev.on?"":" disabled")+'><span id="bg-vn">'+dev.vol+'</span></div>'+
+      '<p class="note gfxmn">이 기기에서만 적용돼요. 데이터 절약 모드에서는 꺼진 채로 시작해요. 효과음이 날 때나 채팅 이벤트 중에는 잠깐 작아져요.</p></div>';
+    return (typeof secCard==="function"?secCard("bgm","배경음악",view,edit):"")+devc};
+  window.gBgmWire=function(){
+    var bo=document.getElementById("bg-on");if(bo)bo.onclick=function(){dev.on=!dev.on;devSave();bo.classList.toggle("on",dev.on);bo.setAttribute("aria-checked",String(dev.on));
+      var d=document.getElementById("gbgmd");d.querySelector(".nrow").classList.toggle("off",!dev.on);d.querySelector(".nfold").classList.toggle("open",dev.on);
+      gest=true;if(!dev.on)switchTo(null);sync()};
+    var v=document.getElementById("bg-v");if(v)v.oninput=function(){dev.vol=+v.value;devSave();document.getElementById("bg-vn").textContent=v.value;if(st==="playing")fadeTo(target(),120)};
+    var li=document.getElementById("bg-l");window.bgSave=null;bgEd=null;if(!li)return;
+    var b=(cfg&&cfg.bgm)||{};bgEd={list:b.list||"",name:b.name||"",auto:b.auto!==false,shuf:!!b.shuf};
+    var f=document.getElementById("bg-lf"),chk=function(){var id=parseList(li.value);f.classList.toggle("bad",id===null);f.classList.toggle("ok",!!id);
+      f.textContent=id===null?"재생목록 ID를 찾지 못했어요 · list= 가 들어간 링크인지 확인해 주세요":id?"✓ 재생목록 ID를 찾았어요 · "+id:"";return id};
+    li.oninput=chk;chk();
+    document.querySelectorAll("[data-bgsw]").forEach(function(x){x.onclick=function(){var k=x.dataset.bgsw;bgEd[k]=!bgEd[k];x.classList.toggle("on",bgEd[k]);x.setAttribute("aria-checked",String(bgEd[k]))}});
+    window.bgSave=async function(){var id=chk(),s=document.getElementById("bg-st");if(id===null){s.textContent="재생목록 링크를 확인해 주세요";return}
+      var nm=String(document.getElementById("bg-n").value||"").trim().slice(0,20);
+      try{await db.doc("rooms/"+RID).update({bgm:{list:id||"",name:nm,auto:!!bgEd.auto,shuf:!!bgEd.shuf}});gest=true;editing=null;window.bgSave=null;bgEd=null;render()}catch(e){s.textContent="저장 실패 — 권한을 확인해 주세요"}}};
+  window.gBgmState=function(){return{st:st,want:want,title:title,idx:idx,n:n,vol:volNow,dev:dev,cls:L.className,bad:bad}};
+})();
 </script>
 <script>
 /* ================= 모션 레이어 (motion-prompt 참고, 2026-11-15) — 위쪽 "모션 레이어" 스타일과 함께 지우면 원래대로 ================= */

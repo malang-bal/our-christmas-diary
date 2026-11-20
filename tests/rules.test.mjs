@@ -523,6 +523,18 @@ describe("문답은 멤버 두 명만", () => {
     await assertFails(r.update({ closed: true }));
     await assertFails(r.delete());
   });
+  test("배경음악: 재생목록 ID·이름 20자·자동재생·섞어 재생만 저장할 수 있다", async () => {
+    const r = db(B).doc("rooms/" + RID), ok = { list: "PLabcdefghij_-12345", name: "겨울 노래", auto: true, shuf: false };
+    await assertSucceeds(r.update({ bgm: ok }));
+    await assertSucceeds(r.update({ bgm: { ...ok, list: "" } }));
+    await assertFails(r.update({ bgm: { ...ok, list: 'x"><img src=1>' } }));
+    await assertFails(r.update({ bgm: { ...ok, list: "short" } }));
+    await assertFails(r.update({ bgm: { ...ok, name: "가".repeat(21) } }));
+    await assertFails(r.update({ bgm: { ...ok, auto: "yes" } }));
+    await assertFails(r.update({ bgm: { ...ok, url: "https://evil" } }));
+    await assertFails(r.update({ bgm: "PLabcdefghij" }));
+    await assertFails(db(C).doc("rooms/" + RID).update({ bgm: ok }));
+  });
   test("내 정보는 이름만 바꿀 수 있고 문답을 옮길 수 없다", async () => {
     await assertSucceeds(db(B).doc("users/" + B).update({ name: "바비" }));
     await assertFails(db(B).doc("users/" + B).update({ roomId: "room2" }));

@@ -136,6 +136,15 @@ service cloud.firestore {
     function isHex(c) { return c is string && c.matches('^#[0-9a-fA-F]{6}$'); }
     function isImgUrl(u) { return u is string && u.size() <= 600 && u.matches('^https://firebasestorage[.]googleapis[.]com/[A-Za-z0-9._~%/?&=+-]*$'); }
 
+    // 배경음악: YouTube 재생목록 ID(비우면 끔)·이름 20자·자동재생·섞어 재생만
+    function validBgm(d) {
+      return !('bgm' in d)
+        || (d.bgm is map
+            && d.bgm.keys().hasOnly(['list', 'name', 'auto', 'shuf'])
+            && d.bgm.list is string && d.bgm.list.matches('^([A-Za-z0-9_-]{10,64})?$')
+            && d.bgm.name is string && d.bgm.name.size() <= 20
+            && d.bgm.auto is bool && d.bgm.shuf is bool);
+    }
     function validRoom(d) {
       // 제목·부제·질문은 모든 문답이 함께 쓰는 값이라 사이트 코드에만 있고, 문답 문서에는 저장하지 않는다
       return d.palette is map
@@ -169,11 +178,12 @@ service cloud.firestore {
 
       allow update: if memberEdit() || partnerJoin();
 
-      // 멤버가 고칠 수 있는 것: 색·종이·효과, 그리고(혼자일 때) 짝꿍 코드 재발급
+      // 멤버가 고칠 수 있는 것: 색·종이·효과·배경음악, 그리고(혼자일 때) 짝꿍 코드 재발급
       function memberEdit() {
         return signedIn() && uid() in resource.data.memberIds && isOpen()
-          && changed().hasOnly(['palette', 'paper', 'fx', 'pairCode', 'pairExp'])
+          && changed().hasOnly(['palette', 'paper', 'fx', 'bgm', 'pairCode', 'pairExp'])
           && validRoom(request.resource.data)
+          && validBgm(request.resource.data)
           && (request.resource.data.pairCode == resource.data.pairCode
               || (resource.data.memberIds.size() == 1
                   && !exists(/databases/$(database)/documents/pairs/$(request.resource.data.pairCode))
