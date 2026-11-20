@@ -1330,7 +1330,7 @@ html.gbgm-on{scroll-padding-top:calc(56px + env(safe-area-inset-top,0px))}
 </script>
 <script>
 /* 새 버전 알림: 올라간 index.html이 바뀌면 상단에 새로고침 안내를 띄워요 */
-const BUILD_ID="1795203039837";
+const BUILD_ID="1795205404203";
 (function(){
   if(!/^https?:/.test(location.protocol))return;
   let shown=false;
@@ -3141,7 +3141,7 @@ window.__boot=boot;if(window.__fbGo)window.__fbGo();
 
   /* ---------- 상태 ---------- */
   var P=null,ready=false,apiP=null,cur="",want=null,st="idle",title="",idx=0,n=0,errs=0,userPaused=false,
-      volNow=0,fadeT=0,blockT=0,duckN=0,lastOn=null,lastSt="",vid="",ambVid="",ambK=0,introRun=false,evpOn=false,loopSet="",shufDone="",gest=false,progT=0;
+      volNow=0,fadeT=0,blockT=0,duckN=0,lastOn=null,lastSt="",vid="",ambVid="",ambK=0,introRun=false,evpOn=false,loopSet="",shufDone="",gest=false,progT=0,pend=false,making=false,mkT=0,ldT=0,netFail=false,mkN=0;
   function inRoom(){var ra=document.getElementById("roomApp");return !!(ra&&!ra.hidden&&typeof RID!=="undefined"&&RID&&typeof cfg!=="undefined"&&cfg)}
   function onMain(){var m=document.getElementById("mainApp");return !!(m&&!m.hidden)}
 
@@ -3186,15 +3186,19 @@ window.__boot=boot;if(window.__fbGo)window.__fbGo();
   function api(){if(apiP)return apiP;apiP=new Promise(function(res,rej){if(window.YT&&YT.Player){res();return}
     var prev=window.onYouTubeIframeAPIReady;window.onYouTubeIframeAPIReady=function(){try{prev&&prev()}catch(e){}res()};
     var s=document.createElement("script");s.src="https://www.youtube.com/iframe_api";s.async=true;s.onerror=function(){apiP=null;rej()};document.head.appendChild(s)});return apiP}
-  function make(list){return api().then(function(){return new Promise(function(res){
-    P=new YT.Player("gytp",{width:200,height:200,playerVars:{listType:"playlist",list:list,playsinline:1,rel:0,autoplay:0,origin:location.origin},
-      events:{onReady:function(){ready=true;vol(0);res()},onStateChange:onSt,onError:onErr}})})})}
+  /* 플레이어 만들기: 15초 안에 준비되지 않으면(스크립트가 막히거나 iframe이 안 뜨면) 실패로 보고, 다음에 누르면 새로 만들어요 */
+  function make(list){return new Promise(function(res,rej){var my=++mkN;making=true;netFail=false;clearTimeout(mkT);
+    var fail=function(){if(my!==mkN)return;clearTimeout(mkT);if(!making)return;making=false;netFail=true;rej()};mkT=setTimeout(fail,15000);
+    api().then(function(){if(my!==mkN||!making)return;try{
+      P=new YT.Player("gytp",{width:200,height:200,playerVars:{listType:"playlist",list:list,playsinline:1,rel:0,autoplay:0,origin:location.origin},
+        events:{onReady:function(){if(my!==mkN)return;clearTimeout(mkT);making=false;ready=true;vol(0);res()},onStateChange:onSt,onError:onErr}})}catch(e){fail()}},fail)})}
+  function reset(){mkN++;clearTimeout(mkT);making=false;try{P&&P.destroy&&P.destroy()}catch(e){}P=null;ready=false;loopSet="";shufDone="";L.innerHTML='<div id="gytp"></div>'}
   function vol(v){volNow=Math.max(0,Math.min(100,v));try{P&&ready&&P.setVolume(Math.round(volNow))}catch(e){}}
   function target(){return dev.vol*((duckN>0||evpOn)?.35:1)}
   function fadeTo(v,ms,done){clearInterval(fadeT);var v0=volNow,t0=performance.now();if(!(ms>0)){vol(v);done&&done();return}
     fadeT=setInterval(function(){var k=Math.min(1,(performance.now()-t0)/ms);vol(v0+(v-v0)*k);if(k>=1){clearInterval(fadeT);done&&done()}},50)}
   function meta(){try{var d=P.getVideoData();if(d&&d.title)title=d.title;if(d&&d.video_id)vid=d.video_id;var pl=P.getPlaylist();n=pl?pl.length:0;idx=Math.max(0,P.getPlaylistIndex())+1}catch(e){}}
-  function play(){if(!P||!ready)return;userPaused=false;clearInterval(fadeT);vol(0);try{P.unMute();P.playVideo()}catch(e){}
+  function play(){if(!P||!ready){pend=true;return}pend=false;userPaused=false;clearInterval(fadeT);vol(0);try{P.unMute();P.playVideo()}catch(e){}
     clearTimeout(blockT);blockT=setTimeout(function(){if(st!=="playing"&&want){st="blocked";paint()}},2200)}
   function onSt(e){var s=e.data;meta();
     if(s===1){clearTimeout(blockT);st="playing";errs=0;
@@ -3227,10 +3231,11 @@ window.__boot=boot;if(window.__fbGo)window.__fbGo();
     if(!w){cur="";if(P&&ready&&(st==="playing"||st==="loading")){fadeTo(0,750,function(){try{P.stopVideo()}catch(e){}})}else{try{P&&ready&&P.stopVideo()}catch(e){}}st="idle";paint();return}
     var go=was||w.auto;st="loading";paint();
     /* 플레이어가 상태를 알려 주지 않고 멈춰 있으면(불러온 채 대기) "불러오는 중"에 갇히지 않게 4초 뒤 정리해요 */
-    setTimeout(function(){if(want===w&&st==="loading"){meta();st=go?"blocked":"paused";paint()}},4000);
+    setTimeout(function(){if(want===w&&st==="loading"&&ready){meta();st=go?"blocked":"paused";paint()}},4000);
     var load=function(){if(want!==w)return;cur=w.list;
-      if(!P){make(w.list).then(function(){if(want!==w)return;meta();if(go)play();else{st="paused";paint()}},function(){st="error";paint()})}
-      else if(ready){vol(0);try{if(go){P.loadPlaylist({list:w.list,listType:"playlist",index:0});clearTimeout(blockT);blockT=setTimeout(function(){if(st!=="playing"&&want===w){st="blocked";paint()}},3500)}
+      if(!P||!ready){if(making&&P){if(go)pend=true;return}reset();if(go)pend=true;
+        make(w.list).then(function(){if(want!==w)return;meta();if(pend)play();else{st="paused";paint()}},function(){if(want!==w)return;pend=false;st="error";paint()})}
+      else{vol(0);try{if(go){P.loadPlaylist({list:w.list,listType:"playlist",index:0});clearTimeout(blockT);blockT=setTimeout(function(){if(st!=="playing"&&want===w){st="blocked";paint()}},3500)}
         else P.cuePlaylist({list:w.list,listType:"playlist",index:0})}catch(e){}}};
     if(was&&P&&ready)fadeTo(0,750,load);else load()}
   function sync(){mountCard();
@@ -3244,8 +3249,9 @@ window.__boot=boot;if(window.__fbGo)window.__fbGo();
   /* ---------- 조작 ---------- */
   function toggle(){if(!want)return;gest=true;
     if(st==="playing"){userPaused=true;fadeTo(0,300,function(){try{P.pauseVideo()}catch(e){}});st="paused";paint();return}
-    if(st==="error"||!P){var w=want;want=null;w.auto=true;switchTo(w);return}
-    if(ready){st="loading";paint();play()}}
+    if(!ready&&making){pend=true;st="loading";paint();return}
+    if(st==="error"||!P||!ready){var w=want;want=null;w.auto=true;switchTo(w);return}
+    st="loading";paint();play()}
   function next(){if(P&&ready){try{P.nextVideo()}catch(e){}}}
   function prev(){if(P&&ready){try{P.getCurrentTime()>4?P.seekTo(0,true):P.previousVideo()}catch(e){}}}
   [C,B,S].forEach(function(r){r.querySelector(".bm-pp,.bs-pp").onclick=toggle});
@@ -3277,7 +3283,7 @@ window.__boot=boot;if(window.__fbGo)window.__fbGo();
   ["pointerup","pointercancel"].forEach(function(k){tr.addEventListener(k,function(){tr._d=false})});
   tr.addEventListener("keydown",function(e){if(!P||!ready)return;var dt=e.key==="ArrowRight"?5:e.key==="ArrowLeft"?-5:0;if(dt){e.preventDefault();try{P.seekTo(Math.max(0,P.getCurrentTime()+dt),true)}catch(x){}setTimeout(prog,60)}});
   /* 첫 터치: 자동재생이 막혀 있었다면 이 터치로 시작해요 (일시정지를 직접 누른 뒤에는 시작하지 않아요) */
-  document.addEventListener("pointerdown",function(e){gest=true;if(st==="blocked"&&want&&want.auto&&!userPaused&&!(e.target.closest&&e.target.closest(".bm-pp,.bs-pp"))){st="loading";paint();play()}},true);
+  document.addEventListener("pointerdown",function(e){gest=true;if(st==="blocked"&&want&&want.auto&&!userPaused&&!(e.target.closest&&e.target.closest(".bm-pp,.bs-pp"))){if(!ready&&!making){toggle();return}st="loading";paint();play()}},true);
   /* 채팅 이벤트 중이거나 효과음이 날 때는 잠깐 작게 */
   addEventListener("evp:bar",function(e){evpOn=!!(e.detail&&e.detail.active);if(st==="playing")fadeTo(target(),evpOn?400:900)});
   function duck(ms){if(st!=="playing")return;duckN++;fadeTo(target(),200);setTimeout(function(){duckN=Math.max(0,duckN-1);if(st==="playing")fadeTo(target(),700)},ms)}
@@ -3289,16 +3295,20 @@ window.__boot=boot;if(window.__fbGo)window.__fbGo();
     var pg=C.querySelector(".bm-pg b"),W=pg.clientWidth;if(W){var lit=Math.min(Math.ceil(W/10),Math.floor(k/100*Math.ceil(W/10)));pg.style.clipPath="inset(0 "+Math.max(0,W-lit*10)+"px 0 0)"}
     tr.querySelector("i").style.width=k+"%";tr.querySelector("b").style.left=k+"%";tr.setAttribute("aria-valuenow",String(Math.round(k)));tr.setAttribute("aria-valuetext",fmt(c)+" / "+fmt(d));
     S.querySelector(".bs-c").textContent=fmt(c);S.querySelector(".bs-d").textContent=fmt(d)}catch(e){}}
-  function label(){return st==="loading"?"재생목록을 불러오는 중이에요":st==="blocked"?"눌러서 배경음악 켜기":st==="error"?"재생목록을 열 수 없어요":title||(want&&want.name)||"배경음악"}
+  function label(){return st==="loading"?"재생목록을 불러오는 중이에요":st==="blocked"?"눌러서 배경음악 켜기":st==="error"?(netFail?"배경음악을 불러오지 못했어요":"재생목록을 열 수 없어요"):title||(want&&want.name)||"배경음악"}
   function setTx(el,t,anim){if(el.textContent===t)return;var ch=anim&&!!el.textContent;el.textContent=t;if(ch)fx(el,[{opacity:0,transform:"translateY(4px)"},{opacity:1,transform:"none"}],240)}
-  function paint(){var on=st==="playing",show=!!want;
+  /* 감시: 어떤 이유로든 "불러오는 중"이 12초 넘게 이어지면, 준비됐으면 "눌러서 켜기"로, 준비 못 했으면 "다시 시도"로 바꿔요 */
+  function watch(){if(st==="loading"&&want){if(!ldT)ldT=setTimeout(function(){ldT=0;if(st!=="loading"||!want)return;meta();
+      if(ready){st=want.auto&&!userPaused?"blocked":"paused"}else{reset();netFail=true;pend=false;st="error";try{console.warn("[배경음악] 플레이어가 준비되지 않아 다시 시도를 기다려요")}catch(x){}}paint()},12000)}
+    else{clearTimeout(ldT);ldT=0}}
+  function paint(){watch();var on=st==="playing",show=!!want;
     var room=inRoom(),home=room&&typeof tab!=="undefined"&&tab==="home";
     if(home)mountCard();
     var cWas=C.hidden;C.hidden=!(show&&home&&C.isConnected);
     if(cWas&&!C.hidden)fx(C,[{opacity:0},{opacity:1}],200);
     if(!show&&shOpen)closeSheet();
     [C,S].forEach(function(r){r.classList.toggle("on",on);r.dataset.st=st});
-    var nm=want&&want.name?want.name:"",cnt=n?idx+" / "+n:"",tl=label(),err=st==="error"?"설정에서 링크와 공개 범위를 확인해 주세요":"";
+    var nm=want&&want.name?want.name:"",cnt=n?idx+" / "+n:"",tl=label(),err=st==="error"?(netFail?"▶를 눌러 다시 시도해 주세요":"설정에서 링크와 공개 범위를 확인해 주세요"):"";
     setTx(C.querySelector(".bm-t"),tl,!C.hidden);
     C.querySelector(".bm-k").textContent=err||[nm,cnt].filter(Boolean).join(" · ");
     C.querySelector(".bm-open").setAttribute("aria-label","배경음악 플레이어 열기 · "+tl);
@@ -3360,7 +3370,7 @@ window.__boot=boot;if(window.__fbGo)window.__fbGo();
     window.bgSave=async function(){var id=chk(),s=document.getElementById("bg-st");if(id===null){s.textContent="재생목록 링크를 확인해 주세요";return}
       var nm=String(document.getElementById("bg-n").value||"").trim().slice(0,20);
       try{await db.doc("rooms/"+RID).update({bgm:{list:id||"",name:nm,auto:!!bgEd.auto,shuf:!!bgEd.shuf}});gest=true;editing=null;window.bgSave=null;bgEd=null;render()}catch(e){s.textContent="저장 실패 — 권한을 확인해 주세요"}}};
-  window.gBgmState=function(){return{st:st,want:want,title:title,idx:idx,n:n,vol:volNow,dev:dev,cls:L.className,bad:bad}};
+  window.gBgmState=function(){return{st:st,want:want,title:title,idx:idx,n:n,vol:volNow,dev:dev,cls:L.className,bad:bad,ready:ready,making:making,pend:pend,netFail:netFail}};
 })();
 </script>
 <script>
