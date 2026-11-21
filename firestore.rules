@@ -342,7 +342,7 @@ service cloud.firestore {
       match /sgifts/{sid} {
         allow read: if isMember(rid);
         allow create: if canWrite(rid)
-          && sid.matches('^' + uid() + '_[1-5]$')
+          && sid.matches('^' + uid() + '_([1-9]|10)$')
           && request.resource.data.keys().hasOnly(['from', 'to', 'n', 'd', 'sd', 'ts', 'op'])
           && request.resource.data.from == uid()
           && request.resource.data.to != uid()

@@ -1403,7 +1403,7 @@ body.gcap-on #roomApp{padding-bottom:92px}body.gcap-on #gtd{display:none!importa
 </script>
 <script>
 /* 새 버전 알림: 올라간 index.html이 바뀌면 상단에 새로고침 안내를 띄워요 */
-const BUILD_ID="1795262796534";
+const BUILD_ID="1795290368327";
 (function(){
   if(!/^https?:/.test(location.protocol))return;
   let shown=false;
@@ -1686,7 +1686,7 @@ function sgCntTx(){return sgCan()?"남은 선물 "+sgLeft()+" / "+SG_MAX:""}
 function sgCnt(){const c=document.querySelector(".gsgc");if(c)c.textContent=sgCntTx();sgCardSync()}
 function sgSendUI(n){const p=partner();if(!p||!n)return;const pn=realName(p),g=sgFor(n),left=sgLeft();
   if(n<=today){gToastMsg("이미 전달된 답변이에요");return}
-  if(!g&&!left){gToastMsg("선물은 다섯 개까지 넣을 수 있어요 · 다른 답변의 선물을 빼면 다시 넣을 수 있어요");return}
+  if(!g&&!left){gToastMsg("선물은 열 개까지 넣을 수 있어요 · 다른 답변의 선물을 빼면 다시 넣을 수 있어요");return}
   modal('<div class="sg-m"><div class="sg-ic">'+GICO.replace(/width="14" height="14"/,'width="26" height="26"')+'</div><h3>DAY '+n+' 답변에 선물 '+(g?"고치기":"넣기")+'</h3><p class="note">DAY '+n+' 문답이 열리면 답변과 함께 '+esc(pn)+' 님에게 가요 · <span class="sg-nw">남은 선물 '+(left)+' / '+SG_MAX+'</span></p>'+
     '<label class="sg-l">선물 이름<input id="sg-n" maxlength="40" placeholder="예) 따뜻한 코코아 한 잔" autocomplete="off" value="'+esc(g?g.n:"")+'"></label><label class="sg-l">선물 설명 <small>(선택)</small><textarea id="sg-d" maxlength="80" rows="2" placeholder="선물을 열면 함께 보여요">'+esc(g?g.d||"":"")+'</textarea></label><p class="note sg-t">전달되기 전(DAY '+(n-1)+'까지)에는 고치거나 뺄 수 있어요. 받은 뒤 3일이 지나도록 열지 않으면 사라져요.</p>'+
     '<div class="sg-b">'+(g?'<button class="sg-bt sg-del" id="sg-r" type="button">선물 빼기</button><span style="flex:1"></span>':"")+'<button class="sg-bt" id="sg-x" type="button">취소</button><button class="sg-bt pri" id="sg-o" type="button"'+(g?"":" disabled")+'>'+(g?"저장":"넣기")+'</button></div></div>',m=>{
@@ -1694,8 +1694,8 @@ function sgSendUI(n){const p=partner();if(!p||!n)return;const pn=realName(p),g=s
     $("#sg-x").onclick=closeModal;const nI=$("#sg-n"),o=$("#sg-o");nI.oninput=()=>{o.disabled=!nI.value.trim()};setTimeout(()=>{try{nI.focus()}catch(e){}},60);
     const busy=(b,t)=>{b.disabled=true;b.textContent=t};
     o.onclick=async()=>{const nm=nI.value.trim().slice(0,40),d=$("#sg-d").value.trim().slice(0,80);if(!nm||o.disabled)return;if(n<=today){closeModal();gToastMsg("이미 전달된 답변이에요");return}
-      if(!g&&sgLeft()<1){closeModal();gToastMsg("선물은 다섯 개까지 넣을 수 있어요");return}busy(o,"저장 중…");
-      try{if(g)await db.doc(P("sgifts/"+g.id)).update({n:nm,d});else{const sid=sgSlot();if(!sid){closeModal();gToastMsg("선물은 다섯 개까지 넣을 수 있어요");return}await db.doc(P("sgifts/"+sid)).set({from:me,to:p,n:nm,d,sd:n,ts:Date.now(),op:false})}closeModal();gToastMsg(g?"선물을 고쳤어요":"DAY "+n+" 답변에 선물을 넣었어요 · 남은 선물 "+Math.max(0,left-1)+" / "+SG_MAX)}
+      if(!g&&sgLeft()<1){closeModal();gToastMsg("선물은 열 개까지 넣을 수 있어요");return}busy(o,"저장 중…");
+      try{if(g)await db.doc(P("sgifts/"+g.id)).update({n:nm,d});else{const sid=sgSlot();if(!sid){closeModal();gToastMsg("선물은 열 개까지 넣을 수 있어요");return}await db.doc(P("sgifts/"+sid)).set({from:me,to:p,n:nm,d,sd:n,ts:Date.now(),op:false})}closeModal();gToastMsg(g?"선물을 고쳤어요":"DAY "+n+" 답변에 선물을 넣었어요 · 남은 선물 "+Math.max(0,left-1)+" / "+SG_MAX)}
       catch(e){o.disabled=false;o.textContent=g?"저장":"넣기";gToastMsg("저장하지 못했어요 · 연결이나 권한을 확인해 주세요")}};
     const r=$("#sg-r");if(r)r.onclick=async()=>{if(n<=today){closeModal();gToastMsg("이미 전달된 선물은 뺄 수 없어요");return}busy(r,"빼는 중…");
       try{await db.doc(P("sgifts/"+g.id)).delete();closeModal();gToastMsg("선물을 뺐어요 · 남은 선물 "+Math.min(SG_MAX,left+1)+" / "+SG_MAX)}catch(e){r.disabled=false;r.textContent="선물 빼기";gToastMsg("빼지 못했어요 · 연결을 확인해 주세요")}}})}
@@ -1755,7 +1755,7 @@ const GICO='<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" 
 let gGift={n:0,opened:false};
 /* 특별한 선물: 내 답변에 넣어 두면 그 답변의 DAY가 열릴 때 짝꿍에게 가요.
    한 사람 5개(규칙으로 5칸 고정). 받는 사람은 그날부터 3일 더 오늘의 대화에서 열 수 있고, 그 뒤엔 사라져요 */
-const SG_MAX=5,SG_KEEP=3;let SGS=[];
+const SG_MAX=10,SG_KEEP=3;let SGS=[];
 function sgLeft(){return Math.max(0,SG_MAX-SGS.filter(x=>x.from===me).length)}
 function sgSlot(){for(let k=1;k<=SG_MAX;k++)if(!SGS.some(x=>x.id===me+"_"+k))return me+"_"+k;return null}
 function sgPend(){return SGS.filter(x=>x.to===me&&!x.op&&x.sd<=today&&today-x.sd<=SG_KEEP).sort((a,b)=>(a.sd-b.sd)||((a.ts||0)-(b.ts||0)))}

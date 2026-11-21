@@ -442,12 +442,15 @@ describe("문답은 멤버 두 명만", () => {
     await assertFails(db(A).doc(p + "chats/d5/messages/gift_" + A).set({ ...ok, uid: A, gid: "x".repeat(17) }));
     await assertFails(db(A).doc(p + "chats/d5/messages/gift_" + A).set({ ...ok, uid: A, gid: 3 }));
   });
-  test("특별한 선물: 한 사람 5칸, 상대에게만, 열리기 전까지 보낸 사람만 고치고 뺀다", async () => {
+  test("특별한 선물: 한 사람 10칸, 상대에게만, 열리기 전까지 보낸 사람만 고치고 뺀다", async () => {
     const sg = (u, k, o = {}) => db(u).doc(p + "sgifts/" + u + "_" + k).set({ from: u, to: u === A ? B : A, n: "붕어빵", d: "따끈해", sd: 9, ts: 1, op: false, ...o });
     await assertSucceeds(sg(A, 1));
     await assertSucceeds(sg(A, 5));
-    // 6번째 칸·남의 칸·나에게·바깥 사람에게·형식 위반 → 거절
-    await assertFails(sg(A, 6));
+    await assertSucceeds(sg(A, 10));
+    // 11번째·0번째·01 칸·남의 칸·나에게·바깥 사람에게·형식 위반 → 거절
+    await assertFails(sg(A, 11));
+    await assertFails(sg(A, 0));
+    await assertFails(sg(A, "01"));
     await assertFails(db(A).doc(p + "sgifts/" + B + "_1").set({ from: A, to: B, n: "x", d: "", sd: 9, ts: 1, op: false }));
     await assertFails(db(A).doc(p + "sgifts/" + A + "_2").set({ from: B, to: A, n: "x", d: "", sd: 9, ts: 1, op: false }));
     await assertFails(sg(A, 2, { to: A }));
