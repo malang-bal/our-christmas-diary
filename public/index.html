@@ -1320,6 +1320,18 @@ body.gcap-on #roomApp{padding-bottom:92px}body.gcap-on #gtd{display:none!importa
 @keyframes gcapf{from{opacity:0}}@keyframes gcapu{from{transform:translateY(40px);opacity:.4}}
 @media (prefers-reduced-motion:reduce){#gcapsh,#gcapsh .shp{animation:none}}
 #gcapsh button:focus:not(:focus-visible),#gcapbar button:focus:not(:focus-visible){outline:none}
+
+/* ===== 채팅 말풍선 (틴트 · 이름 생략 · 시간은 옆) ===== */
+#roomApp .chat>.mw{display:flex;align-items:flex-end;gap:6px;max-width:80%;flex:none}
+#roomApp .chat>.mw.me{align-self:flex-end;flex-direction:row-reverse}
+#roomApp .chat>.mw.you{align-self:flex-start}
+#roomApp .chat>.mw>.m{max-width:none;min-width:0;align-self:auto;padding:8px 14px 9px;border-radius:18px;line-height:1.55;color:var(--txt)}
+#roomApp .chat>.mw.gf.me>.m{border-top-right-radius:6px}
+#roomApp .chat>.mw.gf.you>.m{border-top-left-radius:6px}
+#roomApp .chat>.mw:not(.gf){margin-top:-3px}
+#roomApp .chat>.mw.gf:not(:first-child){margin-top:8px}
+#roomApp .chat>.mw>.mtm{flex:none;font-style:normal;font-size:10.5px;line-height:1.2;color:var(--mute2);padding-bottom:3px;white-space:nowrap;font-variant-numeric:tabular-nums;letter-spacing:0}
+#roomApp .chat>.mw:not(.gl)>.mtm{display:none}
 </style>
 </head>
 <body>
@@ -1391,7 +1403,7 @@ body.gcap-on #roomApp{padding-bottom:92px}body.gcap-on #gtd{display:none!importa
 </script>
 <script>
 /* 새 버전 알림: 올라간 index.html이 바뀌면 상단에 새로고침 안내를 띄워요 */
-const BUILD_ID="1795235806463";
+const BUILD_ID="1795262129652";
 (function(){
   if(!/^https?:/.test(location.protocol))return;
   let shown=false;
@@ -1621,7 +1633,9 @@ function gChatPaint(c,ms,live,first){
   /* 새 글, 그리고 서버 시각이 정해져 자리가 바뀐 내 글(휴대폰 시계가 틀린 경우)을 시각 순서 자리에 놓는다 */
   for(const [el,m,moved] of fresh){const at=m._at??m.ts??0,next=[...c.children].find(x=>x!==el&&+x.dataset.at>at);c.insertBefore(el,next||null);
     if(!moved&&!first&&m.uid!==me&&!gRM()&&el.animate)el.animate([{opacity:0},{opacity:1}],{duration:140,easing:"ease-out"})}
-  if(!ms.length&&!c.children.length)c.innerHTML='<div class="note">아직 대화가 없어요.</div>';try{gCap.on&&gCapPaint()}catch(e){}}
+  if(!ms.length&&!c.children.length)c.innerHTML='<div class="note">아직 대화가 없어요.</div>';
+  gChatGroup(c);if(!c._gObs&&window.MutationObserver){c._gObs=new MutationObserver(()=>gChatGroup(c));c._gObs.observe(c,{childList:true})}
+  try{gCap.on&&gCapPaint()}catch(e){}}
 function gRushNow(){return gAnsOk&&today>=1&&today<=Q.length&&!(answers[me]||{})[today]?today:0}
 function viewWrite(){
   /* 답변을 다 불러오기 전에는 '오늘 답변 없음'으로 오해해 긴급 송부 칸을 띄우거나, 빈 목록으로 저장해 기존 답변을 덮어쓰지 않도록 기다려요 */
@@ -1799,9 +1813,14 @@ function gGiftWire(n){const b=$("#ggift");if(!b)return;const card=b.closest(".gc
     const it=GIFTS[Math.floor(Math.random()*GIFTS.length)],o0={uid:me,gift:it.n,ts:Date.now(),af:gAf()};if(it.i)o0.gid=it.i;
     try{await db.doc(P("chats/d"+n+"/messages/gift_"+me)).set(gSt(o0));gGift.opened=true;b.classList.add("done");b.setAttribute("aria-label","오늘 선물은 이미 열었어요");gGiftSheet(realName(me),gGName(o0),n,gGDesc(o0));gGiftSync(n,msgs)}
     catch(e){gToastMsg("선물을 열지 못했어요 · 이미 열었거나 연결이 끊겼어요")}finally{delete b.dataset.busy}}}
-function msgHtml(m,live){if(m.gift)return gGiftLine(m);if(m.dice)return'<div class="dice">― '+esc(realName(m.uid))+' 님이 주사위를 굴렸어요 · <b style="color:'+diceCol(m.v,m.dice)+'">'+m.v+"</b> ―</div>";const t=live?agoTxt(m.ts):new Date(m.ts).toLocaleTimeString("ko-KR",{hour:"2-digit",minute:"2-digit"});
-  const mk=m.emote?{c:""}:gMk(m.text),body=m.emote?'<img class="emo" src="'+emoSrc(m.emote)+'" alt="">':'<span class="mb">'+esc(mk.t)+'</span>';
-  return '<div class="m '+(m.uid===me?"me":"you")+(mk.c?" "+mk.c:"")+'" style="'+bg(m.uid)+'"><i>'+esc(nameOf(m.uid))+" · "+(live?'<span data-ago="'+m.ts+'">'+t+"</span>":t)+"</i>"+body+"</div>"}
+function msgHtml(m,live){if(m.gift)return gGiftLine(m);if(m.dice)return'<div class="dice">― '+esc(realName(m.uid))+' 님이 주사위를 굴렸어요 · <b style="color:'+diceCol(m.v,m.dice)+'">'+m.v+"</b> ―</div>";const t=live?agoTxt(m.ts):gHM(m.ts);/* 오늘은 "n초 전·n분 전", 지난 날은 24시간제 HH:MM */
+  const mk=m.emote?{c:""}:gMk(m.text),body=m.emote?'<img class="emo" src="'+esc(emoSrc(m.emote))+'" alt="">':'<span class="mb">'+esc(mk.t)+'</span>';
+  /* 말풍선: 이름 없이 · 프로필색을 종이에 옅게 섞은 바탕(상대 쪽은 내 쪽보다 아주 조금만 옅게) · 시간은 묶음 마지막 말풍선 옆 (묶음은 gChatGroup) */
+  const mine=m.uid===me,C=gPalNow(),uc=String(members[m.uid]?.color||(mine?C.main:"#888888")).slice(0,7),tb=gMixHex(C.paper,uc,C.dk?(mine?.36:.32):(mine?.22:.19));
+  return '<div class="mw '+(mine?"me":"you")+'" data-u="'+esc(m.uid)+'" title="'+esc(nameOf(m.uid))+" · "+esc(t)+'"><div class="m '+(mine?"me":"you")+(mk.c?" "+mk.c:"")+'" style="background:'+tb+'">'+body+'</div><i class="mtm">'+(live?'<span data-ago="'+m.ts+'">'+t+"</span>":t)+"</i></div>"}
+/* 같은 사람이 5분 안에 이어 보낸 말풍선을 한 묶음으로: 첫 말풍선(gf)만 꼬리 모서리, 마지막(gl)만 시간 */
+function gChatGroup(c){const k=[...c.children],same=(a,b)=>!!(a&&b&&a.classList.contains("mw")&&b.classList.contains("mw")&&a.dataset.u===b.dataset.u&&Math.abs((+b.dataset.at||0)-(+a.dataset.at||0))<=300000);
+  k.forEach((x,i)=>{if(!x.classList.contains("mw"))return;x.classList.toggle("gf",!same(k[i-1],x));x.classList.toggle("gl",!same(x,k[i+1]))})}
 function renderBanner(){clearInterval(bt);const b=$("#banner");if(!headers.length){b.innerHTML="";return}
   b.innerHTML='<div class="ban">'+headers.map((h,i)=>'<img class="'+(i===0?"on":"")+'" src="'+esc(blob(h.aid))+'" style="object-position:50% '+(+h.y||50)+'%" alt="">').join("")+"</div>";bi=0;
   /* 7단계: 첫 그림은 다 그려진 뒤 0.24초 페이드 (반쯤 그려진 그림이 튀지 않게) */
