@@ -1391,7 +1391,7 @@ body.gcap-on #roomApp{padding-bottom:92px}body.gcap-on #gtd{display:none!importa
 </script>
 <script>
 /* 새 버전 알림: 올라간 index.html이 바뀌면 상단에 새로고침 안내를 띄워요 */
-const BUILD_ID="1795235511737";
+const BUILD_ID="1795235806463";
 (function(){
   if(!/^https?:/.test(location.protocol))return;
   let shown=false;
@@ -2417,7 +2417,7 @@ async function gCapRender(ms,n,st,hide,fontKey,emb){
     hrL(hr2.y);
     const lead=(a,b,yy,f,col)=>{txt(g,a,PX,yy,f,col);txt(g,b,PX+cw,yy,f,col,"","right");const wa=tw(f,a),wb=tw(f,b);g.fillStyle="#cfc8bf";for(let x=PX+wa+16;x<PX+cw-wb-16;x+=12)g.fillRect(x,yy-6,3,3)};
     lead("주고받은 말",cnt.talk+"",O+tot.y+48,"700 30px "+MONO,ink);
-    lead("선물",cnt.gift+"",O+tot.y+92,"400 22px "+MONO,gr);lead("주사위 · 이벤트",cnt.dice+" · "+cnt.ev,O+tot.y+128,"400 22px "+MONO,gr);
+    lead("선물",cnt.gift+"",O+tot.y+92,"400 22px "+MONO,gr);lead("주사위",cnt.dice+"",O+tot.y+128,"400 22px "+MONO,gr);
     hrL(hr3.y);subL.forEach((l,i)=>txt(g,l,W/2,O+ty.y+42+i*34,"400 22px "+MONO,gr,"","center"));
     cvBar(g,y8,PX+110,O+bc.y+10,cw-220,80,ink);digits(g,W/2,O+bc.y+124,gr)}
   return cv}
