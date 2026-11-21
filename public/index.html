@@ -1403,7 +1403,7 @@ body.gcap-on #roomApp{padding-bottom:92px}body.gcap-on #gtd{display:none!importa
 </script>
 <script>
 /* 새 버전 알림: 올라간 index.html이 바뀌면 상단에 새로고침 안내를 띄워요 */
-const BUILD_ID="1795262129652";
+const BUILD_ID="1795262796534";
 (function(){
   if(!/^https?:/.test(location.protocol))return;
   let shown=false;
@@ -2300,7 +2300,7 @@ async function gCapRender(ms,n,st,hide,fontKey,emb){
       if(r.g==="say")txt(g,wrap(SC_NF,r.n,sc.nw-16,1)[0],x0,y+31,SC_NF,acc,"-0.3px");
       else{const pb=bubCol(r.x.m.uid),pw=Math.min(sc.nw-12,tw(SC_CF,r.n)+28);g.fillStyle=pb;rrect(g,x0,y+6,pw,34,17);g.fill();txt(g,wrap(SC_CF,r.n,pw-28,1)[0],x0+14,y+30,SC_CF,nameCol(r.x.m.uid));
         if(r.im){g.drawImage(r.im,x0+sc.nw,y,112,112);continue}}
-      r.ls.forEach((l,i)=>txt(g,l,x0+sc.nw,y+31+i*r.lh,SC_TF,C.text,LS_B))}
+      r.ls.forEach((l,i)=>txt(g,l,x0+sc.nw,y+31+i*r.lh,SC_TF,r.x&&r.x.mk==="gdim"?gMixHex(C.paper,C.text,.35):C.text,LS_B))}
     if(sc.moreY!==undefined)txt(g,"⋯ 이벤트가 이어져요",x0,t+sc.moreY+26,"500 22px "+F,mute)};
 
   /* ── 말풍선 배치 (입장권·채팅만·메신저 공통)
@@ -2408,7 +2408,7 @@ async function gCapRender(ms,n,st,hide,fontKey,emb){
       if(x.k==="ev"){rows.push({sys:1,ls:["── 이벤트 ──"],...sp(46)});for(const l of x.ls){const t=l.k==="say"?"» "+l.n+": "+l.t:l.k==="div"?"· "+l.t+" ·":l.k==="note"?"("+l.t+")":l.t,ls=wrap("400 23px "+MONO,t,cw-40,8);rows.push({ev:1,ls,...sp(ls.length*34+8)})}rows.push({sys:1,ls:[""],...sp(10)});continue}
       const sc=x.sc!==undefined?1:0,ind=sc?28:0;
       if(x.k==="sys"){const t="* "+x.t+(x.b?" · "+x.b:"")+" *",ls=wrap("400 21px "+MONO,t,cw-40-ind,4);rows.push({sys:1,sc,ls,...sp(ls.length*32+16)})}
-      else{const ls=wrap(RF,x.im||x.t==="[이모티콘]"?"[이모티콘]":x.t,TX-ind,8);rows.push({who:x.who,tm:x.gF?x.tm:"",mine:x.mine,sc,ls,...sp(ls.length*38+(x.gL?18:6))})}
+      else{const bf=x.mk==="gbold"?"700 25px "+MONO:RF,ls=wrap(bf,x.im||x.t==="[이모티콘]"?"[이모티콘]":x.t,TX-ind,8);rows.push({who:x.who,tm:x.gF?x.tm:"",mine:x.mine,sc,ls,bf,dim:x.mk==="gdim",...sp(ls.length*38+(x.gL?18:6))})}
       if(x.scL)rows.push({scE:1,...sp(30)})}
     const subL=cfg.sub?wrap("400 22px "+MONO,hid(cfg.sub),cw-40,2):["THANK YOU"];const hr2=sp(48),tot=sp(150),hr3=sp(48),ty=sp(30+subL.length*34),bc=sp(150),T=88,PH=y+T+40,H=PH+120;
     cv.width=W;cv.height=H;const g=g0();g.fillStyle=C.bg;g.fillRect(0,0,W,H);
@@ -2432,7 +2432,8 @@ async function gCapRender(ms,n,st,hide,fontKey,emb){
       if(r.sys){r.ls.forEach((l,i)=>txt(g,l,W/2+RX/2,ry+26+i*32,"400 21px "+MONO,gr,"","center"));continue}
       if(r.tm)txt(g,r.tm,PX+RX,ry+29,"400 21px "+MONO,gr);
       if(r.tm||r.chr)txt(g,wrap("700 23px "+MONO,r.who,NW-16,1)[0],PX+RX+TMW,ry+29,"700 23px "+MONO,r.chr||r.mine?C.ink:ink);
-      r.ls.forEach((l,i)=>txt(g,l,PX+TMW+NW,ry+29+i*38,RF,ink))}
+      /* 느낌표(!) 단락: 감열지에 흐리게 찍힌 것처럼 아주 옅게 */
+      r.ls.forEach((l,i)=>txt(g,l,PX+TMW+NW,ry+29+i*38,r.bf||RF,r.dim?"rgba(38,35,33,.26)":ink))}
     hrL(hr2.y);
     const lead=(a,b,yy,f,col)=>{txt(g,a,PX,yy,f,col);txt(g,b,PX+cw,yy,f,col,"","right");const wa=tw(f,a),wb=tw(f,b);g.fillStyle="#cfc8bf";for(let x=PX+wa+16;x<PX+cw-wb-16;x+=12)g.fillRect(x,yy-6,3,3)};
     lead("주고받은 말",cnt.talk+"",O+tot.y+48,"700 30px "+MONO,ink);
