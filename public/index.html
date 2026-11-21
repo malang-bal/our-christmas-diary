@@ -1754,7 +1754,7 @@ function gGDesc(m){if(m&&m.sg)return gTag(String(m.gd||""),m);const it=m&&m.gid&
 const GICO='<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" d="M12 7.15C10.1 3.45 5.8 2.45 5.7 4.95c-.1 1.9 3.3 2.3 6.3 2.2zM12 7.15c1.9-3.7 6.2-4.7 6.3-2.2.1 1.9-3.3 2.3-6.3 2.2z"/><path d="M10.9 8H3.1a.6.6 0 0 0-.6.6V12a.6.6 0 0 0 .6.6h7.8zM13.1 8h7.8a.6.6 0 0 1 .6.6V12a.6.6 0 0 1-.6.6h-7.8zM10.9 13.8H5a1 1 0 0 0-1 1v5.6a1 1 0 0 0 1 1h5.9zM13.1 13.8H19a1 1 0 0 1 1 1v5.6a1 1 0 0 1-1 1h-5.9z"/></svg>';
 let gGift={n:0,opened:false};
 /* 특별한 선물: 내 답변에 넣어 두면 그 답변의 DAY가 열릴 때 짝꿍에게 가요.
-   한 사람 5개(규칙으로 5칸 고정). 받는 사람은 그날부터 3일 더 오늘의 대화에서 열 수 있고, 그 뒤엔 사라져요 */
+   한 사람 10개(규칙으로 10칸 고정). 받는 사람은 그날부터 3일 더 오늘의 대화에서 열 수 있고, 그 뒤엔 사라져요 */
 const SG_MAX=10,SG_KEEP=3;let SGS=[];
 function sgLeft(){return Math.max(0,SG_MAX-SGS.filter(x=>x.from===me).length)}
 function sgSlot(){for(let k=1;k<=SG_MAX;k++)if(!SGS.some(x=>x.id===me+"_"+k))return me+"_"+k;return null}
