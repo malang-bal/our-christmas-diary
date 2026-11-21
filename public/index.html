@@ -1259,6 +1259,67 @@ html.gbgm-on{scroll-padding-top:calc(56px + env(safe-area-inset-top,0px))}
 .bm-vol{display:flex;align-items:center;gap:12px;margin-top:12px}.bm-vol b{font-size:14px}.bm-vol input{flex:1;accent-color:var(--main,#c8352b)}.bm-vol span{min-width:26px;text-align:right;font-variant-numeric:tabular-nums;color:var(--mute2,#605856)}.bm-vol.off{opacity:.45}
 @keyframes gbspin{to{transform:rotate(360deg)}}
 @keyframes bmeqa{0%,100%{transform:scaleY(.3)}50%{transform:scaleY(1)}}
+
+/* 채팅 캡처 */
+#roomApp .gchh2{display:flex;align-items:center;gap:6px}#roomApp .gchh2 .gcht{flex:1;min-width:0}#roomApp .gchh2 .evp-open{margin-left:0}
+.gcapb{flex:none;display:inline-flex;align-items:center;gap:5px;min-height:32px;padding:2px 12px;border:1px solid var(--line);border-radius:999px;background:transparent;color:inherit;font:inherit;font-size:13px;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.gcapb svg{flex:none}.gcapb.on{background:var(--main);border-color:var(--main);color:var(--on,#fff)}
+.gchh2:has(.gcapb.on) .evp-open{display:none}
+.gcaph{font-size:12px;color:var(--main);text-align:center;margin:-2px 0 8px}
+#roomApp .chat.gcap{position:relative;padding-left:36px;cursor:pointer;-webkit-user-select:none;user-select:none}
+#roomApp .chat.gcap>:not(.gcapL){position:relative;z-index:1}
+.gcapL{position:absolute;left:0;right:0;top:0;pointer-events:none;z-index:0}
+.gcapL i{position:absolute;left:0;right:0;border-radius:12px}
+.gcapL i::before{content:"";position:absolute;left:6px;top:50%;width:20px;height:20px;margin-top:-11px;border-radius:50%;border:1.5px solid color-mix(in srgb,var(--txt) 28%,transparent);background:var(--paper);box-sizing:border-box}
+.gcapL i.on{background:color-mix(in srgb,var(--main) 12%,transparent)}
+.gcapL i.on::before{background:var(--main);border-color:var(--main)}
+.gcapL i.on::after{content:"";position:absolute;left:13px;top:50%;width:5px;height:10px;margin-top:-8px;border:solid #fff;border-width:0 2px 2px 0;transform:rotate(45deg)}
+/* 채팅 캡처 v2 · 아래 바 + 미리보기 시트 */
+#gcapbar{position:fixed;left:0;right:0;bottom:0;z-index:60;display:flex;align-items:center;gap:12px;padding:14px max(20px,calc(50% - 290px)) calc(14px + env(safe-area-inset-bottom));background:var(--paper,#fff);color:var(--txt);border-radius:22px 22px 0 0;box-shadow:0 -1px 0 color-mix(in srgb,var(--txt) 8%,transparent),0 -10px 28px rgba(0,0,0,.14)}
+#gcapbar .gcapc{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px;line-height:1.25}
+#gcapbar .gcapc b{font-size:15px;font-weight:700;letter-spacing:-.02em;white-space:nowrap}
+#gcapbar .gcapc b em{font-style:normal;color:var(--main);font-variant-numeric:tabular-nums;margin-right:1px}
+#gcapbar .gcapc span{font-size:12px;color:var(--mute2);letter-spacing:-.01em;font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#gcapbar .gcapx{flex:none;width:40px;height:40px;display:grid;place-items:center;border:1px solid var(--line);border-radius:50%;background:transparent;color:var(--mute2);cursor:pointer}
+#gcapbar .gcapx:disabled{opacity:.35;cursor:default}
+#gcapbar .gcapgo{flex:none;display:inline-flex;align-items:center;gap:6px;height:44px;padding:0 20px 0 18px;border:0;border-radius:999px;background:var(--main);color:var(--on,#fff);font:inherit;font-size:14.5px;font-weight:700;letter-spacing:-.01em;cursor:pointer;transition:transform .12s,opacity .15s}
+#gcapbar .gcapgo:active{transform:scale(.97)}#gcapbar .gcapgo:disabled{opacity:.4;cursor:default}
+body.gcap-on #roomApp{padding-bottom:92px}body.gcap-on #gtd{display:none!important}
+
+/* 미리보기 시트 */
+#gcapsh{position:fixed;inset:0;z-index:70;display:flex;align-items:flex-end;justify-content:center;background:rgba(10,10,12,.42);animation:gcapf .18s ease-out}
+#gcapsh .shp{width:min(100%,560px);max-height:calc(100dvh - 24px);display:flex;flex-direction:column;background:var(--paper,#fff);color:var(--txt);border-radius:26px 26px 0 0;box-shadow:0 -12px 40px rgba(0,0,0,.25);animation:gcapu .26s cubic-bezier(.2,.8,.2,1)}
+#gcapsh .shh{position:relative;display:flex;align-items:center;padding:18px 20px 10px}
+#gcapsh .shh::before{content:"";position:absolute;left:50%;top:7px;width:36px;height:4px;margin-left:-18px;border-radius:2px;background:color-mix(in srgb,var(--txt) 16%,transparent)}
+#gcapsh .shh h3{flex:1;margin:0;font-size:17px;font-weight:700;letter-spacing:-.03em}
+#gcapsh .shh small{font-size:12px;font-weight:400;color:var(--mute2);margin-left:8px;letter-spacing:0;font-variant-numeric:tabular-nums}
+#gcapsh .shh button{width:36px;height:36px;display:grid;place-items:center;border:0;border-radius:50%;background:color-mix(in srgb,var(--txt) 6%,transparent);color:var(--txt);cursor:pointer}
+/* 미리보기: 결과 이미지를 그대로 줄여서 · 길면 안에서 스크롤 */
+#gcapsh .shv{position:relative;margin:4px 20px 0;border-radius:16px;background:color-mix(in srgb,var(--txt) 5%,var(--paper));overflow:auto;max-height:44dvh;min-height:180px;overscroll-behavior:contain;scrollbar-width:none}
+#gcapsh .shv::-webkit-scrollbar{display:none}
+#gcapsh .shv img{display:block;width:100%;height:auto;transition:opacity .16s}
+#gcapsh .shv.busy img{opacity:.45}
+#gcapsh .shv i{position:sticky;bottom:0;display:block;height:28px;margin-top:-28px;background:linear-gradient(transparent,color-mix(in srgb,var(--txt) 5%,var(--paper)));pointer-events:none}
+#gcapsh .shc{padding:18px 20px 4px;display:flex;flex-direction:column;gap:16px;overflow:auto}
+#gcapsh .shl{display:flex;align-items:center;justify-content:space-between;gap:12px}
+#gcapsh .shl>b{font-size:13px;font-weight:700;letter-spacing:-.01em;color:var(--mute2)}
+/* 모양 고르기: 작은 그림 카드 4장 */
+#gcapsh .sts{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:-6px}
+#gcapsh .sts button{display:flex;flex-direction:column;align-items:center;gap:7px;padding:10px 4px 9px;border:1.5px solid transparent;border-radius:14px;background:color-mix(in srgb,var(--txt) 4%,transparent);color:var(--txt);font:inherit;font-size:12.5px;font-weight:500;letter-spacing:-.02em;cursor:pointer;transition:border-color .15s,background .15s}
+#gcapsh .sts button[aria-checked=true]{border-color:var(--main);background:color-mix(in srgb,var(--main) 8%,transparent);font-weight:700}
+#gcapsh .sts svg{width:44px;height:52px;display:block}
+/* 글꼴 · 가리기 */
+#gcapsh .seg{display:inline-flex;padding:3px;border-radius:999px;background:color-mix(in srgb,var(--txt) 6%,transparent)}
+#gcapsh .seg button{min-width:64px;height:32px;padding:0 14px;border:0;border-radius:999px;background:transparent;color:var(--mute2);font:inherit;font-size:13.5px;cursor:pointer}
+#gcapsh .seg button[data-f=serif]{font-family:"Noto Serif KR","Nanum Myeongjo","AppleMyungjo",serif}
+#gcapsh .seg button[aria-checked=true]{background:var(--paper);color:var(--txt);font-weight:700;box-shadow:0 1px 3px rgba(0,0,0,.14)}
+#gcapsh .shl .sw{width:44px;height:26px}
+#gcapsh .shf{padding:14px 20px calc(16px + env(safe-area-inset-bottom))}
+#gcapsh .shf button{width:100%;height:52px;border:0;border-radius:16px;background:var(--main);color:var(--on,#fff);font:inherit;font-size:16px;font-weight:700;letter-spacing:-.02em;cursor:pointer}
+#gcapsh .shf button:disabled{opacity:.5;cursor:default}
+@keyframes gcapf{from{opacity:0}}@keyframes gcapu{from{transform:translateY(40px);opacity:.4}}
+@media (prefers-reduced-motion:reduce){#gcapsh,#gcapsh .shp{animation:none}}
+#gcapsh button:focus:not(:focus-visible),#gcapbar button:focus:not(:focus-visible){outline:none}
 </style>
 </head>
 <body>
@@ -1330,7 +1391,7 @@ html.gbgm-on{scroll-padding-top:calc(56px + env(safe-area-inset-top,0px))}
 </script>
 <script>
 /* 새 버전 알림: 올라간 index.html이 바뀌면 상단에 새로고침 안내를 띄워요 */
-const BUILD_ID="1795205404203";
+const BUILD_ID="1795235511737";
 (function(){
   if(!/^https?:/.test(location.protocol))return;
   let shown=false;
@@ -1532,7 +1593,7 @@ function viewDay(){
   const n=sel,live=n===today&&!CLOSED,p=partner();
   const a=(id,cls)=>'<div class="ans '+cls+'"><b>'+esc(realName(id))+"</b>"+esc(answers[id]?.[n]||"아직 쓰지 않았어요")+"</div>";
   $("#view").innerHTML='<div class="gtk"><div class="card dcard">'+stampArea(n,live)+'<div class="gadm2">ADMIT TWO · No. '+String(n).padStart(4,"0")+'</div><div class="dhead" style="'+dheadStyle(n,live)+'"><span class="gday">DAY '+n+'</span><span class="gdate">'+gDate(n)+'</span><span class="badge '+(live?"":"closed")+'">'+(live?"채팅 열림":"종료·보관됨")+'</span>'+stampText(n)+stampBtn(n,live)+'</div>'+stEditor(n,live)+'<div class="q">'+esc(Q[n-1])+"</div>"+a(me,"me")+(p?a(p,"you"):'<div class="note">상대가 아직 참여하지 않았어요.</div>')+
-  '</div>'+gStub(n,live)+'</div><div class="card gchat"><div class="gchh">'+(live?"오늘의 대화":"그날의 대화")+'</div><div class="chat" id="chat"></div>'+(live?'<div class="row"><div class="ibox"><textarea id="ci" rows="1" placeholder="이 주제로 이야기해요" maxlength="500" autocomplete="off" enterkeyhint="send"></textarea><button class="ggift" id="ggift" type="button" hidden aria-label="오늘의 선물 열기"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" d="M12 7.15C10.1 3.45 5.8 2.45 5.7 4.95c-.1 1.9 3.3 2.3 6.3 2.2zM12 7.15c1.9-3.7 6.2-4.7 6.3-2.2.1 1.9-3.3 2.3-6.3 2.2z"/><path d="M10.9 8H3.1a.6.6 0 0 0-.6.6V12a.6.6 0 0 0 .6.6h7.8zM13.1 8h7.8a.6.6 0 0 1 .6.6V12a.6.6 0 0 1-.6.6h-7.8zM10.9 13.8H5a1 1 0 0 0-1 1v5.6a1 1 0 0 0 1 1h5.9zM13.1 13.8H19a1 1 0 0 1 1 1v5.6a1 1 0 0 1-1 1h-5.9z"/></svg><i class="gdot"></i></button><span class="gtip" id="gtip" hidden>오늘의 선물이 도착했어요</span></div><button class="btn pri sendb" id="cs" title="보내기"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4z"/></svg></button></div>':'<div class="row" style="justify-content:flex-start;align-items:center;gap:8px"><span class="note">이 날의 대화는 닫혔어요. 기록만 볼 수 있어요.</span></div>')+"</div>";
+  '</div>'+gStub(n,live)+'</div><div class="card gchat"><div class="gchh gchh2"><span class="gcht">'+(live?"오늘의 대화":"그날의 대화")+'</span>'+gCapBtn(n)+'</div><div class="chat" id="chat"></div>'+(live?'<div class="row"><div class="ibox"><textarea id="ci" rows="1" placeholder="이 주제로 이야기해요" maxlength="500" autocomplete="off" enterkeyhint="send"></textarea><button class="ggift" id="ggift" type="button" hidden aria-label="오늘의 선물 열기"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" d="M12 7.15C10.1 3.45 5.8 2.45 5.7 4.95c-.1 1.9 3.3 2.3 6.3 2.2zM12 7.15c1.9-3.7 6.2-4.7 6.3-2.2.1 1.9-3.3 2.3-6.3 2.2z"/><path d="M10.9 8H3.1a.6.6 0 0 0-.6.6V12a.6.6 0 0 0 .6.6h7.8zM13.1 8h7.8a.6.6 0 0 1 .6.6V12a.6.6 0 0 1-.6.6h-7.8zM10.9 13.8H5a1 1 0 0 0-1 1v5.6a1 1 0 0 0 1 1h5.9zM13.1 13.8H19a1 1 0 0 1 1 1v5.6a1 1 0 0 1-1 1h-5.9z"/></svg><i class="gdot"></i></button><span class="gtip" id="gtip" hidden>오늘의 선물이 도착했어요</span></div><button class="btn pri sendb" id="cs" title="보내기"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4z"/></svg></button></div>':'<div class="row" style="justify-content:flex-start;align-items:center;gap:8px"><span class="note">이 날의 대화는 닫혔어요. 기록만 볼 수 있어요.</span></div>')+"</div>";
   wireStamp(n);
   if(live){/* 입력칸은 한 줄짜리 글상자: 안드로이드 크롬의 자동 완성 줄(열쇠·카드·위치)이 뜨지 않게. 쓰는 만큼 4줄까지 늘어나요 */const gCiFit=()=>{const c=$("#ci");if(!c)return;c.style.height="";c.style.height=Math.min(c.scrollHeight+2,120)+"px"};const send=async()=>{const t=$("#ci").value.trim();if(!t)return;$("#ci").value="";gCiFit();try{const ts0=Date.now(),af=gAf(),cp=P("chats/d"+n+"/messages"),items=[[cp,gSt({uid:me,text:t,ts:ts0,af})]];const dm=[...t.matchAll(DICE_RE)].slice(0,5);for(let i=0;i<dm.length;i++){const dn=+dm[i][1];items.push([cp,gSt({uid:me,dice:dn,v:1+Math.floor(Math.random()*dn),ts:ts0+i+1,af})])}await gPost(items)}catch(e){const ci=$("#ci");if(ci&&!ci.value.trim()){ci.value=t;gCiFit()}alert("전송하지 못했어요. 연결을 확인하거나, 문답이 닫혔는지 확인해 주세요.")}};$("#cs").onclick=()=>{send();const ci=$("#ci");if(ci&&document.activeElement!==ci)ci.focus({preventScroll:true})};{const cb=$("#cs");/* 보내기 버튼을 눌러도 입력칸이 포커스를 잃지 않게 → 키보드가 내려가지 않아요 */["pointerdown","mousedown","touchstart"].forEach(t=>cb.addEventListener(t,e=>{if(document.activeElement===$("#ci"))e.preventDefault()},{passive:false}));cb.addEventListener("touchend",e=>{if(document.activeElement===$("#ci")){e.preventDefault();cb.click()}},{passive:false})}$("#ci").onkeydown=e=>{if(e.key==="Enter"&&!e.shiftKey&&!e.isComposing){e.preventDefault();send()}};$("#ci").oninput=gCiFit;gGiftWire(n)}
   {const c0=$("#chat"),k0=RID+"|"+n;if(c0&&gChatCache.has(k0)&&!c0.dataset.gk){c0.innerHTML=gChatCache.get(k0);c0.scrollTop=c0.scrollHeight}}
@@ -1555,12 +1616,12 @@ function gChatPaint(c,ms,live,first){
   const fresh=[];
   for(const m of ms){const id=m._id||m.uid+":"+m.ts,h=msgHtml(m,live),k=key(h);let o=map.get(id);
     if(!o||o.k!==k){const t=document.createElement("div");t.innerHTML=h;const el=t.firstElementChild;if(o&&o.el.isConnected){o.el.replaceWith(el)}else fresh.push([el,m]);o={k,el};map.set(id,o)}
-    {const a=String(m._at??m.ts??0);if(o.el.isConnected&&o.el.dataset.at!==a)fresh.push([o.el,m,1]);o.el.dataset.at=a}keep.add(id)}
+    o.el._gm=m;{const a=String(m._at??m.ts??0);if(o.el.isConnected&&o.el.dataset.at!==a)fresh.push([o.el,m,1]);o.el.dataset.at=a}keep.add(id)}
   for(const [id,o] of map)if(!keep.has(id)){o.el.remove();map.delete(id)}
   /* 새 글, 그리고 서버 시각이 정해져 자리가 바뀐 내 글(휴대폰 시계가 틀린 경우)을 시각 순서 자리에 놓는다 */
   for(const [el,m,moved] of fresh){const at=m._at??m.ts??0,next=[...c.children].find(x=>x!==el&&+x.dataset.at>at);c.insertBefore(el,next||null);
     if(!moved&&!first&&m.uid!==me&&!gRM()&&el.animate)el.animate([{opacity:0},{opacity:1}],{duration:140,easing:"ease-out"})}
-  if(!ms.length&&!c.children.length)c.innerHTML='<div class="note">아직 대화가 없어요.</div>'}
+  if(!ms.length&&!c.children.length)c.innerHTML='<div class="note">아직 대화가 없어요.</div>';try{gCap.on&&gCapPaint()}catch(e){}}
 function gRushNow(){return gAnsOk&&today>=1&&today<=Q.length&&!(answers[me]||{})[today]?today:0}
 function viewWrite(){
   /* 답변을 다 불러오기 전에는 '오늘 답변 없음'으로 오해해 긴급 송부 칸을 띄우거나, 빈 목록으로 저장해 기존 답변을 덮어쓰지 않도록 기다려요 */
@@ -2006,6 +2067,369 @@ function gPmTop(v){return -61+70*v[1]}
 function gPmStyle(n){const v=gPmV(n);return "left:calc(20% + 42%*"+v[0].toFixed(3)+" - 75px);top:"+gPmTop(v).toFixed(1)+"px;transform:rotate("+((v[2]*2-1)*12).toFixed(1)+"deg)"}
 function gDateObj(n){const [y,m,d]=cfg.start.split("-").map(Number);return new Date(y,m-1,d+n-1)}
 
+/* ===== 채팅 캡처: 대화 칸 위 [캡처] → 처음과 끝 말풍선을 누르면 그 사이를 골라 이미지로 저장 =====
+   · 고르면 아래 바 → [미리보기] 시트에서 모양 4가지(입장권·채팅만·메신저·영수증)·글꼴(고딕/명조)·이름 가리기를 보며 저장 · 한 번에 60개까지
+   · 고른 줄은 #chat 안에 겹친 표시층(.gcapL)으로 보여줘요 (말풍선 모양·자리는 그대로) */
+const GCAP_MAX=60,GCAP_ST=[["ticket","입장권","DAY와 절취선·바코드"],["plain","채팅만","종이에 대화만 깔끔하게"],["msgr","메신저","프로필·시간이 있는 메신저 느낌"],["rcpt","영수증","글자로만 정리한 영수증"]];
+let gCap={on:false,n:0,a:null,b:null,hide:false,st:(()=>{try{const v=localStorage.getItem("o30.capst");return GCAP_ST.some(x=>x[0]===v)?v:"ticket"}catch(e){return"ticket"}})()};
+const GCAP_IC='<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8V5.5A1.5 1.5 0 0 1 5.5 4H8M16 4h2.5A1.5 1.5 0 0 1 20 5.5V8M20 16v2.5a1.5 1.5 0 0 1-1.5 1.5H16M8 20H5.5A1.5 1.5 0 0 1 4 18.5V16"/><circle cx="12" cy="12" r="3"/></svg>';
+const GCAP_X='<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>';
+function gCapBtn(n){const on=gCap.on&&gCap.n===n;return '<button type="button" class="gcapb'+(on?" on":"")+'" id="gcapb" aria-pressed="'+on+'">'+(on?GCAP_X+"캡처 끝내기":GCAP_IC+"캡처")+'</button>'}
+/* 고를 수 있는 줄: 채팅(말풍선·안내 줄) + 이벤트 스크립트 출력(지난 날 .gevc · 진행 중 .evp-msg) */
+const gCapIsEv=x=>x.classList.contains("gevc")||x.classList.contains("evp-msg");
+function gCapRows(){const c=$("#chat");return c?[...c.children].filter(x=>(x._gm||gCapIsEv(x))&&!x.classList.contains("gcapL")&&x.offsetHeight>0):[]}
+let gCapSeq=0;const gCapId=el=>el._gm?(el._gm._id||el._gm.uid+":"+el._gm.ts):(el._gcid||(el._gcid="ev"+(++gCapSeq)));
+/* 이벤트 줄 글자 뽑기: 구분선(div) · 대사(say) · 지문(nar) · 안내(note) */
+function gCapEvLines(el){const out=[],tx=x=>String(x.innerText||x.textContent||"").replace(/\s+/g," ").trim();
+  if(el.classList.contains("gevc")){el.querySelectorAll("p").forEach(p=>{const t=tx(p);if(!t)return;
+      if(p.classList.contains("evd"))out.push({k:"div",t});else if(p.classList.contains("evs"))out.push({k:"note",t});
+      else if(p.classList.contains("evy")){const b=p.querySelector("b"),n=b?tx(b):"";out.push({k:"say",n,t:n?t.slice(n.length).trim():t})}else out.push({k:"nar",t})});return out}
+  const SKIP=".evp-buttons,.evp-choices,.evp-actions,.evp-bar,.evp-menu,button";
+  const walk=node=>{for(const x of node.children){if(x.matches(SKIP))continue;const cl=x.classList;
+    if(cl.contains("evp-say")){const n=x.querySelector(".evp-say-name"),t=x.querySelector(".evp-say-text");out.push({k:"say",n:n?tx(n):"",t:t?tx(t):tx(x)});continue}
+    if(cl.contains("evp-divider")||cl.contains("evp-chapter")){const t=tx(x);if(t)out.push({k:"div",t});continue}
+    if(cl.contains("evp-line")){const t=tx(x);if(t)out.push({k:"nar",t});continue}
+    if([...cl].some(c=>/^evp-(note|card|pick|dice|notice|system|proposal|wait|run)/.test(c))){const t=tx(x);if(t)out.push({k:"note",t});continue}
+    if(x.children.length)walk(x);else{const t=tx(x);if(t)out.push({k:"nar",t})}}};
+  walk(el);return out}
+function gCapRange(){const rows=gCapRows(),ids=rows.map(gCapId);let i=ids.indexOf(gCap.a),j=ids.indexOf(gCap.b);if(i<0&&j<0)return{rows,i:-1,j:-2};if(i<0)i=j;if(j<0)j=i;if(i>j)[i,j]=[j,i];return{rows,i,j}}
+function gCapSel(){const r=gCapRange();return r.i<0?[]:r.rows.slice(r.i,r.j+1)}
+function gCapStart(n){gCap.on=true;gCap.n=n;gCap.a=gCap.b=null;gCapPaint();const c=$("#chat");if(c)c.scrollTop=c.scrollHeight}
+function gCapEnd(){if(!gCap.on)return;gCap.on=false;gCap.a=gCap.b=null;gCapPaint()}
+/* 화면 칠하기: 버튼 글자, 안내 문구, 표시층, 아래 바 */
+function gCapPaint(){
+  const c=$("#chat"),b=$("#gcapb"),live=c&&c.isConnected;
+  if(gCap.on&&(!live||typeof tab==="undefined"||(sel!==gCap.n))){gCap.on=false;gCap.a=gCap.b=null}
+  if(b)b.outerHTML=gCapBtn(gCap.on?gCap.n:-1);
+  document.body.classList.toggle("gcap-on",gCap.on);
+  if(c){c.classList.toggle("gcap",gCap.on);let h=c.parentElement&&c.parentElement.querySelector(".gcaph");
+    if(gCap.on&&!h){h=document.createElement("div");h.className="gcaph";h.textContent="처음과 끝 말풍선을 누르면 그 사이가 모두 골라져요";c.before(h)}
+    if(!gCap.on&&h)h.remove();gCapLayout()}
+  gCapBar()}
+/* 고른 줄 표시: 채팅 칸 너비 그대로의 옅은 띠 + 왼쪽 동그라미 */
+function gCapLayout(){const c=$("#chat");if(!c)return;let L=c.querySelector(":scope>.gcapL");
+  if(!gCap.on){if(L)L.remove();return}
+  if(!L){L=document.createElement("div");L.className="gcapL";L.setAttribute("aria-hidden","true");c.prepend(L)}
+  const r=gCapRange(),rows=r.rows,H=[];
+  rows.forEach((el,k)=>{const on=k>=r.i&&k<=r.j,t=el.offsetTop-3,h=el.offsetHeight+6;H.push('<i class="'+(on?"on":"")+'" style="top:'+t+'px;height:'+h+'px"></i>')});
+  L.style.height=c.scrollHeight+"px";L.innerHTML=H.join("")}
+/* 누르기: 화면에서 누른 높이에 있는 줄을 찾아요 (말풍선 옆 빈 곳을 눌러도 돼요) */
+function gCapTap(e){if(!gCap.on)return;const rows=gCapRows();if(!rows.length)return;
+  e.preventDefault();e.stopPropagation();
+  const y=e.clientY;let best=null,bd=1e9;for(const el of rows){const q=el.getBoundingClientRect(),d=y<q.top?q.top-y:y>q.bottom?y-q.bottom:0;if(d<bd){bd=d;best=el}}
+  if(!best||bd>14)return;const id=gCapId(best);
+  if(gCap.a===null){gCap.a=gCap.b=id}
+  else if(gCap.a!==gCap.b){gCap.a=gCap.b=id}
+  else if(gCap.a===id){gCap.a=gCap.b=null}
+  else{gCap.b=id;const ids=rows.map(gCapId),i=ids.indexOf(gCap.a),j=ids.indexOf(id);
+    if(Math.abs(j-i)+1>GCAP_MAX){gCap.b=ids[i+(j>i?GCAP_MAX-1:-(GCAP_MAX-1))];gToastMsg("한 번에 "+GCAP_MAX+"개까지 담을 수 있어요")}}
+  gCapPaint()}
+/* 고른 줄 → 그리기 재료. 이벤트 중간만 골랐으면 앞쪽에서 제목을 찾아 "이어서"로, 뒤에 이벤트가 더 있으면 "계속"으로 표시해요 */
+function gCapPack(sel){const all=gCapRows(),first=all.indexOf(sel[0]),last=all.indexOf(sel[sel.length-1]);let title="",cont=false,more=false;
+  const fe=sel.findIndex(gCapIsEv);
+  if(fe>=0){const own=gCapEvLines(sel[fe]);if(!(own[0]&&own[0].k==="div")){
+      for(let i=all.indexOf(sel[fe])-1,gap=0;i>=0&&gap<=8;i--){const el=all[i];if(!gCapIsEv(el)){gap++;continue}gap=0;cont=true;const ls=gCapEvLines(el);if(ls[0]&&ls[0].k==="div"){title=ls[0].t;break}}}
+    const le=sel.map(gCapIsEv).lastIndexOf(true);for(let i=all.indexOf(sel[le])+1,gap=0;i<all.length&&gap<=8;i++){const el=all[i];if(!gCapIsEv(el)){gap++;continue}const ls=gCapEvLines(el);if(ls.length){more=true;break}}}
+  return sel.map(el=>el._gm?el._gm:{ev:gCapEvLines(el),title,cont,more})}
+/* ===== 채팅 캡처 v2 · 아래 바(골라 담기) → 미리보기 시트(모양·글꼴·이름 가리기 → 저장) ===== */
+const GCAP_FT=[["sans","고딕"],["serif","명조"]];
+gCap.ft=(()=>{try{const v=localStorage.getItem("o30.capft");return GCAP_FT.some(x=>x[0]===v)?v:"sans"}catch(e){return"sans"}})();
+/* 모양 카드의 작은 그림 (currentColor = 글자색, 테마색은 var(--main)) */
+const GCAP_TH={
+  ticket:'<svg viewBox="0 0 44 52" aria-hidden="true"><path d="M6 3h32a3 3 0 0 1 3 3v8a3 3 0 0 0 0 6v19a3 3 0 0 0 0 6v1a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3v-1a3 3 0 0 0 0-6V20a3 3 0 0 0 0-6V6a3 3 0 0 1 3-3z" fill="var(--paper)" stroke="currentColor" stroke-opacity=".28"/><rect x="9" y="8" width="15" height="3.5" rx="1" fill="currentColor"/><path d="M8 17h28M8 42h28" stroke="currentColor" stroke-opacity=".35" stroke-dasharray="1.5 2.5"/><rect x="9" y="22" width="16" height="5" rx="2.5" fill="currentColor" fill-opacity=".18"/><rect x="19" y="30" width="16" height="5" rx="2.5" fill="var(--main)" fill-opacity=".4"/><path d="M24 44.5v3M26 44.5v3M28.5 44.5v3M30 44.5v3M32.5 44.5v3M35 44.5v3" stroke="currentColor"/></svg>',
+  plain:'<svg viewBox="0 0 44 52" aria-hidden="true"><rect x="3" y="3" width="38" height="46" rx="3" fill="var(--paper)" stroke="currentColor" stroke-opacity=".28"/><rect x="8" y="8" width="11" height="3.5" rx="1" fill="var(--main)"/><path d="M8 15h28" stroke="currentColor" stroke-opacity=".2"/><rect x="8" y="19" width="18" height="5" rx="2.5" fill="currentColor" fill-opacity=".18"/><rect x="17" y="27" width="19" height="5" rx="2.5" fill="var(--main)" fill-opacity=".4"/><rect x="8" y="35" width="14" height="5" rx="2.5" fill="currentColor" fill-opacity=".18"/><path d="M19 45h6" stroke="currentColor" stroke-opacity=".3"/></svg>',
+  msgr:'<svg viewBox="0 0 44 52" aria-hidden="true"><rect x="3" y="3" width="38" height="46" rx="3" fill="var(--main)" fill-opacity=".12" stroke="currentColor" stroke-opacity=".28"/><path d="M3.5 12h37" stroke="currentColor" stroke-opacity=".18"/><path d="M9 6l-2 2 2 2" stroke="currentColor" fill="none" stroke-linecap="round"/><rect x="12" y="6.5" width="10" height="3" rx="1" fill="currentColor" fill-opacity=".6"/><rect x="7" y="17" width="6" height="6" rx="2.2" fill="currentColor" fill-opacity=".3"/><rect x="15" y="18" width="15" height="5" rx="2.5" fill="#fff"/><rect x="19" y="27" width="17" height="5" rx="2.5" fill="var(--main)" fill-opacity=".45"/><rect x="7" y="36" width="6" height="6" rx="2.2" fill="currentColor" fill-opacity=".3"/><rect x="15" y="37" width="12" height="5" rx="2.5" fill="#fff"/></svg>',
+  rcpt:'<svg viewBox="0 0 44 52" aria-hidden="true"><path d="M6 6l3-3 3 3 3-3 3 3 3-3 3 3 3-3 3 3 3-3 3 3 3-3v43l-3 3-3-3-3 3-3-3-3 3-3-3-3 3-3-3-3 3-3-3-3 3z" fill="#fffdf8" stroke="currentColor" stroke-opacity=".28" stroke-linejoin="round"/><rect x="14" y="10" width="16" height="3" rx="1" fill="currentColor"/><path d="M10 17h24M10 36h24" stroke="currentColor" stroke-opacity=".35" stroke-dasharray="1.5 2.5"/><path d="M10 21.5h5M17 21.5h17M10 26h5M17 26h12M10 30.5h5M17 30.5h15" stroke="currentColor" stroke-opacity=".45" stroke-width="1.6"/><path d="M14 40v4M16 40v4M18.5 40v4M20 40v4M23 40v4M25 40v4M27.5 40v4M30 40v4" stroke="currentColor"/></svg>'};
+
+/* 아래 바: 몇 개 · 어디서 어디까지 / 다시 고르기 / 미리보기 */
+function gCapBar(){let bar=document.getElementById("gcapbar");
+  if(!gCap.on){if(bar)bar.remove();gCapSheetClose();return}
+  if(!bar){bar=document.createElement("div");bar.id="gcapbar";bar.setAttribute("role","toolbar");bar.setAttribute("aria-label","채팅 캡처");
+    bar.innerHTML='<div class="gcapc" aria-live="polite"><b id="gcapn"></b><span id="gcapr"></span></div>'
+      +'<button type="button" class="gcapx" id="gcapclr" aria-label="다시 고르기"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg></button>'
+      +'<button type="button" class="gcapgo" id="gcaps">미리보기<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg></button>';
+    ($("#roomApp")||document.body).appendChild(bar);
+    bar.querySelector("#gcapclr").onclick=()=>{gCap.a=gCap.b=null;gCapPaint()};
+    bar.querySelector("#gcaps").onclick=gCapSheet}
+  const s=gCapSel(),k=s.length,t=s.map(el=>el._gm&&el._gm.ts).filter(Boolean);
+  bar.querySelector("#gcapn").innerHTML=k?'<em>'+k+'</em>개 골랐어요':"처음과 끝 말풍선을 눌러 주세요";
+  bar.querySelector("#gcapr").textContent=k?(t.length?(gHM(t[0])===gHM(t[t.length-1])?gHM(t[0]):gHM(t[0])+" – "+gHM(t[t.length-1]))+" · ":"")+"최대 "+GCAP_MAX+"개":"그 사이 대화가 한 장으로 담겨요";
+  bar.querySelector("#gcapclr").disabled=!k;bar.querySelector("#gcaps").disabled=!k}
+
+/* 미리보기 시트: 바꿀 때마다 다시 그려서 보여 주고, 저장은 그 그림 그대로 */
+let gCapCv=null,gCapTk=0;
+function gCapSheetClose(){const m=document.getElementById("gcapsh");if(m)m.remove();gCapCv=null}
+function gCapSheet(){if(!gCapSel().length)return;gCapSheetClose();
+  const m=document.createElement("div");m.id="gcapsh";
+  m.innerHTML='<div class="shp" role="dialog" aria-modal="true" aria-labelledby="gcapst"><div class="shh"><h3 id="gcapst">캡처 미리보기<small id="gcapsz"></small></h3><button type="button" id="gcapcl" aria-label="닫기"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>'
+    +'<div class="shv busy" id="gcapv"><img alt="캡처 미리보기"><i></i></div>'
+    +'<div class="shc"><div class="shl"><b>모양</b></div><div class="sts" role="radiogroup" aria-label="모양">'
+    +GCAP_ST.map(([k,t])=>'<button type="button" role="radio" data-k="'+k+'" aria-checked="'+(gCap.st===k)+'">'+GCAP_TH[k]+t+'</button>').join("")+'</div>'
+    +'<div class="shl"><b>글꼴</b><span class="seg" role="radiogroup" aria-label="글꼴">'+GCAP_FT.map(([k,t])=>'<button type="button" role="radio" data-f="'+k+'" aria-checked="'+(gCap.ft===k)+'">'+t+'</button>').join("")+'</span></div>'
+    +'<div class="shl"><b>이름 가리기 <span style="font-weight:400">· 나 / 상대로 바꿔요</span></b><button type="button" class="sw'+(gCap.hide?" on":"")+'" id="gcaph" role="switch" aria-checked="'+gCap.hide+'" aria-label="이름 가리기"></button></div></div>'
+    +'<div class="shf"><button type="button" id="gcapsv">이미지 저장</button></div></div>';
+  document.body.appendChild(m);
+  const sync=()=>{m.querySelectorAll(".sts button").forEach(b=>b.setAttribute("aria-checked",b.dataset.k===gCap.st));m.querySelectorAll(".seg button").forEach(b=>b.setAttribute("aria-checked",b.dataset.f===gCap.ft));
+    const h=m.querySelector("#gcaph");h.classList.toggle("on",gCap.hide);h.setAttribute("aria-checked",gCap.hide);gCapPreview()};
+  m.querySelectorAll(".sts button").forEach(b=>b.onclick=()=>{gCap.st=b.dataset.k;try{localStorage.setItem("o30.capst",gCap.st)}catch(e){}sync()});
+  m.querySelectorAll(".seg button").forEach(b=>b.onclick=()=>{gCap.ft=b.dataset.f;try{localStorage.setItem("o30.capft",gCap.ft)}catch(e){}sync()});
+  m.querySelector("#gcaph").onclick=()=>{gCap.hide=!gCap.hide;sync()};
+  m.querySelector("#gcapcl").onclick=gCapSheetClose;m.onclick=e=>{if(e.target===m)gCapSheetClose()};
+  m.querySelector("#gcapsv").onclick=gCapSave;
+  m.addEventListener("keydown",e=>{if(e.key==="Escape")gCapSheetClose()});setTimeout(()=>m.querySelector("#gcapcl").focus(),0);
+  gCapPreview()}
+async function gCapPreview(){const m=document.getElementById("gcapsh");if(!m)return;const tk=++gCapTk,v=m.querySelector("#gcapv"),sv=m.querySelector("#gcapsv");
+  v.classList.add("busy");sv.disabled=true;
+  try{if(gCap.ft==="serif")await gCapSerif();const cv=await gCapRender(gCapPack(gCapSel()),gCap.n,gCap.st,gCap.hide,gCap.ft);if(tk!==gCapTk)return;
+    gCapCv=cv;const img=v.querySelector("img");img.src=cv.toDataURL("image/png");m.querySelector("#gcapsz").textContent=cv.width+" × "+cv.height;
+    v.classList.remove("busy");sv.disabled=false}catch(e){if(tk===gCapTk){v.classList.remove("busy");gToastMsg("미리보기를 만들지 못했어요")}}}
+/* 명조는 고를 때 처음 한 번만 불러와요 */
+let gCapSerifP=null;function gCapSerif(){if(gCapSerifP)return gCapSerifP;
+  gCapSerifP=new Promise(r=>{const l=document.createElement("link");l.rel="stylesheet";l.href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;500;700;900&display=swap";l.onload=l.onerror=()=>r();document.head.appendChild(l)});return gCapSerifP}
+async function gCapSave(){const cv=gCapCv;if(!cv)return;const b=document.getElementById("gcapsv");if(b){b.disabled=true;b.textContent="저장하는 중…"}
+  try{const blob=await new Promise(r=>cv.toBlob(r,"image/png"));await gCapDownload(blob,"day-"+gCap.n+"-chat-"+gCap.st+".png");gCapSheetClose();gCapEnd();gToastMsg("이미지를 저장했어요")}
+  catch(e){if(!(e&&e.code==="declined"))alert("이미지를 만들지 못했어요: "+(e.message||e))}
+  finally{const b2=document.getElementById("gcapsv");if(b2){b2.disabled=false;b2.textContent="이미지 저장"}}}
+
+/* ── 채팅 캡처 그리기 v2: 가로 1080 · 고른 만큼 세로가 늘어나요
+   · 여백은 8의 배수 리듬 (바깥 64 · 안쪽 56 · 묶음 사이 28 · 묶음 안 8)
+   · 같은 사람이 5분 안에 이어 보낸 말은 한 묶음 → 이름·시간은 묶음 첫 줄에만, 시간은 마지막 줄에만
+   · 이름·시간은 말풍선 밖 위로 꺼내 말풍선 안은 대화만
+   · 글꼴: sans(Noto Sans KR) / serif(Noto Serif KR) · 한글 자간 살짝 좁혀요 */
+async function gCapRender(ms,n,st,hide,fontKey,emb){
+  const C=gPalNow(),W=(emb&&emb.w)||1080,SANS='"Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif',
+    SERIF='"Noto Serif KR","Nanum Myeongjo","AppleMyungjo","Noto Serif CJK KR",serif',
+    F=fontKey==="serif"?SERIF:SANS,MONO='"Noto Sans Mono CJK KR","D2Coding","Menlo","Consolas",monospace,'+SANS;
+  const p=partner(),dt=gDateObj(n),y8=dt.getFullYear()+String(dt.getMonth()+1).padStart(2,"0")+String(dt.getDate()).padStart(2,"0"),
+    WD="일월화수목금토"[dt.getDay()],ymd=dt.getFullYear()+"년 "+(dt.getMonth()+1)+"월 "+dt.getDate()+"일 "+WD+"요일",
+    dot=y8.slice(0,4)+"."+y8.slice(4,6)+"."+y8.slice(6);
+  const nm=u=>hide?(u===me?"나":"상대"):realName(u);
+  const hid=t=>{t=String(t??"");if(!hide)return t;const a=realName(me),b=p?realName(p):"";if(a)t=t.split(a).join("나");if(b)t=t.split(b).join("상대");return t};
+  const fam=fontKey==="serif"?"Noto Serif KR":"Noto Sans KR";
+  try{await Promise.all([400,500,700,900].map(w=>document.fonts.load(w+' 30px "'+fam+'"',ms.map(m=>m.text||m.gift||"").join(" ")+" 대화 영수증 입장권 ADMIT DAY 0123456789")))}catch(e){}
+  const mg=document.createElement("canvas").getContext("2d");
+  /* 자간(ls)까지 재서 줄을 나눠요 */
+  const wrap=(font,t,w,max,ls)=>{mg.font=font;mg.letterSpacing=ls||"0px";const out=[];for(const para of String(t??"").split("\n")){if(out.length>=max)break;let line="";
+      for(const word of para.split(/ +/)){if(!word)continue;const cand=line?line+" "+word:word;if(mg.measureText(cand).width<=w){line=cand;continue}
+        if(line){out.push(line);line=""}if(mg.measureText(word).width<=w){line=word;continue}
+        let part="";for(const ch of word){if(mg.measureText(part+ch).width>w&&part){out.push(part);part=ch}else part+=ch}line=part}out.push(line)}
+    mg.letterSpacing="0px";if(out.length>max){out.length=max;out[max-1]=out[max-1].replace(/.?$/,"…")}return out};
+  const tw=(font,t,ls)=>{mg.font=font;mg.letterSpacing=ls||"0px";const v=mg.measureText(t).width;mg.letterSpacing="0px";return v};
+  const txt=(g,t,x,y,font,col,ls,al)=>{g.font=font;g.fillStyle=col;g.letterSpacing=ls||"0px";g.textAlign=al||"left";g.fillText(t,x,y);g.letterSpacing="0px";g.textAlign="left"};
+
+  /* 글자 체계 (px @1080) */
+  const LS_B="-0.4px",LS_H="-2px",
+    BF=(w)=>(w||400)+" 30px "+F,BLH=46,              /* 말풍선 본문 30/46 */
+    NF="700 21px "+F,TF="400 20px "+F,               /* 이름 · 시간 */
+    SF="400 22px "+F,SFB="700 22px "+F;              /* 가운데 안내 */
+  const mute=C.mute,soft=gMixHex(C.paper,C.text,.42),hair=gMixHex(C.paper,C.text,.12);
+  const userCol=uid=>((members[uid]&&members[uid].color)||(uid===me?C.main:"#888888")).slice(0,7);
+  /* 말풍선 바탕: 내 말은 조금 더 진하게, 상대는 옅게 → 누가 누군지 색만으로도 갈려요 */
+  const bubCol=uid=>gMixHex(C.paper,userCol(uid),C.dk?(uid===me?.34:.22):(uid===me?.21:.15));
+  const nameCol=uid=>{let c=userCol(uid);for(let i=0;i<12&&gCR(c,C.paper)<3.2;i++)c=C.dk?gLite(c,.1):gDark(c,.08);return c};
+
+  /* 줄 종류: sys(가운데 안내) / bub(말풍선·이모티콘) / ev(이벤트 대본) */
+  const it=[];
+  for(const m of ms){
+    if(m.ev){const ls=m.ev.map(l=>({...l,n:l.n?hid(l.n):"",t:hid(l.t)}));const last=it[it.length-1];if(last&&last.k==="ev")last.ls.push(...ls);else if(ls.length)it.push({k:"ev",ls,title:m.title?hid(m.title):"",cont:!!m.cont,more:!!m.more});continue}
+    if(m.cmd){it.push({k:"sys",t:hid(typeof gCmdText==="function"?gCmdText(m):String(m.text||""))});continue}
+    if(m.gift){it.push({k:"sys",t:m.sg?"DAY "+m.sd+" · "+nm(m.from)+" 님이 "+nm(m.uid)+" 님에게 선물을 보냈어요":nm(m.uid)+" 님이 선물을 열었어요",b:hid(gGName(m)),gift:1});continue}
+    if(m.dice){it.push({k:"sys",t:nm(m.uid)+" 님이 주사위를 굴렸어요",b:String(m.v),bc:diceCol(m.v,m.dice),dice:1});continue}
+    const mk=m.emote?{c:""}:gMk(m.text);
+    if(!m.emote&&mk.c==="gctr"){it.push({k:"sys",t:hid(mk.t)});continue}
+    let im=null;if(m.emote&&String(m.emote).startsWith("data:"))im=await loadImg(m.emote);
+    it.push({k:"bub",m,mine:m.uid===me,who:nm(m.uid),tm:gHM(m.ts),ts:m.ts||0,im,t:m.emote?(im?"":"[이모티콘]"):hid(mk.t),mk:mk.c||""})}
+  /* 묶음: 바로 앞 줄이 같은 사람 말풍선이고 5분 안이면 이어 붙여요 */
+  it.forEach((x,i)=>{if(x.k!=="bub")return;const pv=it[i-1],nx=it[i+1];
+    x.gF=!(pv&&pv.k==="bub"&&pv.m.uid===x.m.uid&&x.ts-pv.ts<=300000);
+    x.gL=!(nx&&nx.k==="bub"&&nx.m.uid===x.m.uid&&nx.ts-x.ts<=300000)});
+  /* 이벤트 장면 묶기 (기존 규칙 그대로) */
+  const scenes=[];{const evi=it.map((x,i)=>x.k==="ev"?i:-1).filter(i=>i>=0);let cur=null;
+    for(const i of evi){if(cur&&i-cur.e-1<=8)cur.e=i;else{cur={s:i,e:i};scenes.push(cur)}}
+    scenes.forEach((sc,k)=>{const f=it[sc.s];if(f.ls[0]&&f.ls[0].k==="div"&&!f.cont){sc.title=f.ls[0].t;f.ls.shift()}else{sc.title=f.title||"이벤트";sc.cont=f.cont}sc.more=it[sc.e].more;
+      if(sc.cont)sc.title+=" · 이어서";
+      for(let i=sc.s;i<=sc.e;i++)it[i].sc=k;it[sc.s].scF=1;it[sc.e].scL=1})}
+  const bubs=it.filter(x=>x.k==="bub"),cnt={ev:scenes.length||it.filter(x=>x.k==="ev").length,talk:bubs.length,gift:it.filter(x=>x.gift).length,dice:it.filter(x=>x.dice).length};
+  const span=bubs.length?(bubs[0].tm===bubs[bubs.length-1].tm?bubs[0].tm:bubs[0].tm+" – "+bubs[bubs.length-1].tm):"";
+  const cv=document.createElement("canvas"),g0=()=>{const g=cv.getContext("2d");g.fontKerning="normal";g.textBaseline="alphabetic";g.textAlign="left";try{g.textRendering="optimizeLegibility"}catch(e){}return g};
+
+  /* ── 이벤트 장면 (대본형) */
+  const SCI=32,SC_NF="700 25px "+F,SC_CF="700 20px "+F,SC_TF="400 28px "+F,SC_NAR="400 28px "+F,SC_NOTE="400 24px "+F,SC_DIV="700 20px "+F,SC_SYS="400 22px "+F;
+  const layScene=(sc,cw)=>{const its=it.slice(sc.s,sc.e+1);let nw=0;
+    its.forEach(x=>{if(x.k==="ev")x.ls.forEach(l=>{if(l.k==="say")nw=Math.max(nw,tw(SC_NF,l.n))});else if(x.k==="bub")nw=Math.max(nw,tw(SC_CF,x.who)+28)});
+    nw=Math.min(240,Math.max(88,Math.ceil(nw)+24));sc.nw=nw;
+    const rows=[];its.forEach(x=>{
+      if(x.k==="ev")x.ls.forEach(l=>{
+        if(l.k==="div")rows.push({g:"div",t:l.t,lh:34});
+        else if(l.k==="say")rows.push({g:"say",n:l.n,ls:wrap(SC_TF,"“"+l.t+"”",cw-nw,8,LS_B),lh:44});
+        else if(l.k==="note")rows.push({g:"story",note:1,ls:wrap(SC_NOTE,l.t,cw,6,LS_B),lh:38});
+        else rows.push({g:"story",ls:wrap(SC_NAR,l.t,cw,10,LS_B),lh:44})});
+      else if(x.k==="bub")rows.push({g:"user",x,n:x.who,im:x.im,ls:x.im?[]:wrap(SC_TF,x.t,cw-nw,8,LS_B),lh:44});
+      else if(x.k==="sys")rows.push({g:"sys",ls:wrap(SC_SYS,x.t+(x.b?" · "+x.b:""),cw-40,3),lh:32})});
+    let y=56,prev=null;for(const r of rows){const gap=prev===null?8:(r.g==="div"||prev==="div")?24:r.g===prev?(r.g==="story"?6:10):20;y+=gap;r.y=y;
+      r.h=r.g==="div"?r.lh:r.im?120:r.ls.length*r.lh;y+=r.h;prev=r.g}
+    if(sc.more){y+=16;sc.moreY=y;y+=34}sc.rows=rows;sc.h=y+8};
+  const drawScene=(g,sc,X0,t,CW)=>{const x0=X0+SCI,cw=CW-SCI,acc=C.ink,nar=gMixHex(C.paper,C.text,.88);
+    g.fillStyle=gMixHex(C.paper,acc,.5);rrect(g,X0+2,t+8,3,sc.h-8,1.5);g.fill();
+    txt(g,"EVENT",x0,t+32,"700 18px "+SANS,acc,"4px");const ew=tw("700 18px "+SANS,"EVENT","4px")+18;
+    txt(g,wrap("700 25px "+F,sc.title,cw-ew,1)[0],x0+ew,t+32,"700 25px "+F,C.text,"-0.5px");
+    for(const r of sc.rows){const y=t+r.y;
+      if(r.g==="div"){const w=tw(SC_DIV,r.t,"3px");txt(g,r.t,x0+cw/2,y+24,SC_DIV,mute,"3px","center");
+        g.fillStyle=hair;const lw=Math.max(0,cw/2-w/2-20);g.fillRect(x0,y+17,lw,2);g.fillRect(x0+cw-lw,y+17,lw,2);continue}
+      if(r.g==="sys"){r.ls.forEach((l,i)=>txt(g,l,x0+cw/2,y+24+i*r.lh,SC_SYS,mute,"","center"));continue}
+      if(r.g==="story"){r.ls.forEach((l,i)=>txt(g,l,x0,y+(r.note?27:31)+i*r.lh,r.note?SC_NOTE:SC_NAR,r.note?mute:nar,LS_B));continue}
+      if(r.g==="say")txt(g,wrap(SC_NF,r.n,sc.nw-16,1)[0],x0,y+31,SC_NF,acc,"-0.3px");
+      else{const pb=bubCol(r.x.m.uid),pw=Math.min(sc.nw-12,tw(SC_CF,r.n)+28);g.fillStyle=pb;rrect(g,x0,y+6,pw,34,17);g.fill();txt(g,wrap(SC_CF,r.n,pw-28,1)[0],x0+14,y+30,SC_CF,nameCol(r.x.m.uid));
+        if(r.im){g.drawImage(r.im,x0+sc.nw,y,112,112);continue}}
+      r.ls.forEach((l,i)=>txt(g,l,x0+sc.nw,y+31+i*r.lh,SC_TF,C.text,LS_B))}
+    if(sc.moreY!==undefined)txt(g,"⋯ 이벤트가 이어져요",x0,t+sc.moreY+26,"500 22px "+F,mute)};
+
+  /* ── 말풍선 배치 (입장권·채팅만·메신저 공통)
+     o.msgr: 아바타·바깥 시간 · o.pill: 안내를 알약 모양으로 */
+  const PADX=26,PADT=17,PADB=19,EMO=168,AV=76,AVG=16,LABH=36;
+  const layBubbles=(cw0,o)=>{let y=0,prev=null;
+    const gapOf=(a,b)=>!a?0:(a.k==="bub"&&b.k==="bub"&&!b.gF)?8:28;
+    for(let i=0;i<it.length;i++){const x=it[i];
+      if(x.scF){const sc=scenes[x.sc];layScene(sc,cw0-SCI);y+=prev?32:0;sc.top=y;y+=sc.h;prev={k:"scene"};i=sc.e;continue}
+      y+=gapOf(prev,x);
+      if(x.k==="sys"){x.lines=wrap(SF,x.t+(x.b?" · "+x.b:""),cw0-160,4);x.h=x.lines.length*32+24}
+      else{const ox=o.msgr&&!x.mine?AV+AVG:0,cw=cw0-ox,maxW=Math.round(cw*(o.msgr?.74:.76));
+        x.ox=ox;x.labH=(x.gF&&!o.msgr)||(o.msgr&&!x.mine&&x.gF)?LABH:0;
+        if(x.im){x.w=EMO;x.bh=EMO}
+        else{const f=BF(x.mk==="gbold"?700:400);x.font=f;x.lines=wrap(f,x.t,maxW-2*PADX,10,LS_B);x.w=Math.ceil(Math.max(...x.lines.map(l=>tw(f,l,LS_B))))+2*PADX;x.bh=PADT+x.lines.length*BLH+PADB-6}
+        x.h=x.labH+x.bh;if(o.msgr&&!x.mine&&x.gF)x.h=Math.max(x.h,AV)}
+      x.y=y;y+=x.h;prev=x}
+    return y};
+  const bubPath=(g,x,y,w,h,mine,first,msgr)=>{const R=Math.min(28,h/2),t=first?8:R;g.beginPath();
+    if(mine){g.moveTo(x+R,y);g.lineTo(x+w-t,y);g.arcTo(x+w,y,x+w,y+t,t);g.arcTo(x+w,y+h,x,y+h,R);g.arcTo(x,y+h,x,y,R);g.arcTo(x,y,x+w,y,R)}
+    else{g.moveTo(x+t,y);g.arcTo(x+w,y,x+w,y+h,R);g.arcTo(x+w,y+h,x,y+h,R);g.arcTo(x,y+h,x,y,R);g.arcTo(x,y,x+w,y,t)}g.closePath()};
+  const drawBubbles=(g,X0,y0,CW,o)=>{
+    for(const sc of scenes)if(sc.top!==undefined)drawScene(g,sc,X0,y0+sc.top,CW);
+    for(const x of it){if(x.sc!==undefined||x.y===undefined)continue;const y=y0+x.y;
+      if(x.k==="sys"){const fb=x.b?(x.dice?x.bc:C.ink):null,lw=Math.max(...x.lines.map(l=>tw(SF,l)))+48;
+        g.fillStyle=o.pillBg||gMixHex(C.paper,C.text,C.dk?.1:.06);rrect(g,X0+CW/2-lw/2,y,lw,x.h,Math.min(x.h/2,24));g.fill();
+        x.lines.forEach((l,i)=>{const yy=y+12+26+i*32,last=i===x.lines.length-1;
+          if(fb&&last&&l.endsWith(" · "+x.b)){const a=l.slice(0,l.length-x.b.length),wa=tw(SF,a),wb=tw(SFB,x.b),sx=X0+CW/2-(wa+wb)/2;
+            txt(g,a,sx,yy,SF,o.pillTx||mute);txt(g,x.b,sx+wa,yy,SFB,o.pillTx||fb)}
+          else txt(g,l,X0+CW/2,yy,SF,o.pillTx||mute,"","center")});continue}
+      const L=X0+x.ox,bx=x.mine?X0+CW-x.w:L;let by=y+x.labH;
+      if(o.msgr){
+        if(!x.mine&&x.gF){g.fillStyle=gMixHex("#ffffff",userCol(x.m.uid),.62);rrect(g,X0,y,AV,AV,30);g.fill();
+          txt(g,x.who.slice(0,1),X0+AV/2,y+AV/2+10,"700 28px "+F,"#ffffff","","center");
+          txt(g,x.who,L+4,y+24,"500 21px "+F,o.nameCol,"-0.3px")}}
+      else if(x.labH){const nmW=tw(NF,x.who,"-0.2px"),gap=10,tmW=tw(TF,x.tm),tot=nmW+gap+tmW,lx=x.mine?X0+CW-tot-6:L+6;
+        txt(g,x.who,lx,y+24,NF,nameCol(x.m.uid),"-0.2px");txt(g,x.tm,lx+nmW+gap,y+24,TF,soft)}
+      if(x.im){g.drawImage(x.im,bx,by,EMO,EMO)}
+      else{const bg=o.msgr?(x.mine?gMixHex("#ffffff",C.main,.26):"#ffffff"):bubCol(x.m.uid);g.fillStyle=bg;bubPath(g,bx,by,x.w,x.bh,x.mine,x.gF,o.msgr);g.fill();
+        const tc=o.msgr?"#262321":C.text;const col=x.mk==="gdim"?gMixHex(bg,tc,.5):tc;
+        x.lines.forEach((l,k)=>txt(g,l,bx+PADX,by+PADT+31+k*BLH,x.font,col,LS_B))}
+      if(o.msgr&&x.gL){const ty=by+x.bh-4;txt(g,x.tm,x.mine?bx-10:bx+x.w+10,ty,"400 19px "+F,o.timeCol,"",x.mine?"right":"left")}}};
+  /* 바코드 아래 숫자 */
+  const digits=(g,cx,y,col)=>txt(g,y8,cx,y,"500 20px "+SANS,col,"12px","center");
+
+  if(st==="ticket"){
+    /* 입장권: 테마 바탕 위 종이 티켓 · 머리(DAY) / 대화 / 꼬리(정보+바코드) 세 칸을 절취선으로 */
+    const M=64,TX0=M,TW=W-2*M,PD=56,cw=TW-2*PD,T0=148,R=24;const ch=layBubbles(cw,{});
+    const HEAD=PD+30+104+20+36+PD-8,top=T0+HEAD,body0=top+PD,SEAM2=body0+ch+PD,STUB=200,T1=SEAM2+STUB,H=T1+96;
+    cv.width=W;cv.height=H;const g=g0();g.fillStyle=C.bg;g.fillRect(0,0,W,H);
+    txt(g,wrap("900 40px "+F,cfg.title||"",TW-200,1)[0],TX0+4,T0-44,"900 40px "+F,C.on,"-1.2px");
+    txt(g,"DAY "+n+" / 30",TX0+TW-4,T0-46,"700 22px "+SANS,gMixHex(C.bg,C.on,.7),"2px","right");
+    {const lay=document.createElement("canvas");lay.width=W;lay.height=H;const k=lay.getContext("2d");k.fillStyle=C.paper;rrect(k,TX0,T0,TW,T1-T0,32);k.fill();
+     k.globalCompositeOperation="destination-out";[[TX0,top],[TX0+TW,top],[TX0,SEAM2],[TX0+TW,SEAM2]].forEach(([a,b])=>{k.beginPath();k.arc(a,b,R,0,7);k.fill()});k.globalCompositeOperation="source-over";
+     g.save();g.shadowColor="rgba(0,0,0,.28)";g.shadowBlur=36;g.shadowOffsetY=14;g.drawImage(lay,0,0);g.restore();
+     /* 어두운 종이 + 어두운 바탕이면 가장자리에 얇은 빛 테두리 → 티켓 윤곽이 묻히지 않아요 */
+     if(gCR(C.paper,C.bg)<1.6){const e=document.createElement("canvas");e.width=W;e.height=H;const q=e.getContext("2d");q.drawImage(lay,0,0);q.globalCompositeOperation="destination-out";q.drawImage(lay,0,2);q.globalCompositeOperation="source-in";q.fillStyle=C.dk?"rgba(255,255,255,.16)":"rgba(0,0,0,.12)";q.fillRect(0,0,W,H);g.drawImage(e,0,0)}}
+    const X=TX0+PD;
+    txt(g,"ADMIT TWO",X,T0+PD+16,"700 19px "+SANS,mute,"4px");txt(g,"No. "+String(n).padStart(4,"0"),X+cw,T0+PD+16,"700 19px "+SANS,mute,"3px","right");
+    txt(g,"DAY "+n,X-5,T0+PD+30+90,"900 104px "+F,C.text,LS_H);
+    txt(g,ymd,X,T0+PD+30+104+20+22,"500 25px "+F,mute,"-0.3px");
+    if(!hide)txt(g,[me,p].filter(Boolean).map(realName).join(" & "),X+cw,T0+PD+30+104+20+22,"700 25px "+F,C.ink,"-0.3px","right");
+    g.strokeStyle=C.perf;g.lineWidth=3;g.lineCap="round";g.setLineDash([2,12]);[top,SEAM2].forEach(yy=>{g.beginPath();g.moveTo(TX0+R+18,yy);g.lineTo(TX0+TW-R-18,yy);g.stroke()});g.setLineDash([]);g.lineCap="butt";
+    drawBubbles(g,X,body0,cw,{});
+    /* 꼬리: 왼쪽 정보 두 칸 · 오른쪽 바코드 */
+    const sy=SEAM2+60,lab=(t,x)=>txt(g,t,x,sy+6,"700 17px "+SANS,mute,"3px"),val=(t,x)=>txt(g,t,x,sy+52,"700 32px "+F,C.text,"-0.8px");
+    lab("TALK",X);val(cnt.talk+"개",X);if(span){lab("TIME",X+150);val(span,X+150)}
+    const bw=300;cvBar(g,y8,X+cw-bw,sy-12,bw,72,C.text);digits(g,X+cw-bw/2,sy+92,mute)}
+  else if(st==="plain"&&emb){
+    /* 이미지로 내보내기 아래 대화 카드: 채팅만과 같은 말풍선 · 머리말은 '오늘의 대화' 한 줄, 서명 대신 이후 대화 수 */
+    const PX=48,cw=W-2*PX,T=48,HD=64;const ch=it.length?layBubbles(cw,{}):56;const B0=T+HD,tail=emb.rest>0?72:0,H=B0+ch+tail+56;cv.width=W;cv.height=H;const g=g0();
+    g.fillStyle=C.paper;g.fillRect(0,0,W,H);
+    txt(g,emb.label||"오늘의 대화",PX,T+22,"700 22px "+F,mute,"-0.3px");
+    if(span)txt(g,span,PX+cw,T+22,"500 20px "+SANS,soft,"0.5px","right");
+    g.fillStyle=hair;g.fillRect(PX,T+HD-26,cw,2);
+    if(it.length)drawBubbles(g,PX,B0,cw,{});else txt(g,"그날은 대화가 없었어요",W/2,B0+36,"400 26px "+F,mute,"","center");
+    if(tail)txt(g,"이후 "+emb.rest+"번의 대화를 나누었어요",W/2,B0+ch+52,"500 23px "+F,mute,"-0.3px","center")}
+  else if(st==="plain"){
+    /* 채팅만: 종이 한 장 · 위에 작은 머리말, 아래 서명 */
+    const PX=72,cw=W-2*PX,T=72,HD=96;const ch=layBubbles(cw,{});const B0=T+HD,H=B0+ch+64+2+88;cv.width=W;cv.height=H;const g=g0();
+    g.fillStyle=C.paper;g.fillRect(0,0,W,H);
+    txt(g,"DAY "+n,PX,T+40,"900 44px "+F,C.ink,"-1.2px");const dw=tw("900 44px "+F,"DAY "+n,"-1.2px");
+    txt(g,dot+" "+WD,PX+dw+16,T+38,"500 23px "+SANS,mute,"0.5px");
+    txt(g,wrap("500 22px "+F,cfg.title||"",cw-dw-260,1)[0],PX+cw,T+38,"500 22px "+F,mute,"-0.3px","right");
+    g.fillStyle=hair;g.fillRect(PX,T+HD-32,cw,2);
+    drawBubbles(g,PX,B0,cw,{});
+    const fy=B0+ch+64;g.fillStyle=hair;g.fillRect(W/2-24,fy,48,2);
+    txt(g,"OUR 30-DAY DIARY",W/2,fy+52,"700 17px "+SANS,soft,"5px","center")}
+  else if(st==="msgr"){
+    /* 메신저: 테마 바탕색을 옅게 깐 대화방 · 상단 바에 상대 이름 */
+    const bgc=gMixHex(C.bg,"#ffffff",.8),dk=gMixHex(C.bg,"#000000",.3),PX=40,cw=W-2*PX,HB=120,T=HB+40+48+36;
+    const ch=layBubbles(cw,{msgr:1});const H=T+ch+64;cv.width=W;cv.height=H;const g=g0();
+    g.fillStyle=bgc;g.fillRect(0,0,W,H);g.fillStyle="rgba(255,255,255,.55)";g.fillRect(0,0,W,HB);g.fillStyle="rgba(0,0,0,.06)";g.fillRect(0,HB,W,2);
+    g.strokeStyle=dk;g.lineWidth=4;g.lineCap="round";g.lineJoin="round";g.beginPath();g.moveTo(PX+20,HB/2-16);g.lineTo(PX+4,HB/2);g.lineTo(PX+20,HB/2+16);g.stroke();
+    txt(g,p?nm(p):"우리",PX+48,HB/2-2,"700 32px "+F,dk,"-0.8px");
+    txt(g,(cfg.title||"")+" · DAY "+n,PX+48,HB/2+32,"400 21px "+F,gMixHex(dk,bgc,.35),"-0.2px");
+    const dl=ymd,dw=tw("500 21px "+F,dl)+48;g.fillStyle="rgba(0,0,0,.14)";rrect(g,W/2-dw/2,HB+40,dw,44,22);g.fill();txt(g,dl,W/2,HB+40+30,"500 21px "+F,"#ffffff","","center");
+    drawBubbles(g,PX,T,cw,{msgr:1,pillBg:"rgba(0,0,0,.12)",pillTx:"#ffffff",nameCol:dk,timeCol:gMixHex(dk,bgc,.3)})}
+  else{ /* 영수증: 테마 바탕 위에 뜯어낸 감열지 한 장 */
+    const RM=96,RW=W-2*RM,PX=RM+56,cw=RW-112,RF="400 25px "+MONO,TMW=88,NW=128,TX=cw-TMW-NW,rows=[];let y=0;const sp=(h)=>{const o={y,h};y+=h;return o};
+    const head=sp(200),hr1=sp(48);
+    for(const x of it){
+      if(x.scF)rows.push({sch:scenes[x.sc].title,...sp(52)});
+      if(x.k==="ev"&&x.sc!==undefined){for(const l of x.ls){if(l.k==="say"){const ls=wrap(RF,"“"+l.t+"”",TX-28,8);rows.push({who:l.n,chr:1,sc:1,ls,...sp(ls.length*38+14)});continue}const t=l.k==="div"?"· "+l.t+" ·":l.k==="note"?"("+l.t+")":l.t,ls=wrap("400 23px "+MONO,t,cw-44,8);rows.push({ev:1,sc:1,note:l.k==="note",ls,...sp(ls.length*34+8)})}if(x.scL&&scenes[x.sc].more)rows.push({ev:1,sc:1,ls:["⋯ 이벤트가 이어져요"],...sp(42)});if(x.scL)rows.push({scE:1,...sp(30)});continue}
+      if(x.k==="ev"){rows.push({sys:1,ls:["── 이벤트 ──"],...sp(46)});for(const l of x.ls){const t=l.k==="say"?"» "+l.n+": "+l.t:l.k==="div"?"· "+l.t+" ·":l.k==="note"?"("+l.t+")":l.t,ls=wrap("400 23px "+MONO,t,cw-40,8);rows.push({ev:1,ls,...sp(ls.length*34+8)})}rows.push({sys:1,ls:[""],...sp(10)});continue}
+      const sc=x.sc!==undefined?1:0,ind=sc?28:0;
+      if(x.k==="sys"){const t="* "+x.t+(x.b?" · "+x.b:"")+" *",ls=wrap("400 21px "+MONO,t,cw-40-ind,4);rows.push({sys:1,sc,ls,...sp(ls.length*32+16)})}
+      else{const ls=wrap(RF,x.im||x.t==="[이모티콘]"?"[이모티콘]":x.t,TX-ind,8);rows.push({who:x.who,tm:x.gF?x.tm:"",mine:x.mine,sc,ls,...sp(ls.length*38+(x.gL?18:6))})}
+      if(x.scL)rows.push({scE:1,...sp(30)})}
+    const subL=cfg.sub?wrap("400 22px "+MONO,hid(cfg.sub),cw-40,2):["THANK YOU"];const hr2=sp(48),tot=sp(150),hr3=sp(48),ty=sp(30+subL.length*34),bc=sp(150),T=88,PH=y+T+40,H=PH+120;
+    cv.width=W;cv.height=H;const g=g0();g.fillStyle=C.bg;g.fillRect(0,0,W,H);
+    const ink="#262321",gr="#7a746e",RP="#fffdf8",Z=18;
+    {const lay=document.createElement("canvas");lay.width=W;lay.height=H;const k=lay.getContext("2d");k.fillStyle=RP;k.beginPath();
+     const top0=56,bot=top0+PH;k.moveTo(RM,top0+Z);for(let x=RM;x<RM+RW;x+=Z*2)k.lineTo(x+Z,top0),k.lineTo(Math.min(x+Z*2,RM+RW),top0+Z);
+     k.lineTo(RM+RW,bot-Z);for(let x=RM+RW;x>RM;x-=Z*2)k.lineTo(x-Z,bot),k.lineTo(Math.max(x-Z*2,RM),bot-Z);k.closePath();k.fill();
+     g.save();g.shadowColor="rgba(0,0,0,.25)";g.shadowBlur=28;g.shadowOffsetY=10;g.drawImage(lay,0,0);g.restore()}
+    const O=56+T,hrL=yy=>{g.strokeStyle="#b5aea6";g.lineWidth=2;g.setLineDash([3,9]);g.lineCap="round";g.beginPath();g.moveTo(PX,O+yy+24);g.lineTo(PX+cw,O+yy+24);g.stroke();g.setLineDash([]);g.lineCap="butt"};
+    txt(g,"대화 영수증",W/2+6,O+head.y+44,"700 44px "+MONO,ink,"12px","center");
+    txt(g,cfg.title||"",W/2,O+head.y+96,"400 23px "+MONO,gr,"","center");
+    const mr=(a,b,yy)=>{txt(g,a,PX,yy,"400 22px "+MONO,gr);txt(g,b,PX+cw,yy,"400 22px "+MONO,ink,"","right")};
+    mr("일시",y8.slice(0,4)+"-"+y8.slice(4,6)+"-"+y8.slice(6)+" ("+WD+")"+(span?" "+bubs[0].tm:""),O+head.y+148);mr("번호","DAY "+String(n).padStart(2,"0")+" / 30",O+head.y+184);
+    hrL(hr1.y);
+    for(const r of rows){const ry=O+r.y;
+      if(r.sch){txt(g,"┌ EVENT · "+wrap("700 23px "+MONO,r.sch,cw-200,1)[0],PX,ry+34,"700 23px "+MONO,C.ink);continue}
+      if(r.scE){txt(g,"└",PX,ry+20,"700 23px "+MONO,C.ink);continue}
+      if(r.sc){g.fillStyle=C.ink;g.fillRect(PX+7,ry,3,r.h)}
+      const RX=r.sc?28:0;
+      if(r.ev){r.ls.forEach((l,i)=>txt(g,l,PX+RX+(r.sc?0:20),ry+26+i*34,"400 23px "+MONO,r.note?"#8a847e":"#46413d"));continue}
+      if(r.sys){r.ls.forEach((l,i)=>txt(g,l,W/2+RX/2,ry+26+i*32,"400 21px "+MONO,gr,"","center"));continue}
+      if(r.tm)txt(g,r.tm,PX+RX,ry+29,"400 21px "+MONO,gr);
+      if(r.tm||r.chr)txt(g,wrap("700 23px "+MONO,r.who,NW-16,1)[0],PX+RX+TMW,ry+29,"700 23px "+MONO,r.chr||r.mine?C.ink:ink);
+      r.ls.forEach((l,i)=>txt(g,l,PX+TMW+NW,ry+29+i*38,RF,ink))}
+    hrL(hr2.y);
+    const lead=(a,b,yy,f,col)=>{txt(g,a,PX,yy,f,col);txt(g,b,PX+cw,yy,f,col,"","right");const wa=tw(f,a),wb=tw(f,b);g.fillStyle="#cfc8bf";for(let x=PX+wa+16;x<PX+cw-wb-16;x+=12)g.fillRect(x,yy-6,3,3)};
+    lead("주고받은 말",cnt.talk+"",O+tot.y+48,"700 30px "+MONO,ink);
+    lead("선물",cnt.gift+"",O+tot.y+92,"400 22px "+MONO,gr);lead("주사위 · 이벤트",cnt.dice+" · "+cnt.ev,O+tot.y+128,"400 22px "+MONO,gr);
+    hrL(hr3.y);subL.forEach((l,i)=>txt(g,l,W/2,O+ty.y+42+i*34,"400 22px "+MONO,gr,"","center"));
+    cvBar(g,y8,PX+110,O+bc.y+10,cw-220,80,ink);digits(g,W/2,O+bc.y+124,gr)}
+  return cv}
+
+async function gCapDownload(blob,name){const dl=await claude.use("downloads");if(dl)await dl.save({filename:name,data:blob});else alert("이 환경에서는 저장을 지원하지 않아요.")}
+/* 버튼·누르기는 문서에서 한 번만 받아요 (다시 그려도 그대로) */
+document.addEventListener("click",e=>{const t=e.target;if(!t||!t.closest)return;
+  if(t.closest("#gcapb")){e.preventDefault();gCap.on?gCapEnd():gCapStart(sel);return}
+  if(gCap.on&&t.closest("#chat"))gCapTap(e)},true);
+addEventListener("resize",()=>{if(gCap.on)gCapLayout()});
+(function(){const r1=render;render=function(){const o=r1.apply(this,arguments);try{gCapPaint()}catch(e){}return o}})();
+
 /* ===== 이미지로 내보내기: 하루 보기 입장권 그대로 · 가로 1080 고정, 답변 길이만큼 세로가 늘어나요 ===== */
 async function exportPng(n){
   const btn=$("#exp");if(btn){btn.disabled=true;btn.style.opacity=".5"}
@@ -2039,19 +2463,10 @@ async function exportPng(n){
     if(!p){L.nop=y+40;y+=70}
     y+=PD-14;const SEAM=y;
     const bcY=SEAM+56,bcH=104;L.bn=bcY+bcH+40;const T1=bcY+bcH+40+48;
-    // 채팅
-    const CH=T1+40,cp=44;let cy=CH+cp+26+30;const items=[],MAXI=8;
-    for(const m of chat){const mine=m.uid===me;if(m.gift){const a="― "+gGiftHead(m),b=gGName(m);mg.font="400 24px "+F;const one=mg.measureText(a+" · ").width;mg.font="700 24px "+F;const full=one+mg.measureText(b+" ―").width;
-        if(full<=TW-2*cp){items.push({m,gift:1,h:44});continue}const gl=wrap("700 28px "+F,b,TW-2*cp-40,3,"0px");items.push({m,gift:2,gl,h:30+14+gl.length*38+6});continue}if(m.dice){items.push({m,dice:1,h:44});continue}
-      let im=null,lines=[],w=0,h=0;const lab=realName(m.uid)+" · "+gHM(m.ts);
-      if(m.emote&&String(m.emote).startsWith("data:")){im=await loadImg(m.emote);w=184;h=20+28+150+18}
-      else{const mk=m.emote?{c:"",t:"🖼 이모티콘"}:gMk(m.text),wf=(mk.c==="gbold"?"800":"500")+" 29px "+F;lines=wrap(wf,mk.t,660,6,"-0.3px");mg.font=wf;mg.letterSpacing="-0.3px";const tw=Math.max(...lines.map(l=>mg.measureText(l).width));mg.letterSpacing="0px";mg.font="500 20px "+F;w=Math.max(tw,mg.measureText(lab).width)+52;h=18+26+lines.length*42+16}
-      items.push({m,mine,im,lines,w,h,lab,mk:(m.emote?"":gMk(m.text).c)})}
-    const shown=items.slice(0,MAXI),rest=items.length-shown.length;
-    shown.forEach((it,i)=>{it.y=cy;cy+=it.h+(i<shown.length-1?14:0)});
-    if(!items.length)cy+=60;
-    if(rest>0){L.rest=cy+52;cy+=70}
-    const CE=cy+cp;const H=Math.min(15000,CE+150);
+    // 채팅: '채팅만' 캡처와 같은 서식으로 그린 카드를 붙여요 (앞 8개까지)
+    const CH=T1+40,MAXI=8,rest=Math.max(0,chat.length-MAXI);
+    const chatCv=await gCapRender(chat.slice(0,MAXI),n,"plain",false,"sans",{w:TW,label:n===today?"오늘의 대화":"그날의 대화",rest});
+    const CE=CH+chatCv.height;const H=Math.min(15000,CE+150);
     // ── 그리기
     const cv=document.createElement("canvas");cv.width=W;cv.height=H;const g=cv.getContext("2d");g.fontKerning="normal";try{g.textRendering="optimizeLegibility"}catch(e){}
     g.fillStyle=C.bg;g.fillRect(0,0,W,H);
@@ -2088,22 +2503,7 @@ async function exportPng(n){
     cvBar(g,y8,X+52,bcY,IW-104,bcH,C.text);
     g.fillStyle=C.mute;g.font="500 26px "+F;g.textAlign="center";{const s=y8.split("").join("   ");g.fillText(s,W/2,L.bn)}g.textAlign="left";
     // 채팅 카드
-    g.fillStyle=C.paper;rrect(g,TX0,CH,TW,CE-CH,28);g.fill();
-    g.fillStyle=C.mute;g.font="700 26px "+F;g.fillText(n===today?"오늘의 대화":"그날의 대화",TX0+cp,CH+cp+26);
-    if(!items.length){g.fillStyle=C.mute;g.font="400 28px "+F;g.textAlign="center";g.fillText("그날은 대화가 없었어요",W/2,CH+cp+26+30+44);g.textAlign="left"}
-    for(const it of shown){
-      if(it.gift===2){g.textAlign="center";g.font="400 24px "+F;g.fillStyle=C.mute;g.fillText("― "+gGiftHead(it.m)+" ―",W/2,it.y+30);
-        g.font="700 28px "+F;g.fillStyle=C.main;it.gl.forEach((l,i)=>g.fillText(l,W/2,it.y+30+14+30+i*38));g.textAlign="left";continue}
-      if(it.gift){g.font="400 24px "+F;const a="― "+gGiftHead(it.m)+" · ",b=gGName(it.m),c=" ―",wa=g.measureText(a).width;g.font="700 24px "+F;const wb=g.measureText(b).width;g.font="400 24px "+F;const wc=g.measureText(c).width;let sx=W/2-(wa+wb+wc)/2;
-        g.fillStyle=C.mute;g.fillText(a,sx,it.y+30);g.fillStyle=C.main;g.font="700 24px "+F;g.fillText(b,sx+wa,it.y+30);g.font="400 24px "+F;g.fillStyle=C.mute;g.fillText(c,sx+wa+wb,it.y+30);continue}
-      if(it.dice){g.font="400 24px "+F;const a="― "+realName(it.m.uid)+" 님이 주사위를 굴렸어요 · ",b=String(it.m.v),c=" ―",wa=g.measureText(a).width;g.font="700 24px "+F;const wb=g.measureText(b).width;g.font="400 24px "+F;const wc=g.measureText(c).width;let sx=W/2-(wa+wb+wc)/2;
-        g.fillStyle=C.mute;g.fillText(a,sx,it.y+30);g.fillStyle=diceCol(it.m.v,it.m.dice);g.font="700 24px "+F;g.fillText(b,sx+wa,it.y+30);g.font="400 24px "+F;g.fillStyle=C.mute;g.fillText(c,sx+wa+wb,it.y+30);continue}
-      const bx=it.mine?TX0+TW-cp-it.w:TX0+cp,col=members[it.m.uid]?.color||(it.mine?C.main:"#888888");
-      const bbg=gMixHex(C.paper,col.slice(0,7),.3);g.fillStyle=bbg;rrect(g,bx,it.y,it.w,it.h,26);g.fill();
-      g.fillStyle=gMixHex(bbg,C.text,.68);g.font="500 20px "+F;g.fillText(it.lab,bx+26,it.y+18+18);
-      if(it.im)g.drawImage(it.im,bx+17,it.y+18+28,150,150);
-      else{g.fillStyle=it.mk==="gdim"?gMixHex(bbg,C.text,.5):C.text;g.font=(it.mk==="gbold"?"800":"500")+" 29px "+F;g.letterSpacing="-0.3px";it.lines.forEach((l,k)=>g.fillText(l,bx+26,it.y+18+26+31+k*42));g.letterSpacing="0px"}}
-    if(rest>0){g.fillStyle=C.mute;g.font="500 26px "+F;g.textAlign="center";g.fillText("이후 "+rest+"번의 대화를 나누었어요",W/2,L.rest);g.textAlign="left"}
+    g.save();rrect(g,TX0,CH,TW,CE-CH,28);g.clip();g.drawImage(chatCv,TX0,CH);g.restore();
     // 꼬리말
     g.fillStyle=C.on;g.globalAlpha=.6;g.font="400 24px "+F;g.textAlign="center";g.fillText(names+" · "+(cfg.title||"")+" · "+dt.getFullYear()+"년 "+(dt.getMonth()+1)+"월 "+dt.getDate()+"일",W/2,H-60);g.globalAlpha=1;g.textAlign="left";
     const blob=await new Promise(r=>cv.toBlob(r,"image/png"));
