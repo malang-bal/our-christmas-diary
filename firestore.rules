@@ -304,7 +304,7 @@ service cloud.firestore {
               && request.resource.data.text.size() >= 1 && request.resource.data.text.size() <= 500)
             ||
             (request.resource.data.keys().hasOnly(['uid', 'dice', 'v', 'ts', 'st', 'af'])
-              && request.resource.data.dice in [6, 10, 100]
+              && request.resource.data.dice in [2, 6, 10, 100]
               && request.resource.data.v is int
               && request.resource.data.v >= 1 && request.resource.data.v <= request.resource.data.dice)
           );

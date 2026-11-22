@@ -382,6 +382,9 @@ describe("문답은 멤버 두 명만", () => {
     await assertFails(ch({ uid: A, text: "사칭", ts: 2 }));
     await assertFails(ch({ uid: B, text: "가".repeat(501), ts: 2 }));
     await assertFails(ch({ uid: B, dice: 6, v: 7, ts: 3 }));
+    await assertSucceeds(ch({ uid: B, dice: 2, v: 2, ts: 3 }));
+    await assertFails(ch({ uid: B, dice: 2, v: 3, ts: 3 }));
+    await assertFails(ch({ uid: B, dice: 4, v: 1, ts: 3 }));
     await assertFails(ch({ uid: B, dice: 1000, v: 999, ts: 3 }));
     await assertFails(ch({ uid: B, text: "덤", extra: 1, ts: 2 }));
     // 정렬용 서버 시각: 서버 시각만 허용, 기기 시계 값은 거절
