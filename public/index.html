@@ -1403,7 +1403,7 @@ body.gcap-on #roomApp{padding-bottom:92px}body.gcap-on #gtd{display:none!importa
 </script>
 <script>
 /* 새 버전 알림: 올라간 index.html이 바뀌면 상단에 새로고침 안내를 띄워요 */
-const BUILD_ID="1795356976307";
+const BUILD_ID="1795357103508";
 (function(){
   if(!/^https?:/.test(location.protocol))return;
   let shown=false;
@@ -1707,8 +1707,8 @@ function viewMore(){
 const bg=id=>{const c=members[id]?.color;return c?"background:"+c+"4d":""};
 const blob=id=>String(id||"");const emoSrc=blob;
 function agoTxt(ts){const d=Math.max(0,Math.floor((Date.now()-ts)/1000));return d<60?d+"초 전":d<3600?Math.floor(d/60)+"분 전":Math.floor(d/3600)+"시간 전"}
-/* 주사위: [d2] [d6] [d10] [d100] · 앞에 개수를 붙여도 돼요 ([1D100]=[d100], [2d6]=6면체 두 개). 대소문자 상관없이, 한 번 보낼 때 모두 합쳐 4개까지 */
-const DICE_RE=/\[([1-4])?d(100|10|6|2)\]/gi,DICE_MAX=4,DICE_CMD=/^([1-4])?d(100|10|6|2)$/,gDiceList=t=>{const out=[];for(const m of String(t).matchAll(DICE_RE)){const k=+(m[1]||1),n=+m[2];for(let i=0;i<k&&out.length<DICE_MAX;i++)out.push(n);if(out.length>=DICE_MAX)break}return out},diceCol=(v,n)=>v===1?"#d33":v===n?"#2a9d4b":"#9a9a9a";
+/* 주사위: [d2] [d6] [d10] [d100] · 앞에 개수를 붙여도 돼요 ([1D100]=[d100], [2d6]=6면체 두 개). 대소문자 상관없이, 한 번 보낼 때 모두 합쳐 5개까지 */
+const DICE_RE=/\[([1-5])?d(100|10|6|2)\]/gi,DICE_MAX=5,DICE_CMD=/^([1-5])?d(100|10|6|2)$/,gDiceList=t=>{const out=[];for(const m of String(t).matchAll(DICE_RE)){const k=+(m[1]||1),n=+m[2];for(let i=0;i<k&&out.length<DICE_MAX;i++)out.push(n);if(out.length>=DICE_MAX)break}return out},diceCol=(v,n)=>v===1?"#d33":v===n?"#2a9d4b":"#9a9a9a";
 /* 채팅 명령어: 맨 앞 ! → 흐린 회색 말, # → 통째로 굵게 (표시할 때 기호는 떼요) */
 function gMk(t){t=String(t||"");const m=/^([!！#＃])\s*([\s\S]+)$/.exec(t);if(!m)return{c:"",t};return{c:/[!！]/.test(m[1])?"gdim":"gbold",t:m[2]}}
 /* ===== 오늘의 선물 (C안): 입력칸 안의 선물 아이콘 · 하루에 한 사람 한 번 =====
