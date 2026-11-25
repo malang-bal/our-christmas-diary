@@ -1502,7 +1502,7 @@ body.gcap-on #roomApp{padding-bottom:92px}body.gcap-on #gtd{display:none!importa
 </script>
 <script>
 /* 새 버전 알림: 올라간 index.html이 바뀌면 상단에 새로고침 안내를 띄워요 */
-const BUILD_ID="1795618286553";
+const BUILD_ID="1795619309418";
 (function(){
   if(!/^https?:/.test(location.protocol))return;
   let shown=false;
@@ -2000,7 +2000,7 @@ function tkCard(){const t=tkS(),have=Math.max(0,tkHave()),fill=Math.min(TK_PER,h
   return '<div class="card tkcard" id="tkcard"><div class="row" style="justify-content:space-between;align-items:center"><b>티켓 · 뽑기</b><span class="note">프레임 '+t.own.length+' / '+GFR.length+'</span></div>'+
     '<div class="punch" aria-label="티켓 '+have+'장">'+[0,1,2,3,4].map(i=>'<div class="ph5'+(i<fill?" on":"")+'">'+(i<fill?"ADMIT":i+1)+'</div>').join("")+'</div>'+
     '<div class="note">'+(have>=TK_PER?have+'장 모았어요! 지금 뽑을 수 있어요'+(have>TK_PER?' · '+(have-TK_PER)+'장은 다음으로 넘어가요':''):have+'장 모았어요 · '+(TK_PER-have)+'장 더 모으면 1번 뽑을 수 있어요')+' · 모든 문답에서 함께 모여요</div>'+
-    '<div class="tkways"><div class="tkway"><span>둘 다 그날 답변 쓰기</span><span>'+esc(st)+'</span></div><div class="tkway"><span>보낸 특별한 선물을 상대가 열기</span><span>'+(sent?'열기 전 '+sent+'개':'—')+'</span></div>'+
+    '<div class="tkways"><div class="tkway"><span>두 사람의 답변이 모두 도착했을 때</span><span>'+esc(st)+'</span></div><div class="tkway"><span>보낸 특별한 선물을 상대가 확인했을 때</span><span>'+(sent?'열기 전 '+sent+'개':'—')+'</span></div>'+
     '<div class="tkway" style="display:block"><div style="display:flex;justify-content:space-between"><span>한마디 10개마다</span><span style="opacity:.7;font-size:12px">'+sn+' / '+nx+'</span></div><div class="tkbar"><b style="width:'+((sn%10)*10)+'%"></b></div></div></div>'+
     '<button type="button" class="tkdraw" id="tkdraw"'+(have>=TK_PER&&left?"":" disabled")+'>'+(left?'🎟 티켓 '+TK_PER+'장으로 뽑기':'프레임을 모두 모았어요 🎉')+'</button>'+(log?'<div class="tklog">'+log+'</div>':"")+'</div>'}
 function tkPicker(){const t=tkS();return '<div id="tkpick"><div class="note" style="margin-top:14px;font-weight:700">프레임 <span style="font-weight:500">'+t.own.length+' / '+GFR.length+' · 홈 한마디 줄에서 상대에게도 보여요</span></div><div class="tkpick">'+
