@@ -658,4 +658,16 @@ describe("티켓·프레임", () => {
     await assertFails(db(A).doc(p + "members/" + A).set({ name: "앨리스", color: "#c8352b", img: "", fr: "dragon" }));
     await assertFails(db(B).doc(p + "members/" + A).set({ name: "앨리스", color: "#c8352b", img: "", fr: "hat" }));
   });
+
+  test("한마디 이어 두기·해시태그·최근 본 한마디는 본인 프로필에만, 정해진 모양으로", async () => {
+    await fullRoom();
+    const p = "rooms/" + RID + "/";
+    const base = { name: "앨리스", color: "#c8352b", img: "" };
+    await assertSucceeds(db(A).doc(p + "members/" + A).set({ ...base, lk: { s1: ["t1", "t2"] }, tg: { s1: ["밥", "야식"] }, hs: [{ i: "t1", t: 1 }, { i: "t2", t: 2 }, { i: "t3", t: 3 }] }));
+    await assertSucceeds(db(A).doc(p + "members/" + A).update({ hs: [{ i: "t4", t: 4 }] }));
+    await assertFails(db(A).doc(p + "members/" + A).update({ hs: [1, 2, 3, 4] }));
+    await assertFails(db(A).doc(p + "members/" + A).update({ lk: ["t1"] }));
+    await assertFails(db(A).doc(p + "members/" + A).update({ tg: "밥" }));
+    await assertFails(db(B).doc(p + "members/" + A).update({ lk: { s1: ["t9"] } }));
+  });
 });

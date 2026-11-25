@@ -222,8 +222,12 @@ service cloud.firestore {
       match /members/{mid} {
         allow read: if isMember(rid);
         allow create, update: if canWrite(rid) && mid == uid()
-          && request.resource.data.keys().hasOnly(['name', 'color', 'img', 'fr'])
+          && request.resource.data.keys().hasOnly(['name', 'color', 'img', 'fr', 'lk', 'tg', 'hs'])
           && validFr(request.resource.data.get('fr', ''))
+          // 한마디 이어 두기 {내 한마디 id: [상대 한마디 id]} · 해시태그 {내 한마디 id: [태그]} · 최근 홈에서 본 상대 한마디 3개
+          && request.resource.data.get('lk', {}) is map && request.resource.data.get('lk', {}).size() <= 400
+          && request.resource.data.get('tg', {}) is map && request.resource.data.get('tg', {}).size() <= 400
+          && request.resource.data.get('hs', []) is list && request.resource.data.get('hs', []).size() <= 3
           && validName(request.resource.data.name)
           && isHex(request.resource.data.color)
           && (request.resource.data.img == '' || isImgUrl(request.resource.data.img));
