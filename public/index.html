@@ -1409,8 +1409,8 @@ body.gcap-on #roomApp{padding-bottom:92px}body.gcap-on #gtd{display:none!importa
 .tkt{position:fixed;left:50%;bottom:calc(86px + env(safe-area-inset-bottom));transform:translateX(-50%);width:min(340px,calc(100% - 32px));background:#fdf6f3;color:#2b211e;border-radius:18px;padding:16px 16px 14px;text-align:center;box-shadow:0 12px 34px rgba(0,0,0,.35);z-index:100002;cursor:pointer}
 .tkt h3{margin:0 0 3px;font-size:16px}.tkt p{margin:0;color:#7a6a66;font-size:12.5px;line-height:1.5}
 .tkhalves{display:flex;justify-content:center;margin:2px 0 10px}
-.tkhalf{width:86px;height:56px;background:#fff;border:2px solid var(--main);display:flex;flex-direction:column;justify-content:center;align-items:center;font-size:10px;color:var(--main);font-weight:800}
-.tkhalf b{font-size:16px;color:#2b211e}.tkhalf.l{border-radius:10px 0 0 10px;border-right:2px dashed var(--main)}.tkhalf.r{border-radius:0 10px 10px 0;border-left:0}
+.tkhalf{width:92px;padding:9px 8px 8px;background:#fff;border:2px solid var(--main);display:flex;flex-direction:column;justify-content:center;align-items:center;gap:3px;font-size:10.5px;line-height:1.15;color:var(--main);font-weight:800;box-sizing:border-box}
+.tkhalf b{font-size:15px;line-height:1;color:#2b211e}.tkhalf.l{border-radius:10px 0 0 10px;border-right:2px dashed var(--main)}.tkhalf.r{border-radius:0 10px 10px 0;border-left:0}
 @keyframes tkjoinL{from{transform:translateX(-26px) rotate(-6deg);opacity:0}to{transform:none;opacity:1}}@keyframes tkjoinR{from{transform:translateX(26px) rotate(6deg);opacity:0}to{transform:none;opacity:1}}
 .tkhalf.l{animation:tkjoinL .45s cubic-bezier(.3,1.3,.5,1)}.tkhalf.r{animation:tkjoinR .45s cubic-bezier(.3,1.3,.5,1)}
 .tkdg{position:fixed;inset:0;z-index:100003;background:rgba(24,16,32,.82);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;color:#fff;text-align:center;padding:24px}
@@ -1502,7 +1502,7 @@ body.gcap-on #roomApp{padding-bottom:92px}body.gcap-on #gtd{display:none!importa
 </script>
 <script>
 /* 새 버전 알림: 올라간 index.html이 바뀌면 상단에 새로고침 안내를 띄워요 */
-const BUILD_ID="1795621116086";
+const BUILD_ID="1795621692226";
 (function(){
   if(!/^https?:/.test(location.protocol))return;
   let shown=false;
@@ -1973,8 +1973,8 @@ function tkToast(list){if(!list.length)return;$("#tkt")?.remove();const n=tkHave
 let tkBusy=false,tkT=0;function tkScanSoon(){clearTimeout(tkT);tkT=setTimeout(tkScan,600)}
 async function tkScan(){if(tkBusy||PREVIEW||!RID||!cfg||!me)return;tkBusy=true;try{const t=tkS(),got={},list=[],p=partner(),d0=new Date(2026,10,25);
   if(gAnsOk&&p){for(let n=1;n<=Math.min(today,Q.length);n++){const k="a:"+RID+":"+n;if(t.aw[k])continue;if(gDateObj(n)<d0)continue;
-    if((answers[me]||{})[n]&&(answers[p]||{})[n]){got[k]=Date.now();list.push({k:"both",why:"DAY "+n+" 둘 다 답변을 썼어요"})}}}
-  for(const x of (typeof SGS!=="undefined"?SGS:[])){if(x.from!==me||!x.op||!(+x.oa>=TK_T0))continue;const k="g:"+RID+":"+x.id;if(t.aw[k])continue;got[k]=Date.now();list.push({k:"gift",why:"보낸 선물을 "+realName(x.to)+" 님이 열었어요"})}
+    if((answers[me]||{})[n]&&(answers[p]||{})[n]){got[k]=Date.now();list.push({k:"both",why:"DAY "+n+" 두 사람의 답변이 모두 도착했어요"})}}}
+  for(const x of (typeof SGS!=="undefined"?SGS:[])){if(x.from!==me||!x.op||!(+x.oa>=TK_T0))continue;const k="g:"+RID+":"+x.id;if(t.aw[k])continue;got[k]=Date.now();list.push({k:"gift",why:"보낸 선물을 "+realName(x.to)+" 님이 확인했어요"})}
   for(let i=1;i<=Math.floor(t.sn/10);i++){const k="s:"+i;if(t.aw[k])continue;got[k]=Date.now();list.push({k:"say",why:"한마디 "+i*10+"개를 썼어요"})}
   if(list.length){await tkSet({aw:{...t.aw,...got}});tkToast(list);tkRefresh()}}catch(e){}finally{tkBusy=false}}
 function tkSayInc(){const t=tkS();tkSet({sn:t.sn+1}).then(()=>{tkScanSoon();tkRefresh()}).catch(()=>{})}
@@ -1997,9 +1997,9 @@ function tkRefresh(){{const e=$("#tkent");if(e){e.outerHTML=tkEntry();tkWire()}}
 function tkSayBar(){const sn=tkS().sn,nx=(Math.floor(sn/10)+1)*10;return '<div class="tksay" id="tksay"><span>🎟</span><span>'+sn+'개 썼어요 · '+(nx-sn)+'개 더 쓰면 티켓 1장</span><div class="tkbar"><b style="width:'+((sn%10)*10)+'%"></b></div></div>'}
 function tkCard(){const t=tkS(),have=Math.max(0,tkHave()),fill=Math.min(TK_PER,have),left=GFR.filter(x=>!t.own.includes(x[0])).length,p=partner();
   const tn=today>=1&&today<=Q.length?today:0,mineA=tn&&(answers[me]||{})[tn],theirA=tn&&p&&(answers[p]||{})[tn];
-  const st=!tn?"진행 중인 날이 없어요":t.aw["a:"+RID+":"+tn]?"오늘 받았어요 ✓":mineA&&!theirA?"상대 답변 기다리는 중":!mineA&&theirA?"내 답변만 남았어요":"오늘 둘 다 쓰면 1장";
+  const st=!tn?"진행 중인 날이 없어요":t.aw["a:"+RID+":"+tn]?"오늘 받았어요 ✓":mineA&&!theirA?"상대 답변 기다리는 중":!mineA&&theirA?"내 답변만 남았어요":"두 사람 답변이 모두 도착하면 1장";
   const sent=(typeof SGS!=="undefined"?SGS:[]).filter(x=>x.from===me&&!x.op).length,sn=t.sn,nx=(Math.floor(sn/10)+1)*10;
-  const lab=k=>k[0]==="x"?"선물 받은 티켓":k[0]==="a"?"DAY "+k.split(":")[2]+" 둘 다 답변":k[0]==="g"?"보낸 선물을 열었어요":"한마디 "+(+k.split(":")[1]*10)+"개 달성";
+  const lab=k=>k[0]==="x"?"선물 받은 티켓":k[0]==="a"?"DAY "+k.split(":")[2]+" 두 사람의 답변 도착":k[0]==="g"?"보낸 선물을 상대가 확인했어요":"한마디 "+(+k.split(":")[1]*10)+"개 달성";
   /* 한꺼번에 받은 선물 티켓(x:태그:번호)은 한 줄로 묶어 +N 으로 보여요 */
   const grp=[];{const gi={};for(const [k,v] of Object.entries(t.aw)){if(k[0]==="x"){const tg=k.split(":")[1]||"";if(gi[tg]){gi[tg].n++;gi[tg].v=Math.max(gi[tg].v,v);continue}gi[tg]={k,v,n:1,tg};grp.push(gi[tg])}else grp.push({k,v,n:1})}}
   const log=grp.sort((a,b)=>b.v-a.v).slice(0,3).map(({k,v,n,tg})=>{const d=new Date(v);return '<div><span>'+esc(tg&&TK_GIFT[tg]?TK_GIFT[tg]:(d.getMonth()+1)+'/'+d.getDate()+' '+lab(k))+'</span><span>+'+n+'</span></div>'}).join("");
