@@ -1502,7 +1502,7 @@ body.gcap-on #roomApp{padding-bottom:92px}body.gcap-on #gtd{display:none!importa
 </script>
 <script>
 /* 새 버전 알림: 올라간 index.html이 바뀌면 상단에 새로고침 안내를 띄워요 */
-const BUILD_ID="1795620239247";
+const BUILD_ID="1795620414635";
 (function(){
   if(!/^https?:/.test(location.protocol))return;
   let shown=false;
@@ -1992,7 +1992,7 @@ function tkOpenPage(){if($("#tkpg"))return;const pg=document.createElement("div"
   document.body.appendChild(pg);document.body.style.overflow="hidden";tkWire();
   const close=()=>{pg.remove();document.body.style.overflow="";document.removeEventListener("keydown",esc1);const e=$("#tkent");if(e)e.focus({preventScroll:true})};const esc1=e=>{if(e.key==="Escape"&&!$(".tkdg"))close()};
   pg.querySelector(".tkpg-x").onclick=close;document.addEventListener("keydown",esc1);setTimeout(()=>pg.querySelector(".tkpg-x").focus(),30)}
-function tkRefresh(){{const e=$("#tkent");if(e){e.outerHTML=tkEntry();tkWire()}}const c=$("#tkcard");if(c){c.outerHTML=tkCard();tkWire()}const pk=$("#tkpick");if(pk){pk.outerHTML=tkPicker();tkWire()}const sp=$("#tksay");if(sp)sp.outerHTML=tkSayBar()}
+function tkRefresh(){{const e=$("#tkent");if(e){e.outerHTML=tkEntry();tkWire()}}const c=$("#tkcard");if(c){c.outerHTML=tkCard();tkWire()}const pk=$("#tkpick");if(pk){/* 고르기 칸 스크롤 위치를 그대로 지켜요 */const g0=pk.querySelector(".tkpick"),y=g0?g0.scrollTop:0;pk.outerHTML=tkPicker();const g1=document.querySelector("#tkpick .tkpick");if(g1)g1.scrollTop=y;tkWire()}const sp=$("#tksay");if(sp)sp.outerHTML=tkSayBar()}
 function tkSayBar(){const sn=tkS().sn,nx=(Math.floor(sn/10)+1)*10;return '<div class="tksay" id="tksay"><span>🎟</span><span>'+sn+'개 썼어요 · '+(nx-sn)+'개 더 쓰면 티켓 1장</span><div class="tkbar"><b style="width:'+((sn%10)*10)+'%"></b></div></div>'}
 function tkCard(){const t=tkS(),have=Math.max(0,tkHave()),fill=Math.min(TK_PER,have),left=GFR.filter(x=>!t.own.includes(x[0])).length,p=partner();
   const tn=today>=1&&today<=Q.length?today:0,mineA=tn&&(answers[me]||{})[tn],theirA=tn&&p&&(answers[p]||{})[tn];
@@ -2008,7 +2008,10 @@ function tkCard(){const t=tkS(),have=Math.max(0,tkHave()),fill=Math.min(TK_PER,h
     '<button type="button" class="tkdraw" id="tkdraw"'+(have>=TK_PER&&left?"":" disabled")+'>'+(left?'🎟 티켓 '+TK_PER+'장으로 뽑기':'프레임을 모두 모았어요 🎉')+'</button>'+(log?'<div class="tklog">'+log+'</div>':"")+'</div>'}
 function tkPicker(){const t=tkS();return '<div id="tkpick"><div class="note" style="margin-top:14px;font-weight:700">프레임 <span style="font-weight:500">'+t.own.length+' / '+GFR.length+' · 홈 한마디 줄에서 상대에게도 보여요</span></div><div class="tkpick">'+
   '<button type="button" data-fr=""'+(t.eq?"":' class="on"')+'>'+avH(me)+'없음</button>'+GFR.map(([id,nm])=>t.own.includes(id)?'<button type="button" data-fr="'+id+'"'+(t.eq===id?' class="on"':"")+'>'+gFrameAv(me,id)+esc(nm)+'</button>':'<button type="button" disabled><span class="q">?</span>???</button>').join("")+'</div></div>'}
-function tkWire(){const b=$("#tkdraw");if(b)b.onclick=tkDraw;{const e=$("#tkent");if(e){e.onclick=tkOpenPage;e.onkeydown=k=>{if(k.key==="Enter"||k.key===" "){k.preventDefault();tkOpenPage()}}}}document.querySelectorAll("#tkpick [data-fr]").forEach(x=>x.onclick=()=>tkEquip(x.dataset.fr));gMotionCls()}
+function tkWire(){const b=$("#tkdraw");if(b)b.onclick=tkDraw;{const e=$("#tkent");if(e){e.onclick=tkOpenPage;e.onkeydown=k=>{if(k.key==="Enter"||k.key===" "){k.preventDefault();tkOpenPage()}}}}document.querySelectorAll("#tkpick [data-fr]").forEach(x=>x.onclick=()=>tkEquip(x.dataset.fr));
+  /* 프레임을 고르면 화면이 다시 그려져도 고르기 칸의 스크롤 위치를 그대로 지켜요 */
+  {const g=$("#tkpick .tkpick");if(g){if(tkPickY)g.scrollTop=tkPickY;g.onscroll=()=>{tkPickY=g.scrollTop}}}gMotionCls()}
+let tkPickY=0;
 /* 뽑기: 티켓 겹치기 → 찢기 → 봉투(톡) → 빛과 함께 결과 */
 async function tkDraw(){const t0=tkS();if(tkHave()<TK_PER)return;const pool=GFR.filter(x=>!t0.own.includes(x[0]));if(!pool.length)return;
   const dg=document.createElement("div");dg.className="tkdg";dg.setAttribute("role","dialog");dg.setAttribute("aria-modal","true");
