@@ -1431,6 +1431,26 @@ body.gcap-on #roomApp{padding-bottom:92px}body.gcap-on #gtd{display:none!importa
 .tkres h3{margin:0;font-size:22px;word-break:keep-all}.tkbtns{display:flex;flex-direction:column;gap:8px;width:min(260px,80vw)}
 .tkbtns button{border:0;border-radius:14px;padding:13px;font:inherit;font-weight:800;cursor:pointer}.tkbtns .a{background:var(--main);color:#fff}.tkbtns .b{background:rgba(255,255,255,.14);color:#fff}
 .tksay{display:flex;align-items:center;gap:10px;margin:0 0 16px;padding:2px 2px 14px;border-bottom:2px dashed var(--line,#e2d4d0);font-size:12.5px}.tksay .tkbar{flex:1;margin:0}
+
+/* 이미지로 내보내기: 문답만 / 문답 + 대화 고르기 */
+.xpbg{position:fixed;inset:0;background:rgba(20,14,28,.55);z-index:100000}
+.xpsh{position:fixed;left:50%;transform:translateX(-50%);bottom:0;width:min(640px,100%);z-index:100001;background:var(--gpaper,#fdf6f3);color:var(--gtx,#2b211e);border-radius:22px 22px 0 0;padding:20px 18px calc(22px + env(safe-area-inset-bottom));box-shadow:0 -10px 40px rgba(0,0,0,.35);box-sizing:border-box}
+.xpsh h3{margin:0 0 4px;font-size:18px}.xpsh>.note{margin:0 0 14px;color:#7a6a66;font-size:13px}
+.xpops{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.xpop{border:2px solid #e2d4d0;border-radius:16px;background:#fff;padding:14px 10px 12px;display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;font:inherit;color:inherit;cursor:pointer;word-break:keep-all}
+.xpop.on{border-color:var(--main);box-shadow:0 0 0 3px color-mix(in srgb,var(--main) 18%,transparent)}
+.xpop b{font-size:14px}.xpop small{font-size:11.5px;color:#8a7a76;line-height:1.4}
+.xpop:disabled{opacity:.45;cursor:default}
+.xpth{width:74px;border-radius:7px;background:var(--gpaper,#fdf4f3);box-shadow:0 2px 6px rgba(0,0,0,.12);padding:7px 7px 8px;box-sizing:border-box;display:flex;flex-direction:column;gap:4px}
+.xpth i{display:block;height:4px;border-radius:2px;background:#d9c6c2}.xpth i.t{height:7px;width:60%;background:#2b211e;opacity:.8}.xpth i.s{width:70%}
+.xpth .cut{border-top:1.5px dashed #d9c6c2;margin:3px -7px}
+.xpth .bc{height:9px;background:repeating-linear-gradient(90deg,#2b211e 0 1px,transparent 1px 3px);opacity:.7}
+.xpth .bb{height:7px;border-radius:4px;width:62%;background:color-mix(in srgb,var(--main) 35%,#fff)}.xpth .bb.r{align-self:flex-end;background:#eee3e1;width:48%}
+.xpmem{display:flex;align-items:center;gap:8px;margin-top:12px;font:inherit;font-size:12.5px;color:#7a6a66;background:none;border:0;padding:4px 0;cursor:pointer}
+.xpmem i{width:16px;height:16px;border-radius:4px;border:2px solid #cdbab6;display:inline-grid;place-items:center;box-sizing:border-box;font-style:normal;font-size:11px;color:#fff;font-weight:900}
+.xpmem.on i{background:var(--main);border-color:var(--main)}
+.xpsh button:focus:not(:focus-visible){outline:none}
+.xpbtns{display:flex;gap:8px;margin-top:14px}.xpbtns button{flex:1;padding:13px;border-radius:14px;font:inherit;font-weight:800;border:0;cursor:pointer}.xpbtns .a{background:#eee3e1;color:#5a4a46}.xpbtns .b{background:var(--main);color:#fff}
 </style>
 </head>
 <body>
@@ -1502,7 +1522,7 @@ body.gcap-on #roomApp{padding-bottom:92px}body.gcap-on #gtd{display:none!importa
 </script>
 <script>
 /* 새 버전 알림: 올라간 index.html이 바뀌면 상단에 새로고침 안내를 띄워요 */
-const BUILD_ID="1795621692226";
+const BUILD_ID="1795625923009";
 (function(){
   if(!/^https?:/.test(location.protocol))return;
   let shown=false;
@@ -2642,11 +2662,32 @@ addEventListener("resize",()=>{if(gCap.on)gCapLayout()});
 (function(){const r1=render;render=function(){const o=r1.apply(this,arguments);try{gCapPaint()}catch(e){}return o}})();
 
 /* ===== 이미지로 내보내기: 하루 보기 입장권 그대로 · 가로 1080 고정, 답변 길이만큼 세로가 늘어나요 ===== */
-async function exportPng(n){
+
+/* 이미지로 내보내기: 누르면 '문답만 / 문답 + 대화'를 고르는 창 · '다음에도 이걸로'를 켜면 바로 저장 (꾹 누르면 다시 고르기) */
+const GEXP_K="o30.expm";
+function gExpMem(){try{const v=localStorage.getItem(GEXP_K);return v==="qa"||v==="chat"?v:""}catch(e){return""}}
+function gExpAsk(n,force){const mem=gExpMem();if(mem&&!force){exportPng(n,mem);return}gExpSheet(n,mem)}
+function gExpSheet(n,mem){if($(".xpsh"))return;const cnt=sel===n?(msgs||[]).filter(m=>m&&!m.sys).length:-1,noChat=cnt===0;let pick=mem&&!(mem==="chat"&&noChat)?mem:noChat?"qa":"chat",rem=!!mem;
+  const T1='<span class="xpth" aria-hidden="true"><i class="t"></i><i></i><i class="s"></i><i></i><span class="cut"></span><span class="bc"></span></span>';
+  const T2='<span class="xpth" aria-hidden="true"><i class="t"></i><i></i><i class="s"></i><span class="cut"></span><span class="bc"></span><span class="cut"></span><span class="bb"></span><span class="bb r"></span><span class="bb"></span></span>';
+  const bg=document.createElement("div");bg.className="xpbg";const sh=document.createElement("div");sh.className="xpsh";sh.setAttribute("role","dialog");sh.setAttribute("aria-modal","true");sh.setAttribute("aria-label","이미지로 내보내기");
+  sh.innerHTML='<h3>이미지로 내보내기</h3><p class="note">DAY '+n+' · 어떤 내용을 담을까요?</p><div class="xpops" role="radiogroup">'+
+    '<button type="button" class="xpop" role="radio" data-m="qa">'+T1+'<b>문답만</b><small>질문과 두 사람의 답변<br>입장권 한 장</small></button>'+
+    '<button type="button" class="xpop" role="radio" data-m="chat"'+(noChat?" disabled":"")+'>'+T2+'<b>문답 + 대화</b><small>'+(noChat?'이날은 나눈 대화가<br>없어요':'아래에 그날의 대화를<br>이어 붙여요'+(cnt>0?' · 대화 '+cnt+'개':''))+'</small></button></div>'+
+    '<button type="button" class="xpmem" aria-pressed="false"><i aria-hidden="true"></i>다음에도 이걸로 바로 저장하기</button><div class="xpbtns"><button type="button" class="a">취소</button><button type="button" class="b">저장하기</button></div>';
+  document.body.append(bg,sh);
+  const sync=()=>{sh.querySelectorAll(".xpop").forEach(b=>{const on=b.dataset.m===pick;b.classList.toggle("on",on);b.setAttribute("aria-checked",on)});const m=sh.querySelector(".xpmem");m.classList.toggle("on",rem);m.setAttribute("aria-pressed",rem);m.querySelector("i").textContent=rem?"✓":""};sync();
+  sh.querySelectorAll(".xpop").forEach(b=>b.onclick=()=>{if(b.disabled)return;pick=b.dataset.m;sync()});
+  sh.querySelector(".xpmem").onclick=()=>{rem=!rem;sync()};
+  const close=()=>{bg.remove();sh.remove();document.removeEventListener("keydown",esc1)},esc1=e=>{if(e.key==="Escape")close()};document.addEventListener("keydown",esc1);
+  bg.onclick=close;sh.querySelector(".a").onclick=close;
+  sh.querySelector(".b").onclick=()=>{try{if(rem)localStorage.setItem(GEXP_K,pick);else localStorage.removeItem(GEXP_K)}catch(e){}close();exportPng(n,pick)};
+  setTimeout(()=>sh.querySelector(".b").focus(),40)}
+async function exportPng(n,mode){mode=mode==='qa'?'qa':'chat';
   const btn=$("#exp");if(btn){btn.disabled=true;btn.style.opacity=".5"}
   try{
     const C=gPalNow(),W=1080,F='"Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif',PI=Math.PI;
-    let chat=[];try{const sn=await db.collection(P("chats/d"+n+"/messages")).orderBy("ts").get();chat=gMsgs(sn.docs)}catch(e){}
+    let chat=[];if(mode==="chat"){try{const sn=await db.collection(P("chats/d"+n+"/messages")).orderBy("ts").get();chat=gMsgs(sn.docs)}catch(e){}}
     const p=partner(),ids=[me,...(p?[p]:[])],names=[p,me].filter(Boolean).map(realName).join(" & "),st=stampsOf(n)[0],dt=gDateObj(n);
     const y8=dt.getFullYear()+String(dt.getMonth()+1).padStart(2,"0")+String(dt.getDate()).padStart(2,"0");
     try{const TX=[Q[n-1],names,cfg.title,...ids.map(id=>(answers[id]||{})[n]||""),...chat.map(m=>m.text||""),"ADMIT TWO No. DAY 0123456789 그날의 오늘의 대화 이후번의 나누었어요 대화가 없었어요 작성하지 않았어요 님이 주사위를 굴렸어요 · & 년월일째"].join(" ");await Promise.all([400,500,700,900].map(w=>document.fonts.load(w+' 30px "Noto Sans KR"',TX)))}catch(e){}
@@ -2674,10 +2715,14 @@ async function exportPng(n){
     if(!p){L.nop=y+40;y+=70}
     y+=PD-14;const SEAM=y;
     const bcY=SEAM+56,bcH=104;L.bn=bcY+bcH+40;const T1=bcY+bcH+40+48;
-    // 채팅: '채팅만' 캡처와 같은 서식으로 그린 카드를 붙여요 (앞 8개까지)
-    const CH=T1+40,MAXI=8,rest=Math.max(0,chat.length-MAXI);
-    const chatCv=await gCapRender(chat.slice(0,MAXI),n,"plain",false,"sans",{w:TW,label:n===today?"오늘의 대화":"그날의 대화",rest});
-    const CE=CH+chatCv.height;const H=Math.min(15000,CE+150);
+    // 채팅(문답 + 대화일 때만): '채팅만' 캡처와 같은 서식 · 채팅 캡처와 같은 한도(GCAP_MAX)까지,
+    // 그래도 이미지 세로 한도(15000px)를 넘으면 넘지 않을 때까지 줄여요. 나머지는 '이후 N번의 대화'로 적어요
+    const CH=T1+40,HMAX=15000;let chatCv=null,CE=T1;
+    if(mode==="chat"){let lim=Math.min(chat.length,GCAP_MAX);
+      for(let k=0;k<8;k++){chatCv=await gCapRender(chat.slice(0,lim),n,"plain",false,"sans",{w:TW,label:n===today?"오늘의 대화":"그날의 대화",rest:Math.max(0,chat.length-lim)});
+        if(CH+chatCv.height+150<=HMAX||lim<=1)break;lim=Math.max(1,Math.floor(lim*(HMAX-CH-150)/chatCv.height*.95))}
+      CE=CH+chatCv.height}
+    const H=Math.min(HMAX,CE+150);
     // ── 그리기
     const cv=document.createElement("canvas");cv.width=W;cv.height=H;const g=cv.getContext("2d");g.fontKerning="normal";try{g.textRendering="optimizeLegibility"}catch(e){}
     g.fillStyle=C.bg;g.fillRect(0,0,W,H);
@@ -2714,7 +2759,7 @@ async function exportPng(n){
     cvBar(g,y8,X+52,bcY,IW-104,bcH,C.text);
     g.fillStyle=C.mute;g.font="500 26px "+F;g.textAlign="center";{const s=y8.split("").join("   ");g.fillText(s,W/2,L.bn)}g.textAlign="left";
     // 채팅 카드
-    g.save();rrect(g,TX0,CH,TW,CE-CH,28);g.clip();g.drawImage(chatCv,TX0,CH);g.restore();
+    if(chatCv){g.save();rrect(g,TX0,CH,TW,CE-CH,28);g.clip();g.drawImage(chatCv,TX0,CH);g.restore()}
     // 꼬리말
     g.fillStyle=C.on;g.globalAlpha=.6;g.font="400 24px "+F;g.textAlign="center";g.fillText(names+" · "+(cfg.title||"")+" · "+dt.getFullYear()+"년 "+(dt.getMonth()+1)+"월 "+dt.getDate()+"일",W/2,H-60);g.globalAlpha=1;g.textAlign="left";
     const blob=await new Promise(r=>cv.toBlob(r,"image/png"));
@@ -2809,7 +2854,7 @@ var im=document.querySelectorAll(".ban img");if(im.length>1){var k=0;setInterval
   }catch(e){alert("백업을 만들지 못했어요: "+(e.message||e))}
   finally{const b=$("#bk");if(b){b.disabled=false;b.textContent="HTML 백업"}}
 }
-function addExp(n){const b=$("#exp");if(b)b.onclick=()=>exportPng(n)}
+function addExp(n){const b=$("#exp");if(!b)return;b.onclick=()=>{if(b._lp&&Date.now()-b._lp<900)return;gExpAsk(n)};gLongPress(b,()=>{b._lp=Date.now();gExpAsk(n,true)})}
 const loadImg=src=>new Promise(r=>{const i=new Image();if(/^https?:/.test(String(src)))i.crossOrigin="anonymous";i.onload=()=>r(i);i.onerror=()=>r(null);i.src=src});
 function rrect(g,x,y,w,h,r){g.beginPath();g.moveTo(x+r,y);g.arcTo(x+w,y,x+w,y+h,r);g.arcTo(x+w,y+h,x,y+h,r);g.arcTo(x,y+h,x,y,r);g.arcTo(x,y,x+w,y,r);g.closePath()}
 function wrapT(g,text,maxW,maxLines){const out=[];for(const para of String(text).split("\n")){let line="";for(const ch of para){if(line&&g.measureText(line+ch).width>maxW){out.push(line);line=ch}else line+=ch}out.push(line)}
