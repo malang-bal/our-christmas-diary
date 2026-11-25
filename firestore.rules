@@ -117,8 +117,9 @@ service cloud.firestore {
         && request.resource.data.roomId is string
         && uid() in getAfter(roomPath(request.resource.data.roomId)).data.memberIds;
       allow update: if signedIn() && uid() == id
-        && changed().hasOnly(['name'])
-        && validName(request.resource.data.name);
+        && changed().hasOnly(['name', 'tk'])
+        && validName(request.resource.data.name)
+        && validTk(request.resource.data.get('tk', {}));
     }
 
     // 도배 방지: 채팅·한마디는 rooms/{rid}/rate/{내 uid} 의 순번(n)을 같은 묶음에서 올리면서만 쓸 수 있다.
@@ -132,6 +133,17 @@ service cloud.firestore {
         && int(id.split('_')[1]) <= getAfter(ratePath(rid)).data.n;
     }
     function validName(n) { return n is string && n.size() >= 1 && n.size() <= 12; }
+    // 티켓·프레임 (계정 단위): aw = 받은 티켓 {키: 시각}, dr = 뽑은 횟수, own = 모은 프레임, eq = 장착, sn = 지금까지 쓴 한마디 수
+    function frIds() { return ['snow', 'snowsoft', 'snowflake', 'lights', 'wreath', 'holly', 'hat', 'antler', 'bow', 'bells', 'cookie', 'snowman', 'ring', 'bokeh']; }
+    function validFr(f) { return f is string && (f == '' || f in frIds()); }
+    function validTk(t) {
+      return t is map && t.keys().hasOnly(['aw', 'dr', 'own', 'eq', 'sn'])
+        && t.get('aw', {}) is map && t.get('aw', {}).size() <= 600
+        && t.get('dr', 0) is int && t.get('dr', 0) >= 0 && t.get('dr', 0) <= 40
+        && t.get('own', []) is list && t.get('own', []).size() <= 14 && t.get('own', []).hasOnly(frIds())
+        && validFr(t.get('eq', ''))
+        && t.get('sn', 0) is int && t.get('sn', 0) >= 0 && t.get('sn', 0) <= 30000;
+    }
     // 화면에 그대로 들어가는 값은 형식을 못 박는다 (짝꿍이 콘솔로 이상한 값을 넣어 상대 화면을 망가뜨리지 못하게)
     function isHex(c) { return c is string && c.matches('^#[0-9a-fA-F]{6}$'); }
     function isImgUrl(u) { return u is string && u.size() <= 600 && u.matches('^https://firebasestorage[.]googleapis[.]com/[A-Za-z0-9._~%/?&=+-]*$'); }
@@ -210,7 +222,8 @@ service cloud.firestore {
       match /members/{mid} {
         allow read: if isMember(rid);
         allow create, update: if canWrite(rid) && mid == uid()
-          && request.resource.data.keys().hasOnly(['name', 'color', 'img'])
+          && request.resource.data.keys().hasOnly(['name', 'color', 'img', 'fr'])
+          && validFr(request.resource.data.get('fr', ''))
           && validName(request.resource.data.name)
           && isHex(request.resource.data.color)
           && (request.resource.data.img == '' || isImgUrl(request.resource.data.img));

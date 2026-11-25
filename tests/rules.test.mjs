@@ -637,3 +637,25 @@ describe("이미지 저장소(Storage)", () => {
     await assertFails(f(A, "rooms/" + RID + "/headers/h1-1.jpg").delete());
   });
 });
+
+describe("티켓·프레임", () => {
+  test("내 정보에 티켓 장부를 쓸 수 있고, 형식이 틀리거나 남의 것은 안 된다", async () => {
+    await fullRoom();
+    const ok = { aw: { ["a:" + RID + ":1"]: 1 }, dr: 0, own: ["hat"], eq: "hat", sn: 12 };
+    await assertSucceeds(db(A).doc("users/" + A).set({ tk: ok }, { merge: true }));
+    await assertFails(db(B).doc("users/" + A).set({ tk: ok }, { merge: true }));
+    await assertFails(db(A).doc("users/" + A).set({ tk: { ...ok, own: ["dragon"] } }, { merge: true }));
+    await assertFails(db(A).doc("users/" + A).set({ tk: { ...ok, eq: "dragon" } }, { merge: true }));
+    await assertFails(db(A).doc("users/" + A).set({ tk: { ...ok, dr: -1 } }, { merge: true }));
+    await assertFails(db(A).doc("users/" + A).set({ tk: { ...ok, x: 1 } }, { merge: true }));
+    await assertFails(db(A).doc("users/" + A).set({ roomId: "other" }, { merge: true }));
+  });
+  test("멤버 프로필에 아는 프레임만 걸 수 있다", async () => {
+    await fullRoom();
+    const p = "rooms/" + RID + "/";
+    await assertSucceeds(db(A).doc(p + "members/" + A).set({ name: "앨리스", color: "#c8352b", img: "", fr: "snowman" }));
+    await assertSucceeds(db(A).doc(p + "members/" + A).set({ name: "앨리스", color: "#c8352b", img: "", fr: "" }));
+    await assertFails(db(A).doc(p + "members/" + A).set({ name: "앨리스", color: "#c8352b", img: "", fr: "dragon" }));
+    await assertFails(db(B).doc(p + "members/" + A).set({ name: "앨리스", color: "#c8352b", img: "", fr: "hat" }));
+  });
+});
