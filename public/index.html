@@ -1502,7 +1502,7 @@ body.gcap-on #roomApp{padding-bottom:92px}body.gcap-on #gtd{display:none!importa
 </script>
 <script>
 /* 새 버전 알림: 올라간 index.html이 바뀌면 상단에 새로고침 안내를 띄워요 */
-const BUILD_ID="1795620414635";
+const BUILD_ID="1795620889535";
 (function(){
   if(!/^https?:/.test(location.protocol))return;
   let shown=false;
@@ -2409,6 +2409,9 @@ async function gCapRender(ms,n,st,hide,fontKey,emb){
   const nm=u=>hide?(u===me?"나":"상대"):realName(u);
   const hid=t=>{t=String(t??"");if(!hide)return t;const a=realName(me),b=p?realName(p):"";if(a)t=t.split(a).join("나");if(b)t=t.split(b).join("상대");return t};
   const fam=fontKey==="serif"?"Noto Serif KR":"Noto Sans KR";
+  /* 메신저 모양: 상대 프로필 사진을 미리 불러 둬요 (이름 가리기면 쓰지 않아요 · 못 불러오면 첫 글자로) */
+  const capAv={};if(st==="msgr"&&!hide){await Promise.all([...new Set(ms.map(m=>m.uid).filter(u=>u&&u!==me))].map(u=>new Promise(res=>{const src=(members[u]||{}).img;if(!src){res();return}
+    const im=new Image();if(!/^data:|^blob:/.test(src))im.crossOrigin="anonymous";const t=setTimeout(res,4000);im.onload=()=>{clearTimeout(t);capAv[u]=im;res()};im.onerror=()=>{clearTimeout(t);res()};im.src=src})))}
   try{await Promise.all([400,500,700,900].map(w=>document.fonts.load(w+' 30px "'+fam+'"',ms.map(m=>m.text||m.gift||"").join(" ")+" 대화 영수증 입장권 ADMIT DAY 0123456789")))}catch(e){}
   const mg=document.createElement("canvas").getContext("2d");
   /* 자간(ls)까지 재서 줄을 나눠요 */
@@ -2517,8 +2520,9 @@ async function gCapRender(ms,n,st,hide,fontKey,emb){
           else txt(g,l,X0+CW/2,yy,SF,o.pillTx||mute,"","center")});continue}
       const L=X0+x.ox,bx=x.mine?X0+CW-x.w:L;let by=y+x.labH;
       if(o.msgr){
-        if(!x.mine&&x.gF){g.fillStyle=gMixHex("#ffffff",userCol(x.m.uid),.62);rrect(g,X0,y,AV,AV,30);g.fill();
-          txt(g,x.who.slice(0,1),X0+AV/2,y+AV/2+10,"700 28px "+F,"#ffffff","","center");
+        if(!x.mine&&x.gF){const ai=capAv[x.m.uid];if(ai){g.save();rrect(g,X0,y,AV,AV,30);g.clip();const sc=Math.max(AV/ai.naturalWidth,AV/ai.naturalHeight),iw=ai.naturalWidth*sc,ih=ai.naturalHeight*sc;g.drawImage(ai,X0+(AV-iw)/2,y+(AV-ih)/2,iw,ih);g.restore()}
+          else{g.fillStyle=gMixHex("#ffffff",userCol(x.m.uid),.62);rrect(g,X0,y,AV,AV,30);g.fill();
+          txt(g,x.who.slice(0,1),X0+AV/2,y+AV/2+10,"700 28px "+F,"#ffffff","","center")}
           txt(g,x.who,L+4,y+24,"500 21px "+F,o.nameCol,"-0.3px")}}
       else if(x.labH){const nmW=tw(NF,x.who,"-0.2px"),gap=10,tmW=tw(TF,x.tm),tot=nmW+gap+tmW,lx=x.mine?X0+CW-tot-6:L+6;
         txt(g,x.who,lx,y+24,NF,nameCol(x.m.uid),"-0.2px");txt(g,x.tm,lx+nmW+gap,y+24,TF,soft)}
