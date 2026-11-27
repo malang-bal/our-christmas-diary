@@ -2920,13 +2920,25 @@ async function buildBackup(ret){
       let chat=[];try{const sn=await db.collection(P("chats/d"+n+"/messages")).orderBy("ts").get();chat=gMsgs(sn.docs)}catch(e){}
       const st=stampsOf(n)[0],y8=gDate(n).slice(0,10).replace(/\./g,"");
       const ans=order.slice().reverse().map((id,i)=>'<div class="ans'+(i?" you":" me")+'"><b>'+esc(realName(id))+'</b>'+(answers[id]?.[n]?esc(answers[id][n]):'<em>작성하지 않았어요</em>')+'</div>').join("");
-      const bub=chat.length?chat.map(m=>m.gift?gGiftLine(m,1):m.dice?'<div class="dice">― '+esc(realName(m.uid))+' 님이 주사위를 굴렸어요 · <b style="color:'+diceCol(m.v,m.dice)+'">'+m.v+'</b> ―</div>':'<div class="m '+(m.uid===me?"r":"l")+'" style="background:'+gMixHex(C.paper,(members[m.uid]?.color||C.main).slice(0,7),.3)+'"><i>'+esc(realName(m.uid))+' · '+gHM(m.ts)+'</i>'+(m.emote?(String(m.emote).startsWith("data:")?'<img class="emo" src="'+m.emote+'" alt="">':"🖼 이모티콘"):(k=>'<span class="'+k.c+'">'+esc(k.t)+'</span>')(gMk(m.text)))+'</div>').join(""):"";const gf=chat.filter(m=>m.gift);gf.forEach(m=>ALLG.push({m,n}));
+      /* 백업 대화: 지금 채팅창과 같은 말풍선 — 이름 없이 · 프로필색을 종이에 옅게 섞은 바탕 · 5분 안에 이어 보낸 말은 한 묶음(g1 첫 말풍선만 꼬리, gz 마지막만 시간 · 선물 카드 .gf와 겹치지 않게 이름을 다르게) */
+      const isB=m=>m&&!m.gift&&!m.dice&&!m.cmd&&!(!m.emote&&gMk(m.text).c==="gctr"),sameB=(a,b)=>isB(a)&&isB(b)&&a.uid===b.uid&&Math.abs((b.ts||0)-(a.ts||0))<=300000;
+      const mHtml=(m,i)=>{if(m.gift)return gGiftLine(m,1);if(m.dice)return'<div class="dice">― '+esc(realName(m.uid))+' 님이 주사위를 굴렸어요 · <b style="color:'+diceCol(m.v,m.dice)+'">'+m.v+'</b> ―</div>';
+        if(m.cmd&&typeof gCmdText==="function")return '<div class="dice" style="white-space:pre-wrap">'+esc(gCmdText(m))+'</div>';
+        const k=m.emote?{c:"",t:""}:gMk(m.text);if(k.c==="gctr")return '<div class="dice" style="white-space:pre-wrap">'+esc(k.t)+'</div>';
+        const mine=m.uid===me,uc=String(members[m.uid]?.color||(mine?C.main:"#888888")).slice(0,7),tb=gMixHex(C.paper,uc,C.dk?(mine?.36:.32):(mine?.22:.19)),g=(sameB(chat[i-1],m)?"":" g1")+(sameB(m,chat[i+1])?"":" gz");
+        return '<div class="mw '+(mine?"me":"you")+g+'" title="'+esc(realName(m.uid))+' · '+gHM(m.ts)+'"><div class="m'+(k.c?" "+k.c:"")+'"'+(m.emote?' style="background:none;padding:0"':' style="background:'+tb+'"')+'>'+(m.emote?(String(m.emote).startsWith("data:")?'<img class="emo" src="'+esc(m.emote)+'" alt="이모티콘">':"🖼 이모티콘"):'<span class="mb">'+esc(k.t)+'</span>')+'</div><i class="mtm">'+gHM(m.ts)+'</i></div>'};
+      const bub=chat.map(mHtml).join("");const gf=chat.filter(m=>m.gift);gf.forEach(m=>ALLG.push({m,n}));
       days+='<article class="tk day"><div class="body">'+(st?'<div class="stamps"><img src="'+esc(st.img)+'" alt="우표"></div>':"")+(n!==today?'<i class="pmk" style="'+gPmStyle(n)+'"></i>':"")+(gPawDay(n)?'<i class="paw" data-c="'+pmCands(n+":hp",24)+'"></i>':"")+
         '<div class="adm">ADMIT TWO · No. '+String(n).padStart(4,"0")+'</div><div class="dn">DAY '+n+'</div><div class="dt"></div><h2>'+esc(Q[n-1])+'</h2>'+ans+'</div>'+
         '<div class="stub">'+gBar(y8)+'<span class="bn">'+y8+'</span></div></article>'+
         (chat.length?'<details class="chat c1"><summary><span class="cs">'+gYMD(n)+'에 확인된 '+chat.length+'번의 대화</span></summary><div class="bubs">'+bub+'</div></details>':'<div class="chat c1 nochat">그날은 대화가 없었어요.</div>')+
         (gf.length?'<details class="chat"><summary><span class="cs">'+gYMD(n)+'에 확인된 '+gf.length+'개의 기념품</span></summary><div class="gfl">'+gf.map(m=>gBkGift(m)).join("")+'</div></details>':'<div class="chat nochat">그날은 기념품이 없었어요.</div>')}
-    const sayPanels=order.map((id,i)=>{const arr=says.filter(x=>x.uid===id).sort((a,b)=>b.ts-a.ts);return '<div class="pn" id="p'+(i+1)+'"><div class="sheet">'+(arr.length?arr.map(x=>'<div class="say">'+avH(id)+'<div class="sb"><b>'+esc(realName(id))+'</b> <span class="t">'+fmt(x.ts)+'</span><div class="stx">'+esc(x.text)+'</div></div></div>').join(""):'<p class="none">아직 한마디가 없어요</p>')+'</div></div>'}).join("");
+    /* 한마디: 태그는 넣지 않고, 이어 둔 한마디는 상대 한마디를 위에 띄워 대화처럼 */
+    const sayRe=x=>{const o=order.find(u=>u!==x.uid);return o?sLkOf(x.uid,x.id).map(id=>says.find(s=>s.id===id&&s.uid===o)).filter(Boolean):[]};
+    const sayItem=(x,id)=>{const re=sayRe(x),me1='<div class="sb"><b>'+esc(realName(id))+'</b> <span class="t">'+fmt(x.ts)+'</span><div class="stx">'+esc(x.text)+'</div></div>';
+      if(!re.length)return '<div class="say">'+avH(id)+me1+'</div>';
+      return '<div class="say th">'+re.map(y=>'<div class="tp">'+avH(y.uid)+'<div class="sb"><b>'+esc(realName(y.uid))+'</b> <span class="t">'+fmt(y.ts)+'</span><div class="stx">'+esc(y.text)+'</div></div></div>').join("")+'<div class="tm">'+avH(id)+me1+'</div></div>'};
+    const sayPanels=order.map((id,i)=>{const arr=says.filter(x=>x.uid===id).sort((a,b)=>b.ts-a.ts);return '<div class="pn" id="p'+(i+1)+'"><div class="sheet">'+(arr.length?arr.map(x=>sayItem(x,id)).join(""):'<p class="none">아직 한마디가 없어요</p>')+'</div></div>'}).join("");
     const gIdx=order.length+1,gfPanel=gBkGiftPanel(order,ALLG,gIdx);
     const tabs='<button class="on" onclick="T(0)">전체 기록</button>'+order.map((id,i)=>'<button onclick="T('+(i+1)+')">'+esc(realName(id))+'의 한마디</button>').join("")+'<button onclick="T('+gIdx+')">선물</button>';
     const D={me,order,says:{},av:{}};order.forEach(id=>{D.says[id]=says.filter(x=>x.uid===id).map(x=>esc(x.text));D.av[id]=avH(id)});
@@ -2955,9 +2967,17 @@ h2{font-size:21px;font-weight:700;line-height:1.4;margin:12px 0 0;padding-bottom
 .stub{position:relative;margin-top:-1px;padding:24px 22px 18px;border-radius:0 0 12px 12px;background:${nt(C.paper)};display:flex;flex-direction:column}.stub .gsvg{display:block;height:42px;width:calc(100% - 44px);margin:0 22px;color:${C.text}}
 .bn{text-align:center;font-size:11px;font-weight:500;letter-spacing:1.1em;padding-left:1.1em;color:${C.mute};margin-top:3px}
 .chat{position:relative;z-index:1;background:${C.paper};border-radius:12px;padding:0 24px;margin:0 0 26px}.chat summary{list-style:none;cursor:pointer;min-height:52px;display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:13px;font-weight:700;color:${C.mute}}.chat summary::-webkit-details-marker{display:none}.chat summary .cs{min-width:0}.chat summary::after{content:"펼치기";flex:none;font-size:12px;font-weight:500;color:${C.ink}}.chat[open] summary::after{content:"접기"}
-.bubs{display:flex;flex-direction:column;gap:6px;padding:2px 0 20px}.m{max-width:82%;padding:7px 12px;border-radius:14px;white-space:pre-wrap;font-size:15px;line-height:1.45}.m i{display:block;font-style:normal;font-size:11px;color:${C.mute}}.m .gdim{color:${C.mute}}.m .gbold{font-weight:800}.m.l{align-self:flex-start}.m.r{align-self:flex-end}.emo{width:96px;height:96px;display:block}.dice{align-self:center;color:${C.mute};font-size:13px}.none{color:${C.mute};font-size:14px;text-align:center;padding:12px 0}
+.bubs{display:flex;flex-direction:column;gap:6px;padding:2px 0 20px}
+.mw{display:flex;align-items:flex-end;gap:6px;max-width:80%;flex:none}.mw.me{align-self:flex-end;flex-direction:row-reverse}.mw.you{align-self:flex-start}
+.m{min-width:0;padding:8px 14px 9px;border-radius:18px;white-space:pre-wrap;word-break:break-word;font-size:15px;line-height:1.55;color:${C.text}}
+.mw.g1.me>.m{border-top-right-radius:6px}.mw.g1.you>.m{border-top-left-radius:6px}.mw:not(.g1){margin-top:-3px}.mw.g1:not(:first-child){margin-top:8px}
+.mtm{flex:none;font-style:normal;font-size:10.5px;line-height:1.2;color:${C.mute};padding-bottom:3px;white-space:nowrap;font-variant-numeric:tabular-nums;letter-spacing:0}.mw:not(.gz)>.mtm{display:none}
+.m.gdim .mb{color:${C.mute}}.m.gbold .mb{font-weight:800}.emo{width:96px;height:96px;display:block}.dice{align-self:center;color:${C.mute};font-size:13px}.none{color:${C.mute};font-size:14px;text-align:center;padding:12px 0}
 .sheet{background:${C.paper};border-radius:12px;overflow:hidden;padding:4px 28px 8px}
 .say{position:relative;display:grid;grid-template-columns:32px minmax(0,1fr);column-gap:10px;padding:12px 20px 14px;margin:0 -28px}.say+.say::before{content:"";position:absolute;left:12px;right:12px;top:0;border-top:1.5px solid ${C.line2}}.say+.say::after{content:"";position:absolute;left:-11px;right:-11px;top:-11px;height:22px;background:radial-gradient(circle,${C.bg} 10.5px,transparent 11px) left center/22px 22px no-repeat,radial-gradient(circle,${C.bg} 10.5px,transparent 11px) right center/22px 22px no-repeat}
+.say.th{display:block}.say.th .tp,.say.th .tm{display:grid;grid-template-columns:32px minmax(0,1fr);column-gap:10px}
+.say.th .tp{position:relative;padding-bottom:10px;opacity:.62}.say.th .tp .stx{font-size:14px}.say.th .tp .av{width:26px;height:26px;font-size:11px;margin:3px}
+.say.th .tp::after{content:"";position:absolute;left:15.5px;top:36px;bottom:2px;border-left:2px solid ${C.line2}}
 .say .av{width:32px;height:32px;font-size:13px}.sb b{font-size:14px}.sb .t{font-size:12px;color:${C.mute};margin-left:4px}.stx{font-size:16px;font-weight:500;line-height:1.45;margin-top:2px;white-space:pre-wrap}
 footer{text-align:center;color:${C.on};opacity:.6;font-size:13px;padding:10px 0 20px}
 @media print{body{background:#fff}.pn{display:block!important}details{display:block}.tk{filter:none}}`;
